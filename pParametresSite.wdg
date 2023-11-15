@@ -1,0 +1,939 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : pParamètresSite
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x14a235f4000964d4
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAAD6K6+gmAHIffbh15FdpenkDrZyI/stp/qXEuYXO0LbpA9T4FA0/lyxP6KbN8PT0v/tvTNB0kF9hVg0wdO9gKJovVGqYcged396tZX8vtBuVgAPM9IhkBWRpYoZNh4IOBBMzw7PBKIA8MJUsPOidLmQDyZTwT/ic1fxQTN3tblvG+hXBH6TN0bFYoGwmD0xULiQbHvV6mFHtXyO/rBYmeny5+dPb90WzXg1Xwc4/qBv7DpI8HuqtJSaEOLbos4dSNxPhZo+ZTpEd4CLLCGVhB6D2lIa5+Vi5Hzl5XCPxq4DyCRe1V8xR8LW0RfLpLgK0xhCJUrb2qXg
+     code : |1-
+      GLOBAL
+      	// Gestion d'un utilisateur courant
+      	gsNomUtilisateurEnCours est une chaîne
+      	
+      	// Droits de l'utilisateur courant
+      	gnDroitsUtilisateurs est un entier
+      	
+      	// Mémorisation de paramètres en mode backOffice
+      	gtaBackOfficeInfosMémorisées	est un tableau associatif de chaines
+      
+      // Gestion des paramètres du site
+      CONSTANT
+      
+      	// Type des paramètres du site
+      	CN_ENTIER = 1
+      	CN_CHAINE = 2
+      	CN_REEL = 4
+      	CN_BINAIRE = 5
+      	
+      	CN_BANDEAU_IMG 	= 2
+      	CN_IMG_PERSO	= 8
+      	CN_IMG_PDT 		= 16
+      	CN_IMG_FAM		= 32
+      	CN_IMG 			= 64
+      	
+      	// Les constantes des paramètres modifiables par l'administration du site
+      	csAdmin_SSL						= "SSL"						// La partie gestion de compte et validation de commande est elle sécurisée ?
+      	csAdmin_InfoLegales 			= "INFO_LEGALES"				// Texte des informations légales (Chaîne)
+      	csAdmin_Références				= "INFO_REFERENCES"			// Texte des informations de références (Chaîne)
+      	csAdmin_Services				= "INFO_SERVICES"				// Texte des informations concernant les services proposées (Chaîne)
+      	csAdmin_Contacts				= "INFO_CONTACT"				// Texte des informations concernant la méthode de contact (Chaîne)
+      	csAdmin_LogoSite				= "LOGO_SITE"					// L'image de l'entreprise, logo (binaire)	
+      	csAdmin_NomSite					= "NOM_SITE"					// Le nom du site (chaîne)
+      	csAdmin_AffichageNomSite		= "AFFICHER_NOM_SITE"			// Afficher Le nom du site (entier)
+      	csAdmin_Bandeau					= "BANDEAU"					// Le type de bandeau à afficher (Flash ou image)
+      	csAdmin_NomSociété				= "NOM_SOCIETE"				// Nom de la société correspondant au site
+      	csAdmin_AdresseSociété			= "ADRESSE_SOCIETE"			// Adresse de la société
+      	csAdmin_Siret					= "SIRET_SOCIETE"				// Siret de la société
+      	csAdmin_TexteFormulaireContact	= "TEXTE_FORMULAIRE_CONTACT"	// Texte du formulaire de contact
+      		
+      	// Liste des constantes pour la disponibilité des pages
+      	csAdmin_PageAccueil				= "PAGEACCUEIL"
+      	csAdmin_PageDispo_Actualités 	= "ACTU_DISPO"					// Disponibilité de la page d'actualité (Entier)
+      	csAdmin_PageDispo_Nouveautés 	= "NOUVEAUTES_DISPO"			// Disponibilité de la page des nouveautés (Entier)
+      
+      	csAdmin_PageDispo_Promotions 	= "PROMO_DISPO"				// Disponibilité de la page des promos (Entier)
+      	csAdmin_PageDispo_Références 	= "REFERENCES_DISPO"			// Disponibilité de la page des références (Entier)
+      	csAdmin_PageDispo_Services 		= "SERVICES_DISPO"				// Disponibilité de la page des services (Entier)
+      	csAdmin_PageDispo_InfosLégales 	= "INFOS_LEGALES_DISPO"		// Disponibilité de la page des infos légales (Entier)
+      	csAdmin_PageDispo_Presentation	= "PRESENTATION_DISPO"		// Disponibilité de la page de présentation (Entier)
+      	csAdmin_PageDispo_FormulaireContact	= "FORM_CONTACT_DISPO"	// Disponibilité de la page formulaire des contacts (Entier)
+      	
+      	// Listes des constantes de gestion des utilisateurs
+      	csAdmin_Login_Administrateur	= "LOGIN_Administrateur"		// Login administrateur
+      	csAdmin_Login_Utilisateur		= "LOGIN_Utilisateur"			// Login utilisateur
+      	csAdmin_MDP_Administrateur		= "MDP_Administrateur"		// MDP Administrateur
+      	csAdmin_MDP_Utilisateur			= "MDP_Utilisateur"			// MDP Utilisateur
+      	csAdmin_Login_Defaut			= "admin"					// Login par défaut
+      	csAdmin_Login_ListeIP			= "LOGIN_IP"					// Liste IP autorisées
+      	
+      	
+      	// Configuration email
+      	csAdmin_Contact_EmailExpéditeur		= "CONTACT_EMAIL_EXPEDITEUR"		// Adresse email d'envoi pour le formulaire de contact
+      	csAdmin_Contact_EmailDestinataire	= "CONTACT_EMAIL_DESTINATAIRE"		// Adresse email destinataire pour le formulaire de contact
+      	csAdmin_CONFIGSMTP				= "CONFIG_SMTP"				// Configuration du serveur SMTP pour l'envoi des emails
+      	
+      
+      	// Configuration paybox / paypal
+      	csAdmin_Paybox_Configuration	= "PAYBOX_CONFIGURATION"	// Configuration de la solution paybox
+      	csAdmin_Paypal_Configuration	= "PAYPAL_CONFIGURATION"		// Configuration de la solution paypal
+      	
+      	// Gestion des commandes
+      	csAdmin_COMMANDE_EmailExpéditeur	= "COMMANDE_EMAIL_EXPEDITEUR"			// Adresse email d'envoi des confirmations de commandes
+      	csAdmin_COMMANDE_EmailDestinataire	= "COMMANDE_EMAIL_DESTINATAIRE"		// Adresse destinataire des commande
+      	csAdmin_COMMANDE_CGV				= "COMMANDE_CGV"				// Texte des conditions générales de vente
+      	csAdmin_COMMANDE_EmailConfirmation	= "COMMANDE_EMAIL_CONFIRMATION"		// Contenu de l'email de confirmation de commande
+      	csAdmin_COMMANDE_TexteBDC 			= "COMMANDE_TEXTEBDC"	// Texte perso pour le bon de commande
+      	
+      	// Gestion des stocks
+      	csAdmin_COMMANDE_TextePanierStockMax				= "COMMANDE_TEXTE_PANIER_STOCK_MAX"	// Texte perso pour le panier si la quantité max est commandée
+      	csAdmin_COMMANDE_TextePanierStockInsuffisant		= "COMMANDE_TEXTE_PANIER_STOCK_INSUFFISANT"	// Texte perso pour le panier si la quantité en stock est insuffisante
+      	csAdmin_COMMANDE_TexteStockFaible					= "COMMANDE_TEXTE_STOCK_FAIBLE"	// Texte si le stock de produit dispo est faible
+      	csAdmin_COMMANDE_SeuilStockFaible					= "COMMANDE_SEUIL_STOCK_FAIBLE"	// Seuil définissant si le stock d'un produit est faible
+      	
+      	csAdmin_FRAIS_Limite					= "FRAISPORT_LIMITE"
+      	csAdmin_FRAIS_Forfait					= "FRAISPORT_FORFAIT"
+      	csAdmin_FRAIS_TauxTaxeForfait			= "FRAISPORT_TAUX_TAXE_FORFAIT"
+      	
+      	csAdmin_LimiteNouveautesAffichees	= "LIMITE_NOUVEAUTES"		// Nombre maximum de nouveautés affichées dans la page des nouveautés
+      	csAdmin_TitreSectionProduitsLiés	= "TITRESECTION_PRODUITSLIES"	// Titre de la section des "produits liés" de la fiche "produit"
+      	
+      	// Configuration des notifications
+      	csAdmin_NOTIFICATION_EmailExpéditeur	= "NOTIFICATION_EMAIL_EXPEDITEUR"
+      	csAdmin_NOTIFICATION_EmailDestinataire	= "NOTIFICATION_EMAIL_DESTINATAIRE"
+      	csAdmin_NOTIFICATION_SI_COMMANDE		= "NOTIFICATION_SI_COMMANDE"
+      	csAdmin_NOTIFICATION_SI_CONNEXIONBO		= "NOTIFICATION_SI_CONNEXIONBO"
+      	csAdmin_NOTIFICATION_SI_ERREUR			= "NOTIFICATION_SI_ERREUR"
+      		
+      	// Configuration des images par défaut
+      	csAdmin_Image_Defaut_Famille	= "IMAGE_DEFAUT_FAMILLE"
+      	csAdmin_Image_Defaut_Promotion	= "IMAGE_DEFAUT_PROMOTION"
+      	csAdmin_Image_Defaut_Produit	= "IMAGE_DEFAUT_PRODUIT"
+      	
+      	// Dialogue avec la page REST d'administration
+      	csAdmin_URLPAGEREST_Administration	= "URL_PAGEREST_Administration"
+      	
+      	// Constantes de l'historique
+      	CN_HISTORIQUE_TYPE_WEB			= 0
+      	CN_HISTORIQUE_TYPE_WS			= 1
+      	
+      	CN_HISTORIQUE_TYPEOPE_INFO		= 0
+      	CN_HISTORIQUE_TYPEOPE_MODIF		= 1
+      	CN_HISTORIQUE_TYPEOPE_ERREUR	= 2
+      	CN_HISTORIQUE_TYPEOPE_APPEL_WS	= 3
+      	
+      	// Messages d'erreurs génériques
+      	CST_MESSAGE_ERREUR_DROITS 	= <§R143652f7529032da¤fr-FR¤Utilisateur non reconnu ou droits insuffisants§>
+      	CST_MESSAGE_ERREUR_PRODUIT  = <§Rff00005232c96edf¤fr-FR¤Impossible de trouver le produit spécifié§>
+      	
+      	// Textes multi-langues fixés
+      	CST_NOM_FILTRE_PRODUIT_DEFAUT 	= <§Rff00015232cb6edf¤fr-FR¤< Toutes les familles >§>
+      	CST_SAUVEGARDE_EFFECTUEE 		= <§R14365d48d30b7f81¤fr-FR¤Informations enregistrées§>
+      	CST_SAUVEGARDE_NON_EFFECTUEE 	= <§R14365da6d31fee43¤fr-FR¤Les informations n'ont pas été enregistrées§>
+      FIN
+      
+      RESTREINT
+      	// Gestion des erreurs
+      	gsTexteErreurSite		est une chaine
+     type : 720896
+  procedures :
+   -
+     name : RécupèreParamètreSite
+     procedure_id : 1486810192024341132
+     type_code : 15
+     code : |1+
+      // Résumé : Récupération d'un paramètre de configuration du site
+      // Syntaxe :
+      //[ <Résultat> = ] RécupèreParamètreSite (<sNomParamètre> [, <sValeurParDéfaut>])
+      //
+      // Paramètres :
+      //	sNomParamètre : Nom du paramètre (voir les constantes..)
+      //	sValeurParDéfaut (valeur par défaut="") : Valeur par défaut à renvoyer
+      // Valeur de retour :
+      // 	Type indéterminé : Valeur du paramètre
+      //
+      
+      PROCEDURE RécupèreParamètreSite(sNomParamètre,sValeurParDéfaut = "")
+      
+      // Recherche du paramètre
+      HLitRecherchePremier(CONFIGURATION_SITE,Nom_Paramètre,sNomParamètre)
+      SI HTrouve(CONFIGURATION_SITE) ALORS
+      	
+      	// Selon le type de paramètre	
+      	SELON CONFIGURATION_SITE.TypeParamètre
+      		// Entier
+      		CAS CN_ENTIER
+      			// Renvoie la valeur entière de ce paramètre
+      			RENVOYER CONFIGURATION_SITE.ValeurEntier
+      		
+      		// Binaire
+      		CAS CN_BINAIRE
+      			// Renvoie la valeur binaire de ce paramètre
+      			RENVOYER CONFIGURATION_SITE.ValeurBinaire
+      			
+      		// Chaîne
+      		CAS CN_CHAINE
+      			// Renvoie la valeur chaîne de ce paramètre
+      			RENVOYER CONFIGURATION_SITE.ValeurChaîne
+      					
+      		// Réel
+      		CAS CN_REEL		
+      			// Renvoie la valeur réelle de ce paramètre
+      			RENVOYER CONFIGURATION_SITE.ValeurRéelle
+      		
+      		// Cas inconnue
+      		AUTRE CAS
+      			// Ne rien faire
+      			SI pas sNomParamètre dans (csAdmin_Bandeau, csAdmin_LogoSite) alors
+      				// On indique que la valeur par défaut est utilisée en dehors du bandeau et du logo
+      				dbgAssertion(Faux,"Type de paramètre de configuration non connu")
+      			FIN
+      			
+      	FIN
+      Sinon
+      	SI PAS sNomParamètre DANS (csAdmin_Bandeau, csAdmin_LogoSite) ALORS
+      		dbgAssertion(Faux,"Paramètre non trouvé en base : la valeur par défaut va être utilisée")	
+      	FIN
+      FIN
+      
+      
+      // Par défaut, si rien n'est trouvé ou que le type de valeur n'est pas correct, on renvoie une chaîne vide
+      // Si la valeur attendue est une valeur chaîne ou binaire, aucun pb
+      // Si la valeur attendue est une valeur entière ou réelle, elle sera à 0
+      RENVOYER sValeurParDéfaut
+     type : 458752
+   -
+     name : SauvegardeParamètreSite
+     internal_properties : CAAAAAgAAADII9SyL0x4mTami63qmvu++/D8vHofof6pxITVFSzOOsDPIdRZHqRNzPTmkLYSZdpwQDxlrkLZ8+wYyV6E0MQZAzxaisR2g7pqEs7yvHVezU6jiQVN1qOwTCEMDgPMVnczgpEjxBnlnpCLBgUMAMnolePvgkj7B6Dl0hFtymHPRo5A4moHpq0I/Gkr8TRU9Y2r8gX4K6A=
+     procedure_id : 1486811106852457968
+     type_code : 15
+     code : |1-
+      // Résumé : Sauvegarde d'un paramètre de configuration du site
+      // Syntaxe :
+      //[ <Résultat> = ] SauvegardeParamètreSite (<sNomParamètre>, <sValeur>, <nType>)
+      //
+      // Paramètres :
+      //	sNomParamètre : Nom du paramètre
+      //	sValeur : Valeur à affecter à ce paramètre
+      //	nType : Type du paramètre
+      // Valeur de retour :
+      // 	booléen : VRAI si le paramètre a été sauvegardé, FAUX dans le cas contraire
+      //
+      // Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE SauvegardeParamètreSite(sNomParamètre, sValeur, nType)
+      
+      
+      nValeurEntière est un entier
+      moValeurRéelle est un monétaire
+      
+      
+      // Est-ce que l'on doit caster la valeur ?
+      SELON nType
+      
+      	CAS CN_BINAIRE, CN_CHAINE
+      		// On ne fait rien
+      		
+      	CAS CN_REEL
+      		// On caste la valeur dans un monétaire
+      		moValeurRéelle = sValeur
+      		
+      	CAS CN_ENTIER
+      		
+      		// On caste la valeur dans un entier
+      		nValeurEntière = sValeur
+      		
+      	AUTRE CAS
+      		// Le type est inconnu, on renvoie faux		
+      		AjouteErreur("Type de paramètre inconnu")
+      		RENVOYER Faux
+      FIN
+      
+      
+      // Recherche du paramètre dans le fichier de configuration
+      HLitRecherchePremier(CONFIGURATION_SITE,Nom_Paramètre,sNomParamètre)
+      
+      // Mise à jour des paramètres
+      HRAZ()
+      CONFIGURATION_SITE.Nom_Paramètre = sNomParamètre
+      CONFIGURATION_SITE.TypeParamètre = nType
+      
+      SELON nType
+      	CAS CN_BINAIRE
+      		// On attache le mémo
+      		HAttacheMémo(CONFIGURATION_SITE,ValeurBinaire,sValeur)
+      	
+      	CAS CN_CHAINE
+      	
+      		CONFIGURATION_SITE.ValeurChaîne = sValeur
+      	
+      	CAS CN_REEL
+      	
+      		CONFIGURATION_SITE.ValeurRéelle = moValeurRéelle
+      		
+      	CAS CN_ENTIER
+      		
+      		CONFIGURATION_SITE.ValeurEntier = nValeurEntière
+      		
+      	AUTRE CAS
+      		
+      FIN
+      
+      
+      // Est-ce que l'on doit le modifier ou l'ajouter ?
+      SI HTrouve(CONFIGURATION_SITE) ALORS
+      	// Paramètre trouvée : il faut le modifier
+      	SI HModifie(CONFIGURATION_SITE) = Faux alors
+      		AjouteErreur("Impossible de modifier le paramètre")
+      		RENVOYER Faux
+      	SINON
+      		RENVOYER Vrai
+      	FIN
+      
+      SINON
+      	// Paramètre non trouvé : il faut l'ajouter
+      	SI HAjoute(CONFIGURATION_SITE) = Faux alors
+      		AjouteErreur("Impossible d'ajouter le paramètre")
+      		RENVOYER Faux		
+      	SINON
+      		RENVOYER Vrai
+      	FIN
+      
+      FIN
+      
+      CAS EXCEPTION:
+      	dbgAssertion(Faux,"Exception non gérée pendant l'enregistrement du paramètre")
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	renvoyer Faux
+     type : 458752
+   -
+     name : sTransformeHTML
+     procedure_id : 1486840299757772861
+     type_code : 15
+     code : |1-
+      // Résumé : Formate un texte au format HTML
+      // Syntaxe :
+      //[ <Résultat> = ] sTransformeHTML (<sTexte> est chaîne)
+      //
+      // Paramètres :
+      //	sTexte (chaîne) : Texte brut à formater
+      // Valeur de retour :
+      // 	chaîne : Texte formaté en HTML
+      //
+      
+      PROCEDURE sTransformeHTML(sTexte est une chaîne)
+      
+      // Variables locales
+      sTexteHTML est une chaîne
+      
+      // On copie le texte initial
+      sTexteHTML = sTexte
+      
+      // On remplace les RC par des <BR>
+      sTexteHTML = Remplace(sTexteHTML,RC,"<BR>")
+      
+      RENVOYER sTexteHTML
+     type : 458752
+   -
+     name : AjouteErreur
+     procedure_id : 2214623685780599516
+     type_code : 15
+     code : |1-
+      // Résumé : Stocke et remonte une erreur
+      // Syntaxe :
+      //AjouteErreur (<sTexteErreur> est chaîne[, <sErreurTechnique> est chaîne[, <bEnvoieErreur> est booléen]])
+      //
+      // Paramètres :
+      //	sTexteErreur (chaîne) : Texte de l'erreur
+      //	sErreurTechnique (chaîne) : Détail technique de l'erreur
+      // 	bEnvoieErreur (booléen - valeur par défaut=1) : Envoie l'erreur au WebMaster si demandé
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE AjouteErreur(sTexteErreur est une chaine, sErreurTechnique est une chaine = HErreurInfo(), bEnvoieErreur est un booléen = Vrai)
+      
+      // Pour le mode test, on remonte en assertion
+      dbgAssertion(Faux,"Erreur détectée : "+sTexteErreur+RC+sErreurTechnique)
+      
+      // Est-ce qu'un détail technique est disponible
+      SI sErreurTechnique = "" alors
+      	gsTexteErreurSite = gsTexteErreurSite + [RC] + sTexteErreur
+      SINON
+      	gsTexteErreurSite = gsTexteErreurSite + [RC] + sTexteErreur + RC + sErreurTechnique
+      FIN	
+      
+      // _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_INFO,"On a mémorisé une erreur : "+gsTexteErreurSite)
+      
+      // On note dans l'historique
+      _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_ERREUR,sTexteErreur+RC+sErreurTechnique+RC+dbgInfo(dbgPile),*,*,bEnvoieErreur)
+     type : 458752
+   -
+     name : sRenvoyerErreur
+     procedure_id : 2214623720140412016
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie la dernière erreur mémorisée
+      // Syntaxe :
+      //[ <Résultat> = ] sRenvoyerErreur ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne: texte de la dernière erreur
+      //
+      
+      PROCEDURE sRenvoyerErreur()
+      
+      
+      // _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_INFO,"On a renvoyé le texte d'une erreur : "+gsTexteErreurSite+" alors que l'on est connecté en tant que : "+gsNomUtilisateurEnCours)
+      
+      RENVOYER gsTexteErreurSite
+     type : 458752
+   -
+     name : InitialiseErreur
+     procedure_id : 2214624342911404747
+     type_code : 15
+     code : |1-
+      // Résumé : Initialise le mécanisme de remontée des erreurs
+      // Syntaxe :
+      //InitialiseErreur ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE InitialiseErreur()
+      
+      // Variables locales
+      sPileAppel		est une chaine
+      
+      // L'initialisation du système d'erreur n'est effectué, dans le cas d'un WebService, QUE si le traitement est un traitement sans appelant
+      // C'est à dire si la pile des appels ne contient que 2 lignes : l'appelant principal, et cette procédure
+      SI EnModeWebservice() = Vrai alors
+      	// Récupération de la pile des appels
+      	sPileAppel = dbgInfo(dbgPile)
+      	
+      	// Est-ce qu'il y a plus de 2 lignes dans la pile des appels ?
+      	SI ChaîneOccurrence(dbgInfo(dbgPile),RC)>=2 alors
+      		// On ne réinitialise pas la variable de mémorisation des erreurs
+      		RETOUR
+      	FIN
+      	
+      	// C'est un appel initial : on le note dans le log
+      	SI ChaîneOccurrence(dbgInfo(dbgPile),RC)=1 ALORS
+      		_AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_APPEL_WS,"Appel d'une entrée du WS : "+ExtraitChaine(sPileAppel,2,RC))
+      	FIN
+      
+      FIN
+      
+      gsTexteErreurSite = ""
+     type : 458752
+   -
+     name : sRenvoyerRepUpload
+     internal_properties : CAAAAAgAAABIlgWTg7S0RY+87eAGIj1+c6kS3DQUjdYYPVVYTdQ3FRJlU4QWxdTumQZmMg+2s1YWslTyq4cIa/LjYqAqkoGg4b0z8jW3IZaBCbnB44aNdmOE8w2e90wyqF3/3AXuBlb1vT1T2I1Z4YJYY59fipPp48IvRqhJLMDeBtWC4E3R93ji5wbXITVW6TxPQl2oAmR6nlj/hr2tUKzORJl7XevOodJDUS7e+2a02Z4jmvq+Jf1ttMnvIAquLblePrLFPw==
+     procedure_id : 2216034603413171649
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le chemin complet du répertoire d'upload
+      // Syntaxe :
+      //[ <Résultat> = ] sRenvoyerRepUpload ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne: Répertoire d'upload
+      //
+      
+      PROCEDURE sRenvoyerRepUpload()
+      
+      // Variables locales
+      sRepUpload est une chaine = fRepDonnées()+["\"]+"upload"
+      
+      // Est-ce que le répertoire d'upload existe ?
+      SI fRépertoireExiste(sRepUpload) = Faux ALORS
+      	fRepCrée(sRepUpload)
+      FIN
+      
+      RENVOYER sRepUpload
+     type : 458752
+   -
+     name : NotifierModificationConfiguration
+     procedure_id : 2216148115154514816
+     type_code : 15
+     code : |1-
+      // Résumé : Enregistre une modification de configuration
+      // Syntaxe :
+      //NotifierModificationConfiguration (<sTexteModification> est chaîne[, <sValeurAvant> est chaîne[, <sValeurAprès> est chaîne]])
+      //
+      // Paramètres :
+      //	sTexteModification (chaîne) : Modification apportée
+      //	sValeurAvant (chaîne- valeur par défaut="") : Valeur avant modification
+      //	sValeurAprès (chaîne- valeur par défaut="") : Valeur après modification
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE NotifierModificationConfiguration(sTexteModification est une chaine, sValeurAvant est une chaine = "", sValeurAprès est une chaine = "")
+      
+      // Ici, il faut ajouter 
+      // le nom de l'utilisateur, l'heure, l'IP, la pile ?
+      // Puis sauver en base
+      
+      _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_MODIF,sTexteModification,sValeurAvant,sValeurAprès)
+     type : 458752
+   -
+     name : _AjoutHistoriqueSite
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2216380257791799385
+     type_code : 15
+     code : |1+
+      // Résumé : Ajoute une information ou une erreur à l'historique du site
+      // Syntaxe :
+      //_AjoutHistoriqueSite (<nTypeOpération> est entier, <sDétailOpération> est chaîne[, <sValeurAvant> est chaîne[, <sValeurAprès> est chaîne[, <bEnvoieErreur> est booléen]]])
+      //
+      // Paramètres :
+      //	nTypeOpération (entier) : type d'opération (voir constantes CN_HISTORIQUE_TYPEXXXX)
+      //	sDétailOpération (chaîne) : Détail de l'opération ou de l'erreur
+      //	sValeurAvant (chaîne- valeur par défaut="") : Valeur avant modification
+      //	sValeurAprès (chaîne- valeur par défaut="") : Valeur après modification
+      // 	bEnvoieErreur (booléen - valeur par défaut=1) : Envoie l'erreur au WebMaster si demandé
+      // Valeur de retour :
+      // 	Aucune
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE _AjoutHistoriqueSite(nTypeOpération est un entier, sDétailOpération est une chaine, sValeurAvant est une chaine="", sValeurAprès est une chaine ="", bEnvoieErreur est un booléen = Vrai)
+      
+      // Initialisation de l'historique
+      HRAZ(Historique)
+      
+      // On note les informations automatiques
+      Historique.DateHeure = DateSys()+HeureSys()
+      Historique.NomUtilisateur	= gsNomUtilisateurEnCours
+      
+      // Type d'utilisation du code
+      SI EnModeWebservice() = vrai alors
+      	Historique.typeUtilisation = CN_HISTORIQUE_TYPE_WS
+      SINON
+      	Historique.typeUtilisation = CN_HISTORIQUE_TYPE_WEB
+      FIN
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// On prend l'adresse IP 
+      	Historique.AdresseIP	= NetAdresseIP()
+      <sinon>	
+      	// On prend l'adresse IP avec renvoi (cas par exemple d'un proxy) et l'adresse IP directe
+      	Historique.AdresseIP	= NavigateurAdresseIP(Vrai)+" / "+NavigateurAdresseIP(Faux)
+      	
+      <FIN>
+      
+      // On prend les valeurs fournies en paramètres
+      Historique.ValeurAvant = sValeurAvant
+      Historique.ValeurApres = sValeurAprès
+      Historique.DetailOpération = sDétailOpération
+      Historique.typeOpération = nTypeOpération
+      
+      // Ajout en base
+      SI HAjoute(Historique) = Faux ALORS
+      	dbgAssertion(Faux,"Impossible de sauver l'historique")
+      	fSauveTexte(fRepDonnées()+["\"]+"dump_erreur_"+DateSys()+"_"+HeureSys()+".log","Erreur lors de la sauvegarde de l'historique : "+HErreurInfo())
+      FIN
+      
+      SI nTypeOpération = CN_HISTORIQUE_TYPEOPE_ERREUR ALORS
+      	// Notification en cas d'erreur
+      	SI bEnvoieErreur = Vrai _et_ LireNotificationSiErreurActif() = Vrai ALORS
+      		EnvoieMessageWebMaster("Erreur détectée sur le site",...
+      		_sConvertiTexte(ChaîneConstruit("Une erreur a été détectée sur le site le %1 à %2 : %3",DateVersChaine(DateSys(), maskDateSystème),HeureVersChaîne(HeureSys(),maskHeureSystème),sDétailOpération)))
+      	FIN
+      FIN
+      
+      CAS EXCEPTION:
+      	dbgAssertion(Faux,"Impossible de sauver l'historique")
+      	fSauveTexte(fRepDonnées()+["\"]+"dump_erreur_"+DateSys()+"_"+HeureSys()+".log","Erreur lors de la sauvegarde de l'historique : "+HErreurInfo())
+     type : 458752
+   -
+     name : NotifierInformation
+     procedure_id : 2216382847665611533
+     type_code : 15
+     code : |1-
+      // Résumé : Détail de l'opération
+      // Syntaxe :
+      //NotifierInformation (<sDétailOpération> est chaîne)
+      //
+      // Paramètres :
+      //	sDétailOpération (chaîne) : Texte de détail de l'opération
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE NotifierInformation(sDétailOpération est une chaine)
+      
+      _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_INFO,sDétailOpération)
+     type : 458752
+   -
+     name : AfficheErreur
+     procedure_id : 2216416975566332559
+     type_code : 15
+     code : |1-
+      // Résumé : Affiche un erreur
+      // Syntaxe :
+      //AfficheErreur (<sTexteErreur> est chaîne[, <sErreurTechnique> est chaîne])
+      //
+      // Paramètres :
+      //	sTexteErreur (chaîne) : texte de l'erreur
+      //	sErreurTechnique (chaîne) : détails technique de l'erreur
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE AfficheErreur(sTexteErreur est une chaine, sErreurTechnique est une chaine = HErreurInfo())
+      
+      // Pour le mode test, on remonte en assertion
+      dbgAssertion(Faux,"Erreur détectée : "+sTexteErreur+RC+sErreurTechnique)
+      
+      // On note dans l'historique
+      _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_ERREUR,sTexteErreur+RC+sErreurTechnique)
+      
+      // On affiche l'erreur
+      <COMPILE SI TypeConfiguration<>Webservice>
+      	SI EnModeAWP() = vrai alors
+      		Erreur(sTexteErreur)	
+      	SINON
+      		ToastAffiche(sTexteErreur+RC+sErreurTechnique,toastLong,cvMilieu,chCentre,iRougeClair)	
+      	FIN
+      <FIN>
+     type : 458752
+   -
+     name : sRenvoyerRepWebUpload
+     internal_properties : CAAAAAgAAAC7rN81rOT6IBryfIRR8XQB5nkqXEnZifjc1bLohmi6vBoVMrZuvdW845n07OjM1ea6MGK8czv+oellMnszvWNB3P+iQ01GAU8RJ+ZyZzK5w77x1ZSFzmxAOQJAUawd1lCvMRmZsWxp1bZd8oZPqQnnMczZUmnUasAWjyQbZPLPG38l0m11C1YBTM5/7GSsgzi1BdYWepC5N53wiLl4Bwx6eJX9Ku8b77nTG+4c4cuGE49z8uhc
+     procedure_id : 2216475258343978156
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le répertoire de génération des photos
+      // Syntaxe :
+      //[ <Résultat> = ] sRenvoyerRepWebUpload ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne: répertoire de génération des photos
+      //
+      
+      PROCEDURE sRenvoyerRepWebUpload()
+      
+      // Variables locales
+      sRepUpload est une chaine
+      
+      <COMPILE SI Configuration="eCommerce">
+      	sRepUpload = fRepWeb()+["\FR\"]+"img_gen"
+      	
+      	// Est-ce que le répertoire d'upload existe ?
+      	SI fRépertoireExiste(sRepUpload) = Faux ALORS
+      		fRepCrée(sRepUpload)
+      	FIN
+      <FIN>
+      
+      
+      RENVOYER sRepUpload
+     type : 458752
+   -
+     name : sRecupereCheminAccesPageSuivante
+     procedure_id : 2219019516523850125
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le chemin d'accès à la page suivante
+      // Utilisé dans le cas où une page peut avoir différentes pages de retour
+      // Syntaxe :
+      //[ <Résultat> = ] sRecupereCheminAccesPageSuivante ( [<sPageParDéfaut> [, <bRecupereSansUtiliser>]])
+      //
+      // Paramètres :
+      //	sPageParDéfaut (valeur par défaut="") : Page à afficher si aucune page suivante n'a été définit auparavant
+      // 	bRecupereSansUtiliser (valeur par défaut=0) : VRAI pour récupérer uniquement le nom de la page suivante, FAUX pour l'utiliser (dépile)
+      // Valeur de retour :
+      // 	Type indéterminé : Accès suivant
+      //
+      
+      PROCEDURE sRecupereCheminAccesPageSuivante(sPageParDéfaut="", bRecupereSansUtiliser=faux)
+      
+      // Si aucune page n'a été définie, renvoie la page par défaut indiquée en paramètre
+      SI PileInfo(gPileAccesPagesSuivantes, tiNombreTotal) = 0 ALORS
+      	renvoyer sPageParDéfaut
+      FIN
+      
+      // Mémorise l'accès suivant
+      sPageSuivante est une chaine
+      depile(gPileAccesPagesSuivantes, sPageSuivante)
+      // Si la page doit seulement être récupérée (pour savoir le nom)
+      SI bRecupereSansUtiliser ALORS
+      	// Remet la page dans la pile
+      	empile(gPileAccesPagesSuivantes, sPageSuivante)
+      FIN
+      
+      // Renvoie l'accès suivant
+      RENVOYER sPageSuivante
+     type : 458752
+   -
+     name : sDefinitCheminAccesPageSuivante
+     procedure_id : 2219020856554941332
+     type_code : 15
+     code : |1+
+      // Résumé : Définit le chemin d'accès à la page suivante
+      // Utilisé dans le cas où une page peut avoir différentes pages de retour
+      // Syntaxe :
+      //sDefinitCheminAccesPageSuivante (<sPage> [, ...])
+      //
+      // Paramètres :
+      // 	sPage : Nom de la page suivante
+      // 	<*> : Liste des paramètres qui seront à passer à cette page
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE sDefinitCheminAccesPageSuivante(sPage <utile>, *)
+      
+      <COMPILE SI Configuration="eCommerce">
+      	// Définit la page suivante
+      	sAccesPageSuivante est une chaine = PageAdresse(sPage,paCOMPLETE)
+      	
+      	// Ajoute des paramètres
+      	POUR i = 2 _a_ MesParamètres..occurrence
+      		// Ajoute les paramètres
+      		SI i = 2 ALORS
+      			sAccesPageSuivante += "?" + "P"+(i-1)+"="+ MesParamètres[i]	
+      		SINON
+      			sAccesPageSuivante += "&" + "P"+(i-1)+"="+ MesParamètres[i]
+      		FIN
+      		
+      	FIN
+      	
+      	// Ajoute l'identifiant contexte AWP
+      	sIdentifiantContexteAWP est une chaine = IdentifiantContexteAWP()
+      	SI sIdentifiantContexteAWP <> "" ALORS
+      		sAccesPageSuivante += (MesParamètres..Occurrence = 0 ? "?" SINON "&") + sIdentifiantContexteAWP
+      	FIN
+      	
+      	// Empile cette page à la liste des pages "suivantes"
+      	// gsAccesPageSuivante contient le prochain accès
+      	Empile(gPileAccesPagesSuivantes, sAccesPageSuivante)
+      <FIN>
+      
+     type : 458752
+   -
+     name : InitialisationConfiguration
+     internal_properties : CAAAAAgAAADN+76exhH1mcq30Kx2AgxPfa1awN78Yqimx7cn5uFzNRFxLl2RL62L1hb5oJJckWKuZmZx6fxz6Ojm3MACWYTzWzCktXjHLkPYhJTRvc+x0N87YEzDRS/Fbxy+CwsI+JECwn2yteyITd8VQ5sbhDitaergZBslQweaiJIHzYtVV/pL2/K0OAHWKCmOuJSsB5BY3A==
+     procedure_id : 2224624267128698664
+     type_code : 15
+     code : |1+
+      // Résumé : Permet de gérer des configurations spécifiques
+      // Syntaxe :
+      // InitialisationConfiguration ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE InitialisationConfiguration()
+      
+      // Localisation pour développement
+      LOCAL
+      	sRepertoireDonnées est une chaine = INILit("DONNEES","REP_DONNEES","",fRepDonnées()+"\config.ini")
+      	
+      SI sRepertoireDonnées <> "" ALORS
+      	HSubstRep("?",INILit("DONNEES","REP_DONNEES","",fRepDonnées()+"\config.ini"))
+      FIN
+      
+      // Activation des assertions ?
+      SI Val(INILit("DONNEES","ASSERTION","0",fRepDonnées()+"\config.ini")) = Faux ALORS
+      	dbgActiveAssertion(Faux)
+      FIN
+      
+     type : 458752
+   -
+     name : sRenvoyerRepGeneration
+     internal_properties : CAAAAAgAAADII9SyOMRvIbbGOyVqmos+w/DkPFKP+S50bgBFhSCSHxKHAYzJlsRlPGRWSHaileqIcDQlNkIBAySwAb586CzRA3SqAgTe05KqIv4W4ClaASL/ZcGZ4td0MJ34Mpdw4ktHji2/YKUpYlTHwukQFBX8if+LzjTJbJNMQYDqad1j0rpkFk47amnUuB0PLWAgmTjW8gX4K6A=
+     procedure_id : 2242101314218197507
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le chemin complet du répertoire de génération des miniatures
+      // Syntaxe :
+      //[ <Résultat> = ] sRenvoyerRepGeneration ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Répertoire de génération des miniatures
+      //
+      
+      PROCEDURE sRenvoyerRepGeneration()
+      
+      // Variables locales
+      sRepGen est une chaine = fRepDonnées()+["\"]+"gen"
+      
+      // Est-ce que le répertoire de génération existe ?
+      SI fRépertoireExiste(sRepGen) = Faux ALORS
+      	fRepCrée(sRepGen)
+      FIN
+      
+      RENVOYER sRepGen
+     type : 458752
+   -
+     name : SupprimeParamètreSite
+     procedure_id : 2242368160135612727
+     type_code : 15
+     code : |1+
+      // Résumé : Suppression d'un paramètre de configuration du site
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimeParamètreSite (<sNomParamètre>)
+      //
+      // Paramètres :
+      //	sNomParamètre : Nom du paramètre (voir les constantes..)
+      // Valeur de retour :
+      // 	booléen : Vrai si la suppression est effective, Faux sinon
+      //
+      
+      PROCEDURE SupprimeParamètreSite(sNomParamètre)
+      
+      // Recherche du paramètre
+      HLitRecherchePremier(CONFIGURATION_SITE,Nom_Paramètre,sNomParamètre)
+      SI HTrouve(CONFIGURATION_SITE) ALORS
+      	// On supprime
+      	SI HSupprime(CONFIGURATION_SITE) = Faux alors
+      		dbgAssertion(Faux,"Suppression de paramètre non effectué")
+      		RENVOYER Faux	
+      	FIN
+      	
+      	// La suppression a été effectuée
+      	RENVOYER Vrai
+      FIN
+      
+      // Par défaut, aucun paramètre n'est supprimé
+      dbgAssertion(Faux,"Demande de suppression d'un paramètre inexistant")
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : MémoriserChamps
+     procedure_id : 1224949978799385904
+     type_code : 15
+     code : |1-
+      // Résumé : Mémorise pour la session le contenu du champ spécifié
+      // Syntaxe :
+      //MémoriserChamps (<sNomChamp> est chaîne, <sValeur> est chaîne)
+      //
+      // Paramètres :
+      //	sNomChamp (chaîne ANSI) : Nom du champ
+      //	sValeur (chaîne ANSI) : Valeur du champ
+      // Valeur de retour :
+      // 	Aucune
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //
+      PROCEDURE MémoriserChamps(sNomChamp est une chaine, local sValeur est une chaine)
+      
+      gtaBackOfficeInfosMémorisées[sNomChamp] = sValeur
+     type : 458752
+   -
+     name : RécupèreChamps
+     procedure_id : 1224950245088206293
+     type_code : 15
+     code : |1-
+      // Résumé : Récupère le contenu mémorisé sur champs dans la session
+      // Syntaxe :
+      //[ <Résultat> = ] RécupèreChamps (<sNomChamp> est chaîne, <sValeurDéfaut> est chaîne)
+      //
+      // Paramètres :
+      //	sNomChamp (chaîne ANSI) : Nom du champ 
+      //	sValeurDéfaut (chaîne ANSI) : Valeur par défaut
+      // Valeur de retour :
+      // 	Type indéterminé : Valeur mémorisée ou par défaut
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //
+      PROCEDURE RécupèreChamps(sNomChamp est une chaine, local sValeurDéfaut est une chaine)
+      
+      SI gtaBackOfficeInfosMémorisées[sNomChamp]..Vide ALORS
+      	RENVOYER sValeurDéfaut
+      SINON
+      	RENVOYER gtaBackOfficeInfosMémorisées[sNomChamp]
+      FIN
+     type : 458752
+   -
+     name : TestFichierHFSQL
+     procedure_id : 1328882518357372806
+     type_code : 15
+     code : |1+
+      // Résumé : Teste l'ouverture des fichiers
+      // Syntaxe :
+      //TestFichierHFSQL ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE TestFichierHFSQL()
+      
+      // Positionne la vérification à l'identique
+      HVérifieStructure("*", hIdentique)
+      
+      QUAND EXCEPTION DANS
+      	// Teste l'ouverture de tous les fichiers
+      	HOuvre("*")
+      	HFerme("*")
+      	
+      	<COMPILE SI TypeConfiguration=Bibliothèque>
+      		TestEcritRésultat(terInfo, "Fichiers OK")
+      	<FIN>
+      	
+      
+      FAIRE
+      	// Soucis en ouverture	
+      	<COMPILE SI TypeConfiguration=Bibliothèque>
+      		TestEcritRésultat(terErreur, "Fichiers en erreur : " + ExceptionInfo(errMessage))	
+      	<FIN>			
+      FIN
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : COL_Collection1
+resources :
+ string_res :
+  identifier : 0x10225f07114c8aea
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Impossible de trouver le produit spécifié
+     index : 0
+   -
+     text :
+      fr-FR : < Toutes les familles >
+     index : 1
+   -
+     text :
+      fr-FR : Les informations n'ont pas été enregistrées
+     index : 2
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ
+associated_test :
+ name : TEST_pParamètresSite.wxt

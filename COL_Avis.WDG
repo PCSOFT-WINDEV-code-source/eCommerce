@@ -1,0 +1,168 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Avis
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1ebac77e1740f570
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Avis
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Avis est une structure
+      		IDAvis 				est un entier
+      		Date 				est un date
+      		Titre 				est une chaîne
+      		Description 		est une chaîne
+      		Note 				est un entier sans signe sur 1 octet		
+      		IDClient 			est un entier
+      		IDProduit			est un entier
+      		ReferenceProduit	est une chaine
+      		LibelléProduit		est une chaine
+      Fin
+       
+       GLOBAL
+       	gtabAvis est un tableau de STCOL_Avis
+     type : 720896
+  procedures :
+   -
+     name : ListeAvis
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218689331239574280
+     type_code : 15
+     code : |1-
+      // Résumé : Liste les avis des clients sur les produits
+      // Syntaxe :
+      //[ <Résultat> = ] ListeAvis ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	tableau (STCOL_Avis) : Tableau de STCOL_AVIS
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ListeAvis()
+      
+      // Variables locales
+      stAvis est un STCOL_Avis
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER gtabAvis
+      FIN
+      
+      // On supprime l'ancien contenu
+      TableauSupprimeTout(gtabAvis)
+      
+      // Exécution de la requête de parcours / tri des avis
+      REQ_AvisProduit_ListeDetaillee.pIDProduit = Null
+      HExécuteRequête(REQ_AvisProduit_ListeDetaillee)
+      
+      
+      // Parcours des avis
+      Pour TOUT REQ_AvisProduit_ListeDetaillee 
+      	// on récupère les données de base
+      	FichierVersMémoire(stAvis,REQ_AvisProduit_ListeDetaillee)
+      	
+      	// On récupère les informations complémentaires
+      	stAvis.ReferenceProduit = REQ_AvisProduit_ListeDetaillee.Référence	
+      
+      	// On ajoute au tableau
+      	TableauAjouteLigne(gtabAvis,stAvis)	
+      FIN
+      
+      // On renvoie la table des avis
+      RENVOYER gtabAvis
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo(errComplet))
+      	RENVOYER gtabAvis
+     type : 458752
+   -
+     name : SupprimerAvis
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2224574995329084788
+     type_code : 15
+     code : |1+
+      // Résumé : Supprimer l'avis spécifié
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerAvis (<nIDAvisRecherché> est entier)
+      //
+      // Paramètres :
+      //	nIDAvisRecherché (entier) : Identifiant de l'avis recherché
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération s'est correctement déroulée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerAvis( nIDAvisRecherché est un entier )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Variables locales
+      nIndiceAvis est un entier
+      
+      
+      // Recherche de l'avis en base
+      HLitRecherchePremier(Avis,IDAvis,nIDAvisRecherché)
+      SI Htrouve(Avis) = Faux alors
+      	AjouteErreur("Enregistrement non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Suppression en base
+      Si HSupprime(Avis) = Faux alors
+      	AjouteErreur("Suppression de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // On recherche dans le tableau des avis
+      nIndiceAvis = TableauCherche(gtabAvis,tcLinéairePremier,"IDAvis",nIDAvisRecherché)
+      SI nIndiceAvis>0 ALORS
+      	// Suppression 
+      	TableauSupprime(gtabAvis,nIndiceAvis)
+      FIN
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f3085d9
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

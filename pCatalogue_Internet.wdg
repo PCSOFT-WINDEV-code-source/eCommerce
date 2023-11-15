@@ -1,0 +1,462 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : pCatalogue_Internet
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x14a1630e00c63965
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAAC+j1NwgxsDTfrQIENHBR2noO923X6dw0n3DkdvIxWNsSgsyAawVxS4gCVDghO6mFpUPFNxNnAG75FEJvsaA/Sc6x+uOz52zsmXDPuvexIKvQdcIx4hOTCRXsee2vvZWcz05U6RvFX6EGTuXP+FR9fUlzpXmhF2kMMALMTEFNQNIOomPzg=
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAADr4iqbvx0mK5myY6V+xjhvyBJ8ur1lc9VLFIp4BPtnJ5SBpTUq2XdLbJtseatGzU6DTxXrvkestwLPU0iZtevm/GDWXLMgvsRknWvOvmIdZEL/qhLMAA4h7O0sxJi+UfvkGH/D7ci87zn8OFP273HZUP+BHwlQffUkQSd+W01k5w==
+     code : |1+
+      CONSTANT
+      	
+      	// Nom du cookie
+      	CS_NOM_COOKIE_IDENTIFICATION	= "IDENTIFICATION"
+      	CS_MOT_PASSE					= "jfdiezaophrhéàç(_èfjqlm"
+      	
+      	// Type d'adresse
+      	CN_FACTURATION					= 1	// Adresse de facturation
+      	CN_LIVRAISON					= 2	// Adresse de livraison
+      	
+      	// Constantes du projet
+      	CS_LIBELLE_FAMILLES			= <§Rff00035232f66eee¤fr-FR¤< Toutes les familles >§>
+      	
+      	CS_CARACTERISTIQUE_PHOTO = <§Rff000e5232f86eee¤fr-FR¤_Photo§>
+      	
+      FIN
+      
+      STPERIODE est une structure
+      	dDateDebut est une date
+      	dDateFin est une date
+      END
+      
+     type : 720896
+  procedures :
+   -
+     name : RetrouveCivilité
+     internal_properties : CAAAAAgAAACuDitrEV0hs2DDMOoLLGcA1UAvJlY5VO2MXBC0vz/Gj74WJh697lxwVjS1UsLP80mAEe/axbmp7GPmAqRcjuJklyPYNfRdeYXkI5VJR7+H78B77OCs58hX1/RvtxylEXR+tV6ek2b2oZFM12iJa/ihPAqAeYe4n8S5JlXNipJ+90LsLt6fLHFcCqfJX3I+B6t7lfFsm0sZUTDfNUWi4ZHnafiQwFBJ
+     procedure_id : 1488731567187955929
+     type_code : 15
+     code : |1-
+      // Résumé : Récupère la civilité sous format chaîne d'après l'entier correspondant
+      // Syntaxe :
+      //[ <Résultat> = ] RetrouveCivilité (<nCivilité>)
+      //
+      // Paramètres :
+      //	nCivilité : Entier de la civilité
+      // Valeur de retour :
+      // 	chaîne : Civilité en texte
+      //
+      
+      PROCEDURE RetrouveCivilité(nCivilité)
+      
+      // Selon la civilité
+      SELON nCivilité
+      	
+      	CAS 1 // Mr
+      		RENVOYER <§Rff00005232fa6eee¤fr-FR¤M.§>
+      	CAS 2 // Mme
+      		RENVOYER <§Rff00015232fc6eee¤fr-FR¤Mme§>
+      	CAS 3 // Melle
+      		RENVOYER <§Rff00025232fe6eee¤fr-FR¤Melle§>
+      	// Civilité inconnue
+      	AUTRE CAS
+      		RENVOYER ""
+      FIN
+     type : 458752
+   -
+     name : Connexion
+     internal_properties : CAAAAAgAAACXYYFZN5s3Oq69yDK9oYxj0IXNuDEm9KmFd/a62NXPJ8HkVuDrCNl9+EMDBJCe9e5/CjpwEHTeEJKZHPGshHLQua1Qp8EgtJS4+lZAovbMtrnwTCkGcNrcDea5KQqArtZHjumq1WnRF6e6azA=
+     procedure_id : 1489046212258503917
+     type_code : 15
+     code : |1+
+      // Résumé : Ecrit le cookie d'identification indiquant la connexion d'un client
+      // Syntaxe :
+      //Connexion (<nIDClient>, <sLogin>)
+      //
+      // Paramètres :
+      //	nIDClient :Identifiant du client
+      //	sLogin :Login du client
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE connexion(nIDClient <utile>, sLogin <utile>)
+      
+      <COMPILE SI Configuration="eCommerce">
+      	// On écrit le cookie d'identification
+      	CookieEcrit(CS_NOM_COOKIE_IDENTIFICATION,Crypte(nIDClient + TAB + sLogin ,CS_MOT_PASSE,crypteRapide),1)
+      	
+      <FIN>
+     type : 458752
+   -
+     name : bEstConnecté
+     internal_properties : CAAAAAgAAAA6uqfvTd1XN7hJ2wt7L4VV/dB7kHnP3EyUJCj0l4e+555uNvb9Fpx4poRV2pK/s4koYQda/XkBfBsuykRUhspMN8tInWTFiT3EEzWBZ98njzj7lGTgWwQTk/gTIziBJUAq+QJytwqSvc1A60RV1zxdyI6UXXv824B1eqmpxl7iE06AosKjwO1YBmvda07KfJx+90FIjyfIOK4F0t1QX99HfXQUTMTd
+     procedure_id : 1489046955296473176
+     type_code : 15
+     code : |1-
+      // Résumé : Indique si un client est connecté ou non (d'après la présence ou non d'un cookie d'identification)
+      // Syntaxe :
+      //[ <Résultat> = ] bEstConnecté ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : VRAI si un client est connecté, FAUX dans le cas contraire
+      //
+      
+      PROCEDURE bEstConnecté()
+      
+      
+      <COMPILE SI Configuration="eCommerce">
+      	sContenuCookie est une chaîne
+      	
+      	// Lecture du cookie d'identification
+      	sContenuCookie = CookieLit(CS_NOM_COOKIE_IDENTIFICATION)
+      	
+      	// Décryptage du cookie
+      	sContenuCookie = Décrypte(sContenuCookie,CS_MOT_PASSE,crypteRapide)
+      	
+      	// Si le cookie est vide, on sort
+      	SI sContenuCookie ~= "" ALORS
+      		gnIDClientConnecte = -1
+      		RENVOYER Faux
+      	FIN
+      	
+      	HLitRecherchePremier(Client,IDClient,ExtraitChaîne(sContenuCookie,1))
+      	SI HTrouve(Client) ALORS
+      		// On compare le mot de passe et le login du client qui a été sauvegardé
+      		SI ExtraitChaîne(sContenuCookie,2) = Client.Email ALORS
+      			gnIDClientConnecte = Client.IDClient
+      			RENVOYER Vrai
+      		FIN
+      	FIN	
+      <FIN>
+      
+      
+      // Par défaut, aucun client connecté
+      gnIDClientConnecté = -1
+      RENVOYER Faux	
+     type : 458752
+   -
+     name : VérifieConnexion
+     internal_properties : CAAAAAgAAACvs5Go54LUN2MUfaX13EyWflm8HLrLQFmtPZqrmYyQY3yFI/GQ0G4yV6aAjl8B2KDXC5LzOe+B+9gm5X5UqHz8h/lqc4aG1sa1FS9ETsNdZPo/oa6bCFYzkNtpSXfy7WTOiW3aj7yFtBincJDLbmTFR5+7dGXQbsIUPTKdmIytC4aN5mQS+20bqvubmMeW2pkPBs1U+V7cDi2ZVgVjHdV+/jC0fKcYMMyehcxfnAVa2RYIiF/7rIN8eXCK1TrptrmJDcyPdNQyp8MYRTWio3aZPc0+PBTEVdV+BEe4lVUtvyBHJjEH
+     procedure_id : 1489054067819873013
+     type_code : 15
+     code : |1+
+      // Résumé : Contrôle qu'un client soit connecté : utilisé comme contrôle pour les pages où une identification est nécessaire
+      // Syntaxe :
+      //VérifieConnexion ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE VérifieConnexion()
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	SI gnIDClientConnecte = -1 ALORS RETOUR
+      <SINON>
+      	SI gnIDClientConnecte = -1 ALORS PageAffiche(identification)
+      	RETOUR
+      <FIN>
+      
+     type : 458752
+   -
+     name : DéconnexionClient
+     internal_properties : CAAAAAgAAABWWI4sdL2nia9c1CRDVNs//OCL+joZ283BxN576yUAVLChHcZ2tTNf1yk7jHFO3JZlDPx5P1hxAwJsm7bZ/Hwmi8lF5ZBJTH3VyogMXs2tQ5XH/p6d1NAcRxgdujG4tVOAAnrgRF1IxGHIfT1g+r6achUarRJje+F/2IVCec8gCKUaI7+/FgKgLwBgW5a8m7ZzP/bXbw==
+     procedure_id : 1489064216865280615
+     type_code : 15
+     code : |1+
+      // Résumé : Déconnecte un client : vide le cookie
+      // Syntaxe :
+      //DéconnexionClient ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE DéconnexionClient()
+      
+      <COMPILE SI Configuration="eCommerce">
+      	CookieEcrit(CS_NOM_COOKIE_IDENTIFICATION,"")
+      <FIN>
+      
+      
+      gnIDClientConnecté = -1
+     type : 458752
+   -
+     name : GetNomCompletClient
+     procedure_id : 2211957433836607749
+     type_code : 15
+     code : |1-
+      // Résumé : Récupère le nom complet d'un client
+      // Syntaxe :
+      //[ <Résultat> = ] GetNomCompletClient ( [<nIDClient>])
+      //
+      // Paramètres :
+      //	nIDClient : Identifiant du client
+      // Valeur de retour :
+      // 	chaîne: Nom complet (Nom Prénom) du client
+      //
+      
+      PROCEDURE GetNomCompletClient(nIDClient=gnIDClientConnecte)
+      
+      // Si l'enregistrement courant n'est pas le bon
+      si client.IDClient <> nIDClient ALORS
+      	// Se positionne sur l'enregistrement souhaité
+      	HLitRecherchePremier(client,idclient,nIDClient)
+      	si htrouve(client) = faux ALORS
+      		renvoyer ""
+      	FIN
+      FIN
+      	
+      // Renvoie le nom complet du client
+      renvoyer client.nom+[" "]+client.prenom
+     type : 458752
+   -
+     name : bProduitEstEnPromotion
+     procedure_id : 2218672314616227175
+     type_code : 15
+     code : |1-
+      // Résumé : Indique si un produit est en promotion
+      // Syntaxe :
+      //[ <Résultat> = ] bProduitEstEnPromotion (<nIDProduit>)
+      //
+      // Paramètres :
+      //	nIDProduit : Identifiant du produit
+      // Valeur de retour :
+      // 	booléen : VRAI si le produit est en promotion, FAUX autrement
+      //
+      
+      PROCEDURE bProduitEstEnPromotion(nIDProduit)
+      
+      // Se positionne sur le produit
+      HLitRecherchePremier(produit, idproduit, nIDProduit)
+      si htrouve(produit) = faux ALORS
+      	renvoyer faux
+      FIN
+      
+      // Une promotion est-elle en cours sur ce produit ?
+      REQ_PromotionsEnCours.pIDProduit = nIDProduit
+      HExécuteRequête(REQ_PromotionsEnCours)
+      renvoyer (hnbenr(REQ_PromotionsEnCours) > 0)
+     type : 458752
+   -
+     name : RemplaceJoker
+     procedure_id : 2220170447027185211
+     type_code : 15
+     code : |1+
+      // Résumé : Remplace toutes les occurrences d'un mot (avec joker) présent dans une chaîne par un autre mot 
+      // Syntaxe :
+      //[ <Résultat> = ] RemplaceJoker (<sChaîneSource>, <sChaîneARemplacer>, <sChaîneRemplacement> [, <nOptions>])
+      //
+      // Paramètres :
+      //	sChaîneSource : chaîne dans laquelle les remplacements doivent être effectués
+      //	sChaîneARemplacer : chaîne à remplacer dans la chaîne source
+      //	sChaîneRemplacement : chaîne qui remplacera <sChaîneARemplacer>
+      //	nOptions (valeur par défaut=0) : options de recherche (MotComplet, SansCasse)
+      // Valeur de retour :
+      // 	chaîne: Nouvelle chaîne de caractères
+      //
+      
+      PROCEDURE RemplaceJoker(sChaîneSource,sChaîneARemplacer,sChaîneRemplacement,nOptions = 0)
+      
+      
+      sChaîneRetour est une chaine = sChaîneSource // La chaîne que l'on va retourner
+      nPosition est un entier	// La position du premier bloc
+      nPositionPremierJoker est un entier // La position du premier joker (pour l'instant on en gère qu'un)
+      nPositionFinBlocRecherché est un entier // La position de la fin du bloc (le bloc qu'il y a après le joker)
+      sChaineAvantJoker est une chaine		// La chaîne qui est située avant le caractère joker
+      sChaineAprèsJoker est une chaine		// La chaîne qui est située après le caractère joker
+      
+      // Recherche le caractère joker
+      nPositionPremierJoker = Position(sChaîneARemplacer, "*")
+      
+      // Récupération de la chaîne située avant le caractère Joker
+      sChaineAvantJoker = sChaîneARemplacer[[ A nPositionPremierJoker -1]]
+      // Récupération de la chaîne située après le caractère Joker
+      sChaineAprèsJoker = sChaîneARemplacer[[nPositionPremierJoker +1 A ]]
+      
+      // On recherche dans la chaine source la chaîne qu'il y a avant le premier joker
+      nPosition = Position(sChaîneRetour,sChaineAvantJoker, 0, nOptions)
+      TANTQUE nPosition > 0
+      	
+      	// On a une position, on recherche la position de la chaîne qu'il y a après le Joker
+      	nPositionFinBlocRecherché = Position(sChaîneRetour,sChaineAprèsJoker, nPosition+1, nOptions)
+      	SI nPositionFinBlocRecherché > 0 ALORS
+      		// On a trouvé une position, on la remplace par la chaîne de remplacement
+      		// On remplace dans la chaîne
+      		sChaîneRetour[[nPosition A nPositionFinBlocRecherché + Taille(sChaineAprèsJoker)-1]] = sChaîneRemplacement
+      		
+      		// Recalcule la position (on enlève tout le bloc que l'on vient de remplacer)
+      		nPosition = Max(0, nPosition - (nPositionFinBlocRecherché + Taille(sChaineAprèsJoker)-1 - nPosition))
+      		// puis on ajoute la taille de la chaîne de remplacement
+      		nPosition += Taille(sChaîneRemplacement)
+      		
+      	FIN
+      	
+      	// Recherche la position suivante
+      	nPosition = Position(sChaîneRetour,sChaineAvantJoker, nPosition+1 , nOptions)	
+      FIN
+      
+      RENVOYER sChaîneRetour
+     type : 458752
+   -
+     name : AppelWSRestAdministration
+     internal_properties : CAAAAAgAAACSPVfbmGgFQDyMzSMW+vlSbbx5xeDCmxEwXg3pmSZomiS81HhsBg413E2cMXKxw5WnWIBahCrJhHbv7PYWxFKOrWTtcZoETvpDsKrVISJXPVzelwplmUx//lFX7G8NH3oCpZc65IQ0Q6QFbSVqFco7XqDPY16GVZac92ueXTIOC0xywQLMGE/WPQCfXJXC/FBaH+y0IMFIDP+AeqLdhUu7jIQf6A==
+     procedure_id : 2242818685876071581
+     type_code : 15
+     code : |1-
+      // Résumé : Appel de l'API Rest
+      // Syntaxe :
+      //[ <Résultat> = ] AppelWSRestAdministration (<sParamURL> est chaîne)
+      //
+      // Paramètres :
+      //	sParamURL (chaîne ANSI) : Paramètre de l'URL REST
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE AppelWSRestAdministration(sParamURL est une chaine)
+      
+      // Il faut appeler l'API REST du site
+      sURLAPI est une chaine = LireURLPageAdminRest()
+      SI sURLAPI~="" ALORS
+      	AjouteErreur("URL de la page d'administration REST non configuré")
+      	RENVOYER Faux
+      FIN
+      
+      // Appel de l'URL
+      NotifierInformation("Appel de l'API rest : "+sURLAPI+"?"+sParamURL)
+      SI HTTPRequête(sURLAPI+"?"+sParamURL) = Faux ALORS
+      	AjouteErreur("Impossible de contacter l'URL de la page d'administration REST",ErreurInfo())
+      	RENVOYER Faux
+      FIN
+      
+      // Vérification du résultat
+      SELON HTTPDonneRésultat(httpRésultat) 
+      	CAS ""
+      	// Tout s'est bien passée
+      	CAS "ERR"
+      		// Erreur dans la page
+      		AjouteErreur("Une erreur est survenue dans le site lors de la génération de l'image")
+      		RENVOYER Faux
+      		
+      	AUTRE CAS
+      		// Erreur inconnue
+      		AjouteErreur("Une erreur inconnue est  survenue dans le site lors de la génération de l'image")
+      		RENVOYER Faux
+      FIN		
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : RemplaceCaractJoker
+     procedure_id : 2243184581919141143
+     type_code : 15
+     code : |1+
+      // Résumé : Remplace les jokers dans une chaine
+      // Syntaxe :
+      //[ <Résultat> = ] RemplaceCaractJoker (<sChaîneSource>, <sChaîneARemplacer>, <sChaîneRemplacement> [, <nOptions>])
+      //
+      // Paramètres :
+      //	sChaîneSource : La chaîne dans laquelle le remplacement doit être effectué
+      //	sChaîneARemplacer : La chaîne qu'il faut remplacer (ex : Remplacement de tous les liens : RemplaceJoker(sChaineSource,"<A*>","", sansCasse)
+      //	sChaîneRemplacement : La chaîne qu'il faut mettre en remplacement
+      //	nOptions (valeur par défaut=0) : Options, pour l'instant n'accepte que la constante sansCasse
+      // Valeur de retour :
+      // 	chaîne ANSI : la chaîne de résultat
+      //
+      
+      PROCEDURE RemplaceCaractJoker(sChaîneSource,sChaîneARemplacer,sChaîneRemplacement,nOptions = 0)
+      
+      // Variables locales
+      sChaîneRetour 				est une chaîne  	// La chaîne que l'on va retourner
+      nPosition 					est un entier		// La position du premier bloc
+      nPositionPremierJoker 		est un entier 		// La position du premier joker (pour l'instant on en gère qu'un)
+      nPositionFinBlocRecherché 	est un entier 		// La position de la fin du bloc (le bloc qu'il y a après le joker)
+      sChaineAvantJoker 			est une chaîne		// La chaîne qui est située avant le caractère joker
+      sChaineAprèsJoker 			est une chaîne		// La chaîne qui est située après le caractère joker
+      
+      // Initialisation de la chaine de retour
+      sChaîneRetour = sChaîneSource 
+      
+      // Recherche le caractère joker
+      nPositionPremierJoker = Position(sChaîneARemplacer, "*")
+      
+      // Récupération de la chaîne située avant le caractère Joker
+      sChaineAvantJoker = sChaîneARemplacer[[ A nPositionPremierJoker -1]]
+      
+      // Récupération de la chaîne située après le caractère Joker
+      sChaineAprèsJoker = sChaîneARemplacer[[nPositionPremierJoker +1 A ]]
+      
+      // On recherche dans la chaine source la chaîne qu'il y a avant le premier joker
+      nPosition = Position(sChaîneRetour,sChaineAvantJoker, 0, nOptions)
+      TANTQUE nPosition > 0
+      	
+      	// On a une position, on recherche la position de la chaîne qu'il y a après le Joker
+      	nPositionFinBlocRecherché = Position(sChaîneRetour,sChaineAprèsJoker, nPosition+1, nOptions)
+      	SI nPositionFinBlocRecherché > 0 ALORS
+      		// On a trouvé une position, on la remplace par la chaîne de remplacement
+      		// On remplace dans la chaîne
+      		sChaîneRetour[[nPosition A nPositionFinBlocRecherché + Taille(sChaineAprèsJoker)-1]] = sChaîneRemplacement
+      		
+      		// Recalcule la position (on enlève tout le bloc que l'on vient de remplacer)
+      		nPosition = Max(0, nPosition - (nPositionFinBlocRecherché + Taille(sChaineAprèsJoker)-1 - nPosition))
+      		// puis on ajoute la taille de la chaîne de remplacement
+      		nPosition += Taille(sChaîneRemplacement)
+      		
+      	FIN
+      	
+      	// Recherche la position suivante
+      	nPosition = Position(sChaîneRetour,sChaineAvantJoker, nPosition+1 , nOptions)	
+      FIN
+      
+      RENVOYER sChaîneRetour
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : COL_Collection1
+resources :
+ string_res :
+  identifier : 0x1402ca6d007a0b4a
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : M.
+     index : 0
+   -
+     text :
+      fr-FR : Mme
+     index : 1
+   -
+     text :
+      fr-FR : Melle
+     index : 2
+   -
+     text :
+      fr-FR : < Toutes les familles >
+     index : 3
+   -
+     text :
+      fr-FR : _Photo
+     index : 14
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

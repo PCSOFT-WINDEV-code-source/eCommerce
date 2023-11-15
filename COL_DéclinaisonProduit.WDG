@@ -1,0 +1,107 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_DéclinaisonProduit
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad0055ee18f
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier DéclinaisonProduit
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_DéclinaisonProduit est une structure
+      		IDDéclinaisonProduit 			est un entier 
+      		ParDéfaut 						est un booléen 
+      		tabDéclinaisonProduit_ValeurCaractéristique est un tableau de STCOL_DéclinaisonProduit_ValeurCaractéristique 
+      		IDProduit 						est un entier 
+      		IDPhotoProduit 					est un entier 
+      Fin
+       
+       
+     type : 720896
+  procedures :
+   -
+     name : ChangerPhotoDeclinaison
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217246450746839309
+     type_code : 15
+     code : |1-
+      // Résumé : Change la photo associée à une déclinaison
+      // Syntaxe :
+      //[ <Résultat> = ] ChangerPhotoDeclinaison (<nIDDéclinaison> est entier, <nIDPhotoDéclinaison> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaison (entier) : Identifiant de la déclinaison
+      //	nIDPhotoDéclinaison (entier) : Identifiant de la photo
+      // Valeur de retour :
+      // 	booléen : Vrai si le changement a été effectué, Faux dans le cas contraire
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ChangerPhotoDeclinaison(nIDDéclinaison est un entier, nIDPhotoDéclinaison est un entier)
+      
+      // Variables locales
+      nIDContexte		est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Sauvegarde de la position
+      nIDContexte = HSauvePosition(DéclinaisonProduit)
+      
+      //On applique la modification dans la base de données
+      HLitRecherchePremier(DéclinaisonProduit, IDDéclinaisonProduit, nIDDéclinaison)
+      SI HTrouve(DéclinaisonProduit) = Vrai ALORS
+      	//S'il y a une photo sélectionnée pour la déclinaison, on va "l'associer" dans la base de données à la déclinaison
+      	//Sinon c'est que l'on ne veut plus de photo associée à la déclinaison (=> IDImage = 0 dans DéclinaisonProduit)
+      	//Et ce sera alors la photo par défaut du produit qui sera utilisée
+      	
+      	DéclinaisonProduit.IDPhotoProduit = nIDPhotoDéclinaison	
+      	SI HModifie(DéclinaisonProduit) = Faux ALORS		
+      		AfficheErreur("La modification n'a pas été prise en compte",HErreurInfo())
+      		HRetourPosition(nIDContexte)
+      		RENVOYER Faux
+      	FIN
+      	
+      	
+      SINON
+      	AjouteErreur("Déclinaison non trouvée dans la base")
+      	HRetourPosition(nIDContexte)
+      	RENVOYER Faux
+      FIN
+      
+      // Opération terminée
+      HRetourPosition(nIDContexte)
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:	
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	HRetourPosition(nIDContexte)
+      	RENVOYER Faux
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f07111f8a9c
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

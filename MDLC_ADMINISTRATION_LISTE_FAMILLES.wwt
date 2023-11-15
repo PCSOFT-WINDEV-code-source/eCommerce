@@ -1,0 +1,218 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : MDLC_ADMINISTRATION_LISTE_FAMILLES
+ major_version : 28
+ minor_version : 0
+ type : 65543
+ description : Liste des catégories / familles
+ subtype : 0
+page :
+ name : MDLC_ADMINISTRATION_LISTE_FAMILLES
+ identifier : 0x2ebbbafdde5d04ac
+ internal_properties : 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
+ properties :
+  width : 295
+  height : 306
+ controls :
+  -
+    name : MDLC_ADMINISTRATION_LISTE_FAMILLES
+    identifier : 0x2ebbbafdde5e04ac
+    internal_properties : CAAAAAgAAABU7hfvF6h690JWc/6AGX6Bd7XhSKwZhUvKhi4Pw6AWngX4N0UEn6C8w6JcQtLqJmaogX3mLlTsGxtaZ6IjEDRnJlcD5OZWTYGQ24e6WUFVP86VKGESkLtydIyjt53xodxDvzDEFX29Yd3DJsaxoGYaBri7I6E0R5vWqHE7AFjVgBoEKeHsy3JKgcvm/9CSa0MVQ9RoRBJML2q7rExaBD1+The37OMKIZM/TmV4cwttWx0zRD5QBUmsfx8Oxsp/elheFhoEPGBfcvK5JIXbwMUBtS3i0cf+BwHfgdJfdxeQg8HXdcGQ8iTQqPhdkBaRxWbdERObv00rd4tKfCF26092y402H5qTWMfwaFseKsJS6US+xM3KMCU//NVx6uA4niJ4kgv+z+I9K1nTUUWs0w/vwGYlTa/BBbYAP6H2Srb5uoz2x8RB6YOpT7CSUVXsq1xSgN2op9bpaXx0W9PwMX5z7TAfaGVzWyGYkypt+iGNZcx21WGe1INHER8/bSCmXNOa++9QQhlOBgSmdTTEUUWyaGAyYD80AQYj2tC06/d5AcM1/Ykhv7YuCSGnxc9KS9nUJxRbFMWCGbT206GI2dWJsKymcWHDyWT4ynr/mpr2hPzVjY32At4TgMHNLm3W/BdJpBifojOBcX/Hz4QIyQoXG3x7FO8gwOkS5vcd5H0GVJTUEsNUCWi8V5W8SgHie/LdrJLInEyMuxIqW4ppQDhkgMljk/JVT119RVNaNutBjLQGGAlORR/JQEQN9rK1nmVd1UKx19g3MId+2JAPuibY84fNl50lpQsSiy5exahtn/SmPMuj3PVFBGcFcnfUFEEBwdu/k7CnXV7lH6Sk8+Dvvnu3
+    properties :
+     width : 291
+     height : 303
+    controls :
+     -
+       name : ARBRE_Familles
+       identifier : 0x2ebbbafdde5f04ac
+       internal_properties : CAAAAAgAAAAXOMKLSz4yBIrAt5MHiMgGXdOsmEX/TkXWOGCsp9iBXVxX5DKoH9MjNkq2yQUuut4SgprMnFimZdfYUP3Hgmo+Wxi31ccmF3jJKivIbqwfgZnlwlSLo3+3OFTyUSw95QkWz/M++YDvwZfPmzByqDxTfJ+IKxaozUfO4LwnX2ckAJlFZi/RCEzRo1nKxLiqU30d3jDtadnALQlDDjgxyp5gYKOvxnf4/q19peXARoQvQ/ax6hYg7m12DauSl+oA9i0OARe8LsCFftuxvScXEIG04o/7Y1+u3jF7/MKjR04/YSf+mX74jKgEyEPz8VSZAFbKwjIGo5zgKqbtHQ5qTjQlZtaSCN3UNbpdwHhaTLcTauLJUk2/bVD7zUO+e+gWmX/N3iQjc8SNpxsFjnFZDBTU1DchkEEoVt4sXLInm9wvDBmPtMWesTBJO8xtQQmRXOm4ECLtHsnvRGWNW+lyOoSnrHezL5ZwqdIf9mwyNlRwXz3EfTIvSVAYEvRtr5AK44Wph1EiucJpkKNSxFkdPJH/EMV7o+ndmh2n7ZwlTXNYRZ2SsTuueXenc44+COBHa7SeYr2UsXufMjd/YzeXuqAIx2fWHcV9FD+/A34J9I+hgpwlnfX/lotPCTiZ6VQ6KnGUuXfvDAxKsCdHAOk4enLCE59zGyMMOJ30hA+ruxBf/dbxsIsE2oekFwKaQ/+fmaQto7SEKQP3Hl0FHp3/ePQKJAFh1a9KwKRyKtTmxdzOtHNQZtXWCPmnyQBN2sDpBiBtmo14bRw0Q2+W2z3Ng7woqDhplG3GGqHThxm+r2zAXyw1IunlbUnAwPB0/gex8fNLEdodBcBKJ//LlzIttDE7ztVse7Br99QfvAp2w5xZ84lcHNkss3wSD4UT7rQ4r7avK57ysvZwwhi2n6M7+eEAp8MXL5jssV7Qir6T2A77VsyIapelWnLJ5c1n5jUbWvmHnvMqxn3NDWa4GmThPxn4RCxcePnsHwsDEdj4IeN6KzOKEElNZZKpS3L1CGjfuslW/UWh7SXGqSMrXAr/oCGn1hAI9VnxlDUieht11tB+W/L3buamT6s5pIL1kpF2n/onAxajyXdnCWCcCPji01QgHNIXsDSrlDucVUaeR/RqOpMtDqWc1A55PrxDHG+oMmh1K8I09m7uauMNpm0KAvI9C+gObt7/2VNe28Ps4AEQekx7S+Z3N9VTSoHWzftrcu4aPqNcV9UTkOfdeYnKAmR+vFUZJ7gLVruAyMQcIPN0k/1rhwAPt84mkoTNxu+2eHtpfFvqvpv9GD+QkM0kqk2As1GeweOzEn9BTIkJnOzuMrB1SxHb6BMPVJ/q3rkCbeSYJZf0pTD6JERLc6CgGo4eYc9Jo0xXjV1xtN6+HiLqovFLhZNoK4dWFCno13WOnYDStnJTGvX74Nl1azhjLVrzTwg1b7olFeCjqLgCpzkgPJzC9ne3NPzptkmMoyabwTONXaXYhGAvsrcEarTvCtBQ24WH6Mrf4ZZ6bJN70hX/p9pCYgWzuQsUI6F8BrH0jNr+mWKtfEUTHPsTR/1QdfTQHbWtAaK1c/Eq5+WfoRrKg24dWllOjgaLVE57cXvDobsH7wUK+PqmlR0eFg==
+       properties :
+        width : 289
+        height : 301
+       type : 25
+       code_elements :
+        type_code : 25
+        alias : C1
+        p_codes :
+         -
+           code : |1-
+            
+           type : 851980
+         -
+           code : |1-
+            
+           type : 851998
+           role : N
+         -
+           internal_properties : CAAAAAgAAAAbUbshpY0HFzos9eSOQ+XeCZmtxqZZrG58A2HCnw5radoA0NvwIG8c33rVAcgxg9E1QmhcsxB7/93kRXEgQTEJFUPsUicTM1WvUVuYWp/z55gkDTzi/Q==
+           code : |1-
+            
+           type : 851984
+         -
+           type : 852149
+           role : N
+    type : 42
+    code_elements :
+     type_code : 92
+     alias : C2
+     p_codes :
+      -
+        code : |1-
+         
+        type : 851968
+      -
+        type : 852298
+        role : N
+      -
+        type : 851999
+        role : N
+      -
+        type : 852227
+        enabled : false
+      -
+        type : 1310979
+        enabled : false
+      -
+        type : 852228
+        role : N
+        enabled : false
+      -
+        type : 852217
+        role : N
+        enabled : false
+ type : 1
+ languages :
+  - fr-FR
+ code_elements :
+  internal_properties : CAAAAAgAAAA48V7+q113AZgavciZPQT17YPFEiBG0zT3CmxofKKyg0cnfcVZxEb+YeObbSQh5nNFwcggexlZUv3oGQJBlS8=
+  type_code : 91
+  p_codes :
+   -
+     type : 852298
+     role : N
+   -
+     type : 851999
+     role : N
+   -
+     type : 852000
+     role : N
+   -
+     internal_properties : CAAAAAgAAAC8gmh+MC4QrU0utgNBfl0Ba/jqg1LK+Dwp8MhpUhqrFXKYnYkcdsFAaHOY6ObpQ/xfKfSxjrQterWfXIxYE+XU8eTa3dgHHYih6pD5FI+viG7ChbqMzBs=
+     type : 852167
+   -
+     type : 852169
+     role : N
+   -
+     type : 852225
+     role : N
+   -
+     internal_properties : CAAAAAgAAAC8gmh+MC4QrU0utgNBfl0Ba/jqg1LK+Dwp8MhpUhqrFXKYnYkcdsFAaHOY6ObpQ/xfKfSxjrQterWfXIxYE+XU8eTa3dgHHYih6pD5FI+viG7ChbqMzBs=
+     type : 852227
+   -
+     type : 1310979
+     enabled : false
+   -
+     type : 852228
+     role : N
+  procedures :
+   -
+     name : RempliArbreFamilles
+     internal_properties : CAAAAAgAAACcM0Hdgrovghb2Ky005ItkJ/qUVMHIFWNAFqMVdX6ENoig/GL6/EBH7EWCrfI9Rzmr7Hhs4tDD1nI27CbmtELe/SR90foEjrqTIHq14eKXfbyu/8KdURRHppkv1DdVp9L6bT/SHNycaywtjs7xZu2ID8G8qH03FtG7fvgTMI9V7NnneuPPHUzNxJ+keZA/W1Tvgb4ShqtOUmHyTLADV3m1lo4R5g==
+     procedure_id : 2214569237886141612
+     type_code : 14
+     code : |1-
+      // Résumé : Remplit l'arbre des Familles
+      // Syntaxe :
+      //RempliArbreFamilles ( [<sNoeud> [, <nIdentifiantParent>]])
+      //
+      // Cette procédure permet de remplir l'arbre des Familles.
+      // ATTENTION : ELLE EST RECURSIVE
+      // 
+      // Paramètres :
+      //	sNoeud : Le noeud parent dans lequel il faut ajouter les éléments trouvés
+      //	nIdentifiantParent (valeur par défaut=0) : L'identifiant du parent dont il faut rechercher les fils
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE RempliArbreFamilles(sNoeud = CST_NOM_FILTRE_PRODUIT_DEFAUT, nIdentifiantParent = 0)
+      
+      // Variables locales
+      tabListeFamilles 	est un tableau de STCOL_Famille
+      stFamille			est un STCOL_Famille
+      
+      // Recherche des familles
+      tabListeFamilles = COL_Famille.ListeFamilles(nIdentifiantParent)
+      
+      // Parcours des familles
+      Pour tout element stFamille de tabListeFamilles
+      	// On ajoute la famille dans l'arbre
+      	// avec le noeud du parent + TAB + libellé de la famille
+      	ArbreAjoute(ARBRE_Familles,sNoeud + TAB + stFamille.Libellé,aDéfaut,aDéfaut,stFamille.IDFamille,aDernier)
+      		
+      	// On recherche les fils de la famille en cours de traitement
+      	RempliArbreFamilles(sNoeud + TAB + stFamille.Libellé,stFamille.IDFamille)
+      	
+      FIN
+     type : 458752
+   -
+     name : RempliTreeview
+     procedure_id : 2214569237886207148
+     type_code : 14
+     code : |1-
+      // Résumé : Remplit l'arbre des Familles
+      // Syntaxe :
+      // RempliTreeview ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE RempliTreeview()
+      
+       // Suppression de tout ce qu'il y a dans le TV
+      ArbreSupprimeTout(ARBRE_Familles)
+      
+      // On ajoute la racine de la Famille
+      ArbreAjoute(ARBRE_Familles,CST_NOM_FILTRE_PRODUIT_DEFAUT,aDéfaut,aDéfaut,-1,aPremier)
+      
+      // Remplissage de l'arbre des Familles
+      RempliArbreFamilles()
+      
+      // Déroule tout l'arbre
+      ArbreDérouleTout(ARBRE_Familles)
+      
+      // On recharge toutes les données pour être en phase avec l'arbre
+      ChargeFamilles(Vrai,0)
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : MDLC_SansNom1
+resources :
+ string_res :
+  identifier : 0x1eb7c03d05d0fe6d
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : < Toutes les familles >
+     index : 0
+   -
+     text :
+      fr-FR : < Toutes les familles >
+     index : 1
+   -
+     text :
+      fr-FR : < Toutes les familles >
+     index : 2
+webification :
+ internal_properties : CAAAAAgAAACYzxT95H3qP7nIys4LqA==
+custom_note :
+ internal_properties : CAAAAAgAAAC68/W0/adbG0nFCRhrE42B5HRnbDzVHaz86sSQyxlBk7I=
+rad :
+ internal_properties : CAAAAAgAAABoAN7PLpwJW3EiA7WVZdCA5EwrCA1rvutcDHooMWKe

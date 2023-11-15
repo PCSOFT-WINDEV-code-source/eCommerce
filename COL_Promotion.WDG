@@ -1,0 +1,559 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Promotion
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad30581ece4
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Promotion
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Promotion est une structure
+      		IDPromotion 		est un entier 
+      		DateDébut 			est un date 
+      		DateFin 			est un date 
+      		Description 		est un chaîne
+      		QuantitéLimitée 	est un booléen
+      		Quantité 			est un entier
+      		TitrePromotion 		est un chaîne
+      		TexteRemplacement 	est un chaîne
+      		EstPrincipale 		est un booléen
+      		IDProduit 			est un entier
+      		tabPhotoPromotion 	est un tableau dynamique de 0 STCOL_PhotoPromotion 
+      		PrixUnitaireHT		est un monétaire
+      Fin
+       
+      PUBLIC
+      	gtabPromotions 	est un tableau de STCOL_Promotion
+       
+       CONSTANT
+       	ROLE_PROMOTION_GRAND_CARRE	= 1		// Format 600x600 affiché en cas de promotion principale
+       	ROLE_PROMOTION_CARRE_PETIT	= 2		// Format 200x200 affiché dans la liste des promotions
+       	ROLE_PROMOTION_PAYSAGE_GRAND	= 3	// Format 705x175 affiché dans les pages d'accueil
+       FIN
+     type : 720896
+  procedures :
+   -
+     name : ActualiserPromotions
+     procedure_id : 2211662666044954303
+     type_code : 15
+     code : |1+
+      // Résumé : Actualise la liste des promotions
+      // Syntaxe :
+      //ActualiserPromotions ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      Procédure ActualiserPromotions ( )
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RETOUR
+      FIN
+      
+      // On remet à jour le contenu
+      FichierVersTableau(gtabPromotions,Promotion,DateFin)
+     type : 458752
+   -
+     name : ListePromotions
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211663550808555161
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des promotions
+      // Syntaxe :
+      //[ <Résultat> = ] ListePromotions (<sDateDébut> est chaîne, <sDateFin> est chaîne, <nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	sDateDébut (chaîne ANSI) : <indiquez ici le rôle de sDateDébut>
+      //	sDateFin (chaîne ANSI) : <indiquez ici le rôle de sDateFin>
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	tableau (STCOL_Promotion) : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListePromotions ( sDateDébut est un chaîne, sDateFin est un chaîne, nIDProduit est un entier )
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER gtabPromotions
+      FIN
+      
+      // Configuration de la requête
+      REQ_RecherchePromos.pDateDébut 	= sDateDébut  = "" ? Null 	SINON sDateDébut
+      REQ_RecherchePromos.pDateFin 	= sDateFin  = "" ? Null 		SINON sDateFin
+      REQ_RecherchePromos.pDateFinVide = sDateFin  = "" ? Null 	SINON ""
+      REQ_RecherchePromos.pIDProduit 	= nIDProduit = -1 ? Null 	SINON nIDProduit
+      
+      // Exécution de la requête
+      HExécuteRequête(REQ_RecherchePromos)
+      
+      // Suppression de l'ancien contenu
+      TableauSupprimeTout(gtabPromotions)
+      
+      // On remplit le tableau
+      Pour TOUT REQ_RecherchePromos 
+      	// Déclaration des variables
+      	stPromo 	est un STCOL_Promotion	
+      	
+      	// Récupération de la promotion
+      	FichierVersMémoire(stPromo,REQ_RecherchePromos)
+      	
+      	// Ajout à la liste des promotions
+      	TableauAjoute(gtabPromotions,stPromo)
+      FIN
+      
+      // On renvoie la liste des promotions
+      renvoyer gtabPromotions
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER gtabPromotions
+      	
+     type : 458752
+   -
+     name : SupprimerPromotion
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211670615699658614
+     type_code : 15
+     code : |1+
+      // Résumé : Supprimer la promotion spécifiée
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerPromotion (<nIDPromotionRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDPromotionRecherchée (entier) : <indiquez ici le rôle de nIDPromotionRecherchée>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerPromotion ( nIDPromotionRecherchée est un entier )
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la promotion en base
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotionRecherchée)
+      SI Htrouve(Promotion) = Faux alors
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // Suppression en base
+      Si HSupprime(Promotion) = Faux alors
+      	AjouteErreur("Suppression de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ModifierPromotion
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211677973173943194
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie une promotion
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierPromotion (<nIDPromotionRecherchée> est entier, <stContenuPromotion> est STCOL_Promotion)
+      //
+      // Paramètres :
+      //	nIDPromotionRecherchée (entier) : <indiquez ici le rôle de nIDPromotionRecherchée>
+      //	stContenuPromotion (STCOL_Promotion) : <indiquez ici le rôle de stContenuPromotion>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ModifierPromotion ( nIDPromotionRecherchée est un entier , stContenuPromotion est un STCOL_Promotion )
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche en base
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotionRecherchée)
+      SI HTrouve(Promotion) = Faux ALORS
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On remplit les données
+      MémoireVersFichier(stContenuPromotion,Promotion)
+      Promotion.IDPromotion = nIDPromotionRecherchée
+      
+      // Modification en base
+      SI HModifie(Promotion) = Faux ALORS
+      	AjouteErreur("Modification de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Est-ce que c'est la promotion principale ?
+      SI stContenuPromotion.EstPrincipale = Vrai ALORS
+      	SI DefinirPromotionPrincipale(nIDPromotionRecherchée) = Faux ALORS
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : AjouterPromotion
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211677973173877377
+     type_code : 15
+     code : |1+
+      // Résumé : Ajoute une promotion
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterPromotion (<stContenuPromotion> est STCOL_Promotion)
+      //
+      // Paramètres :
+      //	stContenuPromotion (STCOL_Promotion) : <indiquez ici le rôle de stContenuPromotion>
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction AjouterPromotion(stContenuPromotion est un STCOL_Promotion) : entier
+      
+      // Variables locales
+      bufDefaut		est un buffer
+      nIDPromotion 	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation mémoire
+      HRAZ(Promotion)
+      
+      // On remplit les données
+      MémoireVersFichier(stContenuPromotion,Promotion)
+      Promotion.IDPromotion = 0
+      
+      // Modification en base
+      SI HAjoute(Promotion) = Faux ALORS
+      	AjouteErreur("Ajout de l'enregistrement impossible")
+      	RENVOYER -1
+      FIN
+      
+      // mémorisation de la promotion
+      nIDPromotion = promotion.IDPromotion
+      
+      QUAND Exception dans
+      	AssocierPhotoPromotion(Promotion.IDPromotion,ROLE_PROMOTION_GRAND_CARRE,bufDefaut)
+      	AssocierPhotoPromotion(Promotion.IDPromotion,ROLE_PROMOTION_PAYSAGE_GRAND,bufDefaut)
+      FAIRE
+      	dbgAssertion(Faux,"Impossible de créer les images par défaut des promotions")
+      	// Erreur non fatale
+      FIn
+      
+      SI stContenuPromotion.EstPrincipale = Vrai alors
+      	si DefinirPromotionPrincipale(nIDPromotion) = Faux alors
+      		RENVOYER -1
+      	FIN
+      FIN
+      
+      
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER nIDPromotion
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER -1
+     type : 458752
+   -
+     name : LirePromotionEnCours
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217196581147288998
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'identifiant de la promotion en cours
+      // Syntaxe :
+      //[ <Résultat> = ] LirePromotionEnCours ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePromotionEnCours() : entier
+      
+      // Initialisation des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER -1
+      FIN
+      
+      // On ne prend que les promotions dont la date de début est inférieure ou égale à aujourd'hui
+      // et dont la date de fin est supérieure ou égale à aujourd'hui ou vide
+      // Les promotions sont triées par ordre de date de fin croissante
+      
+      // Initialise les paramètres de la requête
+      REQ_RecherchePromos.pDateDébut 	= DateSys()
+      REQ_RecherchePromos.pDateFin 		= DateSys()
+      REQ_RecherchePromos.pIDProduit 	= Null
+      
+      // Exécution de la requête
+      HExécuteRequête(REQ_RecherchePromos)
+      
+      // Lecture de la première promotion
+      HLitPremier(REQ_RecherchePromos)
+      SI HEnDehors(REQ_RecherchePromos) = Vrai alors
+      	// pas de promotion en cours
+      	RENVOYER -1
+      SINON
+      	// On a une promotion en cours
+      	RENVOYER REQ_RecherchePromos.IDPromotion
+      FIN
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER -1
+     type : 458752
+   -
+     name : LirePromotion
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211662666045019885
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la promotion demandée
+      // Syntaxe :
+      //[ <Résultat> = ] LirePromotion (<nIDPromotionRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDPromotionRecherchée (entier) : <indiquez ici le rôle de nIDPromotionRecherchée>
+      // Valeur de retour :
+      // 	STCOL_Promotion : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction LirePromotion ( nIDPromotionRecherchée est un entier )
+      // Variables locales
+      nIndiceTableau		est un entier
+      stPromotionErr		est un STCOL_Promotion
+      
+      // Initialisation de la promotion "erreur"
+      stPromotionErr.IDPromotion = -1
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER stPromotionErr
+      FIN
+      
+      // Si le tableau des promotions n'a pas été chargé, on le charge
+      SI gtabPromotions..Occurrence = 0 alors
+      	ListePromotions("","",-1)
+      FIN
+      
+      // Recherche de la promotion
+      nIndiceTableau = TableauCherche(gtabPromotions,tcLinéaire,"IDPromotion",nIDPromotionRecherchée)
+      SI nIndiceTableau <=0 alors
+      	AjouteErreur("Enregistrement non trouvé")
+      	renvoyer stPromotionErr
+      FIN
+      
+      // On renvoie la promotion
+      renvoyer gtabPromotions[nIndiceTableau]
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER stPromotionErr
+     type : 458752
+   -
+     name : DefinirPromotionPrincipale
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218743370583431137
+     type_code : 15
+     code : |1-
+      // Résumé : Définit la promotion comme promotion principale
+      // Syntaxe :
+      //[ <Résultat> = ] DefinirPromotionPrincipale (<nIDPromotion> est entier)
+      //
+      // Paramètres :
+      //	nIDPromotion (entier) : <indiquez ici le rôle de nIDPromotion>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE DefinirPromotionPrincipale(nIDPromotion est un entier)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // notification
+      NotifierModificationConfiguration("Changement de la promotion par défaut","",""+nIDPromotion)
+      
+      // Recherche de la promotion
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotion)
+      SI Htrouve(Promotion) = Faux alors
+      	AjouteErreur("Promotion non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // On regarde s'il y a déjà une promotion principale
+      HLitRecherchePremier(Promotion,EstPrincipale,Vrai)
+      Tantque htrouve(Promotion) = Vrai
+      	
+      	// On désactive
+      	Promotion.EstPrincipale = Faux
+      	HModifie(Promotion)
+      	
+      	// Lit le suivant
+      	HLitSuivant(Promotion,EstPrincipale)
+      FIN
+      
+      // Recherche de la promotion
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotion)
+      SI HTrouve(Promotion) = Faux ALORS
+      	AjouteErreur("Promotion non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // On passe en promotion principale
+      promotion.EstPrincipale = Vrai
+      SI Hmodifie(Promotion) = Faux alors
+      	AjouteErreur("Impossible de modifier la promotion")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",Exceptioninfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LirePromotionprincipale
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2219355365174238312
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'identifiant de la promotion principale
+      // Syntaxe :
+      //[ <Résultat> = ] LirePromotionprincipale ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePromotionprincipale() : entier
+      
+      // Initialisation des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER -1
+      FIN
+      
+      // On ne prend que les promotions dont la date de début est inférieure ou égale à aujourd'hui
+      // et dont la date de fin est supérieure ou égale à aujourd'hui ou vide
+      // Les promotions sont triées par ordre de date de fin croissante
+      
+      // Recherche la promotion principale
+      hlitrecherchepremier(promotion,EstPrincipale,vrai)
+      si htrouve(promotion) ALORS
+      	// Renvoie l'identifiant
+      	renvoyer Promotion.IDPromotion
+      SINOn
+      	// Non trouvé, renvoie -1
+      	renvoyer -1
+      FIN
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER -1
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f0710ff8a2e
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

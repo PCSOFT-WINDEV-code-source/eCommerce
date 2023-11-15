@@ -1,0 +1,1722 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_ECommerce
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1e0c4c3d00049bd8
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAAD6DaxVh5TsFP213sUnuURHQ4s71/MTL8ApK6SXDp4fKf1PGGbRCjphFK2KR6TmfxwnEcCsMArCs3F+ggW3mg69dMzTWhMyIisj03gwH/8IS9kCOtnD2gVZ/NmVRYBS1Fat5o9VEW+3JXNd/fKAft7PHBUHdqDi2Y6H80rpZ5a76qsF7Gm6rWkmxKdBS9wHkKKUbOAsCgLMcFeuJqmyD/vYJDeVCWx+ED9MMIo47sAy/dXFWYiO5K09UD625WhB6RcIgcVwPwbTsOcYYVl4GajSMhUjhFvgrmIZIxK33w==
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAAAvjXHgin2AFCyr7/JmcgX8eB5rnVV9R7w7nXtj2e0ClD2eQKm7XeGBED+UBr5aAF055wYv4cst6pQl+xdf0qz3o7fpLm9YYGHFdfGuNuTJjU8gRlmRIvPB+Xp6fgbdobwCsGSZjcTdC/3Ms2AeFiccIZuUHsSEYbCTRFGgE+V1yay6x6dF3ATKTaUW/pfVHiSFvxYDbQ+J7PLUtjS6GQ==
+     code : |1+
+      // La collection de procédures COL_ECommerce sert de base à la gestion d'un site de commerce électronique
+      // Elle utilise les fichiers suivants de l'analyse :
+      // - Client : fichier des comptes clients
+      // - Adresse : fichiers des adresses actives pour les clients
+      // - Commande : fichier des commandes passées sur le site
+      // - LigneCde : fichier du détail des commandes
+      // - AdresseArchive : fichier des adresses utilisées dans les commandes, en ajout seulement
+      // - Produit : fichier des produits
+      // - FamilleProduit : fichier des familles de produits
+      // - PhotoProduit : fichier des photos des produits
+      // - TauxTaxe : fichier des taux de taxe
+      // Le projet doit obligatoirement utiliser la gestion des contextes AWP sur le disque (fonction ConfigureContexteAWP(ctxDisque) dans le code d'initialisation du projet)
+      
+      // Constantes du composant interne
+      CONSTANT
+      	// Types de règlements (utilisé dans la rubrique Commande.TypeReglement)
+      	REGL_CB = 1				// Règlement par carte bancaire
+      	REGL_PAYPAL = 2			// Règlement par PayPal
+      	REGL_VIREMENT = 3		// Règlement par virement bancaire
+      	REGL_CHEQUE = 4			// Règlement par chèque
+      	
+      	// Options de la fonction AdresseAffichable
+      	ADR_ACTIVE = 0
+      	ADR_ARCHIVE = 1	
+      	
+      	// Pages par défaut
+      	PAGE_VISUPANIER_DEFAUT = "panier.awp"
+      	PAGE_RETOUR_BOUTIQUE_DEFAUT = "accueil.awp"
+      	PAGE_VISU_PRODUIT_DEFAUT = "produit.awp"
+      	PAGE_VISU_PRODUIT_DEFAUT_MOBILE = "produit_mobile.awp"
+      	
+      	// Rôles des photos des produits
+      	ROLE_PHOTO_NORMAL = 0				// Photo normale en carrée, 512x512 sans agrandissement
+      	ROLE_PHOTO_CARRE_PETIT = 1			// Photo carrée en petit : 128x128
+      	ROLE_PHOTO_CARRE_GRAND = 2			// Photo carrée en grand : 256x256
+      	
+      	// Gestion des caractéristiques de produits d'une même référence
+      	csSeparateurReference	= "#"		// Séparateur de références en cas de caractéristiques
+      	
+      	// Type de solutions de paiement
+      	PAIEMENT_PAYBOX		= "PAYBOX"
+      	PAIEMENT_PAYPAL		= "PAYPAL"
+      	PAIEMENT_CHEQUE		= "CHEQUE"
+      	PAIEMENT_VIREMENT	= "VIREMENT"
+      FIN
+      
+      // Structures de panier client
+      STLignePanier est une structure
+      	// Contenu de la ligne de panier
+      	sRefProduit est une chaîne				// Référence du produit
+      	nNbArticle est un entier				// Nombre d'articles de cette référence
+      	// Variables "cache" pour limiter le nombre de calcul/accès aux fichiers sur le serveur
+      	sLibArticle est une chaîne				// Libellé de l'article
+      	moPrixUnitaireHT est un monétaire		// Prix unitaire HT
+      	moTaxeUnitaire est un monétaire			// Montant de la taxe appliquée à un article
+      	moPrixUnitaireTTC est un monétaire		// Prix unitaire TTC
+      	taCaractéristique est un tableau associatif de variant // tableau contenant des caractéristiques propre au produit (couleur, taille, etc.)
+      	nIDPromotion est un entier // Identifiant de la promotion associée (0 si aucune promotion)
+      	nIDDéclinaison est un entier // Identifiant de la déclinaison
+      FIN
+      
+      STCommande est une structure
+      	// Contenu du panier
+      	tabPanier est un tableau de STLignePanier
+      	// Variables "cache" pour limiter le nombre de calculs sur le serveur
+      	taProduit est un tableau associatif de entier		// Rang d'un produit dans le panier (indexé sur sa référence)
+      	nNbArticle est un entier							// Nombre d'articles
+      	moPrixTotalHT est un monétaire						// Valeur totale du panier (HT)
+      	moTaxeTotal est un monétaire						// Valeur totale des taxes
+      	// Variables de livraison
+      	moFraisDeLivraisonHT est un monétaire				// Frais de livraison (HT)
+      	moFraisDeLivraisonTTC est un monétaire				// Frais de livraison (TTC)
+      	// Valeur totale du panier TTC, y compris les frais de livraison (montant à payer)
+      	moPrixTotalTTC est un monétaire						// Valeur totale du panier (TTC)
+      	
+      	// Variables utilisées par le tunnel de conversion
+      	nIDClient est un entier				// Client en cours de commande
+      	nIDAdresseLivraison est un entier	// Adresse de livraison sélectionnée
+      	nIDAdresseFacturation est un entier	// Adresse de facturation sélectionnée
+      	
+      	nIDCommande est un entier			// Commande en cours de création
+      FIN
+      
+      // Variables globales du composant interne (ces variables sont placées dans le contexte AWP dans la procédure InitialiseECommerce)
+      gbInitTerminée est un booléen = Faux				// Vrai si l'init du composant interne a déjà été effectuée
+      gStPanier est un STCommande							// Variable mémorisant le panier
+      gsErreurEnCours est une chaîne						// Texte contenant la dernière erreur fatale
+      gsPanierErreur est une chaine						// Texte contenant la dernière erreur liée au panier
+      
+      // Points d'entrées personnalisables
+      gPGenereNumCommande est une PROCEDURE = CommandeCrée			// Procédure renvoyant à chaque appel le prochain numéro de commande à utiliser
+      
+      // Noms de pages
+      gsNomPageVisuPanier est une chaîne = PAGE_VISUPANIER_DEFAUT		// Page de visualisation du panier (entrée du tunnel de conversion)
+      gsNomPageRetourBoutique est une chaîne = PAGE_RETOUR_BOUTIQUE_DEFAUT	// Page de retour à la boutique depuis le tunnel de conversion
+      gsNomPageVisuProduit est une chaîne = PAGE_VISU_PRODUIT_DEFAUT	// Page de visualisation d'un produit
+      gsNomPageVisuProduitMobile est une chaîne = PAGE_VISU_PRODUIT_DEFAUT_MOBILE	// Page de visualisation d'un produit sur mobile
+      
+     type : 720896
+  procedures :
+   -
+     name : InitialiseECommerce
+     internal_properties : CAAAAAgAAABg3VlM7ryaioopT9RDDVPFh/jon61wDzbXbNtJSKUM/rWx8xDuAkZu/PCqiCgJKWHPnXwt/hh6SiieLI16KbgPI2CaHPcdktUe6cszOPuMRi5lbSXeVMDvvVMkIuF3RHEYKy+AjCz2hcqX37HE83QRDvibDQaugULYk5e2tdJo4U8W2TXXBgjSKVknRFoxhfl+LyZnc3YghIAminBVsRICDJAXxqmWCXZorALLTgr73eBVPWfOx8WmkDMUfG8OhnAszFUS
+     procedure_id : 2165193327170207594
+     type_code : 15
+     code : |1+
+      // Résumé : Initialise le composant interne
+      // Syntaxe :
+      //[ <Résultat> = ] InitialiseECommerce ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Retourne Vrai lors de la première initialisation
+      // L'appelant sait alors que les variables de la collection de procédures ont leur valeurs par défaut et qu'il peut les remplacer
+      //
+      // Retourne Faux lors des initialisations suivantes (après une relecture de contexte AWP)
+      // L'appelant sait alors que les variables ont été relues dans la session AWP
+      //
+      PROCEDURE InitialiseECommerce()
+      
+      <COMPILE SI Configuration="eCommerce">
+      	// Déclaration des variables globales du contexte
+      	DéclareContexteAWP(gbInitTerminée)
+      	DéclareContexteAWP(gStPanier)
+      	DéclareContexteAWP(gsNomPageVisuPanier)
+      	DéclareContexteAWP(gsNomPageRetourBoutique)
+      	DéclareContexteAWP(gsErreurEnCours)
+      	DéclareContexteAWP(gsNomPageVisuProduit)
+      	DéclareContexteAWP(gsNomPageVisuProduitMobile)
+      	
+      	
+      	// Si c'est la première init (les variables n'ont pas été lues dans le contexte)
+      	SI gbInitTerminée = Faux ALORS
+      		// L'init est terminée
+      		gbInitTerminée = Vrai
+      		
+      		// Retourne Vrai lors de la première initialisation
+      		// L'appelant sait alors que les variables de la collection de procédures ont leur valeurs par défaut et qu'il peut les remplacer
+      		RENVOYER Vrai
+      	FIN
+      <FIN>
+      
+      
+      // Retourne Faux lors des initialisations suivantes (après une relecture de contexte AWP)
+      // L'appelant sait alors que les variables ont été relues dans la session AWP
+      RENVOYER Faux
+      
+     type : 458752
+   -
+     name : PanierNbArticle
+     internal_properties : CAAAAAgAAAB5M2rVCQCJwsutC7drFhXIq+hJEr0FOH+hh0oOq/kgkRVzDTfNqhbToCMIcO5GCb+ehyJoFmH97WVtf/hsfOp28DRjJYsPA1eQEbw37jAzHITmbxhi3Mh2rx7FhlnxG4HI1fC54xaAtWAC+EwYXxvcJJH4oQv/LeGyaViAINdRhOXK1A4jz3WTO+lIRzkyH0SGvsDngFrIE78jC4lMMngyEa1T6E8sMZ/yE18XI3I6ZgymHOMqzddw10/QknsLyX1Ab4KwoSVyQny/+nJVq8vVtv0V2toXtPl5X+16lwk8/oKS5dDMuPykYKiNYJViHb7zuAXW82cTgqIpgP+bk3VoZcb6tjBbUfRGnik4qEC2o07qg/4aU6f4hFA/ncsycmlLYPj+3LTXd/FE5qHwb5s/modTlOyL07/skC993IYN+uy4uGP8j4o7aooSprpPnePLpS/kA8LnHcCcvJz/gt6YLndCHDa1U9CsS2+4JRs4O2lzK6BX0VTGZUxfC8XMGzF73RqrGMzkUPYVfjF4j2TL6+T0CyajydI5u1tIcURwKww4Hie2i6FynjjBE/nyCmy3taJbEnViySQWmOEpDKzAyURLrxterYiZtT9bAGD7O+JgFqJHk4iqj0L7DLQ2t5mIBWekuw4T+gq1DX09CvdVfDFZbJAwjYz2UGxGtzK+m2ibAxhQuX8s+nTLP4rU4K+DkzKV11rfSDWXCptatBKBM+W+XN+2LOv02ZzjLZTt2IKTi7EimH5+rnKyAw/L3KbcDalJDNpwQEkupq4pV4CdNE301G9UCHmR2K8E2qBAfdvoIOJMdKYyXZQ6NfXri/9asJsEXSNg
+     procedure_id : 2165284363300121939
+     type_code : 15
+     code : |1-
+      // Résumé : Retourne un libellé correspondant au nombre d'articles dans le panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierNbArticle ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne : Libellé correspondant au nombre d'articles dans le panier
+      
+      PROCEDURE PanierNbArticle()
+      
+      SELON gStPanier.nNbArticle
+      	CAS 0
+      		RENVOYER "Panier vide"
+      	CAS 1
+      		RENVOYER "1 article"
+      FIN
+      
+      RENVOYER ChaîneConstruit("%1 articles",gStPanier.nNbArticle)
+     type : 458752
+   -
+     name : PanierValeurTTC
+     internal_properties : CAAAAAgAAABc+AfuMFu5mqBYJNujWBqsk5I+HTtasQmUah8XOgrraaoRUzoLKYPlGtox6kE44PRE9YEOuIzy3lm1lM6+DSY8SUzZEiKGRtPh1UL7vYXtkGry+Th6tp5V03/nv6NXbSi3dQIukhlomKLHOFRo1H/Y8x6oyVehmR52oyrfOYpffUWfvoxJpX1AZVqAwJsShehCLAHulbw0/jlLfppllapBTh9QEUsowYHrm34VIqfp7/+4/CNJuLYvDqytaHN9EKZhIaU3Z3xNjmtqiX96eEz6dV9lkSXYiCREpYecpLEfVdXRQ1WzCV2LtIMtJB5x0Gj6N8Wk+GwbNfdrHAzWZ34mcIjhMGWKPuvsNPCtUzax0094csBf2NdQfGf6MPKrDrjSOXqDcafumZPD+XLspjDsWVtu6SkY+iDbRdiZLzDS2QKAvEXCWJh4pozAF2Ux8tKnJ0WK9c100+34VQjtt+8NOF6hNQtDZjKzOI/2ebrSBN5CRslcx4OUBGR+sTVZP3o5sKn0hK9+KI9HiNhoyAsv6Qv941CkQWBpf0ODxKbroNKowvV4sOMBOtYDkt4iba0nUxxH0gjW4F7WNK5MfjeRQ3QnR/8LHatt710ko6DmpoupmZ+17Jx5qRIvF8Fkj9c3toR9oNLwUE0yLk8ln0HjW+zYc+NUtFStYdF6RWfCHZSeOuUp9DjP3N8vfIXm+U6ZfXg1u4kdT435MJL3zGfONSkWckmfUIzWNwZO2iS05RqvswkWAa7HRLQAObPxRshqdbPZd/trnKrFUXh16HbbQX6xv7bpjq5H6pU/6yJriKwPy8cttLU8TgwA+V0nliu9CTtiAiyC/tQ=
+     procedure_id : 2165286167186479001
+     type_code : 15
+     code : |1-
+      // Résumé : Retourne la valeur totale du panier (TTC)
+      // Syntaxe :
+      //[ <Résultat> = ] PanierValeurTTC ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne : Valeur totale du panier (TTC)
+      
+      PROCEDURE PanierValeurTTC()
+      
+      RENVOYER MonétaireVersChaine(gStPanier.moPrixTotalTTC)
+     type : 458752
+   -
+     name : PanierLibelleLigne
+     procedure_id : 2165290015477481706
+     type_code : 15
+     code : |1-
+      // Résumé : Retourne un libellé correspondant à la ligne du panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierLibelleLigne (<nLigne> est entier)
+      //
+      // Paramètres :
+      //	nLigne (entier) : ligne du panier
+      // Valeur de retour :
+      // 	chaîne : Libellé de la ligne du panier
+      //
+      
+      PROCEDURE PanierLibelleLigne( nLigne est un entier )
+      
+      dbgAssertion(nLigne<=TableauOccurrence(gStPanier.tabPanier))
+      
+      stLigne est un STLignePanier = gStPanier.tabPanier[nLigne]
+      
+      RENVOYER ChaîneConstruit("%1 %2 (%3)",stLigne.nNbArticle,stLigne.sLibArticle,MonétaireVersChaine(stLigne.moPrixUnitaireTTC*stLigne.nNbArticle))
+     type : 458752
+   -
+     name : PanierAjoute
+     procedure_id : 2166670031416594321
+     type_code : 15
+     code : |1+
+      // Résumé : Ajoute un produit dans le panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierAjoute (<sRefProduit> est chaîne, <nNbAjout> est entier [, <taCaractéristique> est tableau associatif [, <moPrixSpecifique> est monétaire [, <nIDPromotion> est entier [, <nIDDéclinaison> est entier]]]])
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne ANSI) : Référence du produit
+      //	nNbAjout (entier) : Quantité à ajouté
+      //	taCaractéristique (tableau associatif - valeur par défaut=0) : Caractéristiques du produit
+      //	moPrixSpecifique (monétaire - valeur par défaut=-1) : Prix du produit
+      //	nIDPromotion (entier - valeur par défaut=0) :  Identifiant de la promotion
+      //	nIDDéclinaison (entier - valeur par défaut=0) : <indiquez ici le rôle de nIDDéclinaison>
+      // Valeur de retour :
+      // 	chaîne ANSI : Référence du produit ajouté
+      //
+      
+      PROCEDURE PanierAjoute(LOCAL sRefProduit est une chaîne, LOCAL nNbAjout est un entier, taCaractéristique est un tableau associatif de variants = null, LOCAL moPrixSpecifique est un monetaire=-1, LOCAL nIDPromotion est un entier = 0, LOCAL nIDDéclinaison est un entier = 0)
+      
+      // Variables locales
+      sReferenceAjoutée		est une chaine
+      
+      // Est-ce que l'on a un tableau de caractéristiques ?
+      Si taCaractéristique..Occurrence > 0 alors
+      	// On va le mémoriser dans la référence
+      	sReferenceAjoutée = _sConstruitReference(sRefProduit,taCaractéristique)
+      SINON
+      	sReferenceAjoutée = sRefProduit
+      FIN
+      
+      RENVOYER PanierModifieNombre(sReferenceAjoutée, nNbAjout, *, taCaractéristique, moPrixSpecifique, nIDPromotion, nIDDéclinaison)
+      
+     type : 458752
+   -
+     name : PanierSupprimeProduit
+     internal_properties : CAAAAAgAAAC3OFdo1likIuLTKL0V6Po55eAGg2YQM6vDSumzQ9fI4c2Z9KT+HcNYuOHyoDBZGbvBkG2m8PObloSyJUqSXvhjfAjroEAeukPPMMBoNGxSqzzNewyhYXuj3jxhzr/iO7Ekg7SDaMVDZQOewSo2wsAOP13LKIlilJRmPrNqzDFgjrP3h3CaZZD1bsgGP7OYyuvNYngmgpV2refWxZoTU5bim5DGmPQ7UTZitx+RybME88ae5L+RsiZfV3Dy8rrsQsyl1sXzFUdhQkFU8ME8jRawNMdGysFRenVO+sw21nz3PDXzzquG1t/Y8mAv/nEI7aO7koyZKe7nW4NsoyjHdrUVTFZJnVWiKBo9XQZ4bG0Dpsy2lOEC31p5ZnwVbLb6fWn3TFq4pVFZmylH0AwxWfBpnvf9JK6V/ozzPqmXmmDV5fIrB5XEzBbQPWbqiC8z9d6LhMkHnGitfvzEgPvRgsAjGSTQ78cMrWEubIbHqRPN8byPzQRSwtdKfvNgmGU3MG34+NsPDdqqAujGp0KilmDGUmmkqbYdHeHb5nmok+mPqS+sAN9h0oJWTOT0Lf0zhbtkHA/XaDM=
+     procedure_id : 2166739231938571403
+     type_code : 15
+     code : |1+
+      // Résumé : Supprime un produit du panier (quelque soit la quantité présente)
+      // Syntaxe :
+      //PanierSupprimeProduit (<sRefProduit> est chaîne)
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne ANSI) : Référence à supprimer
+      
+      PROCEDURE PanierSupprimeProduit(LOCAL sRefProduit est une chaîne )
+      
+      dbgAssertion(gStPanier.taProduit[sRefProduit]>0,"Suppression d'un article inexistant")
+      nRangDansPanier est un entier = gStPanier.taProduit[sRefProduit]
+      
+      // Actualise les compteurs globaux
+      gStPanier.nNbArticle -= gStPanier.tabPanier[nRangDansPanier].nNbArticle
+      gStPanier.moPrixTotalTTC -= gStPanier.tabPanier[nRangDansPanier].nNbArticle*gStPanier.tabPanier[nRangDansPanier].moPrixUnitaireTTC
+      gStPanier.moPrixTotalHT -= gStPanier.tabPanier[nRangDansPanier].nNbArticle*gStPanier.tabPanier[nRangDansPanier].moPrixUnitaireHT
+      gStPanier.moTaxeTotal -= gStPanier.tabPanier[nRangDansPanier].nNbArticle*gStPanier.tabPanier[nRangDansPanier].moTaxeUnitaire
+      Si gStPanier.tabPanier[nRangDansPanier].taCaractéristique<>null alors
+      	TableauSupprimeTout(gStPanier.tabPanier[nRangDansPanier].taCaractéristique)	
+      FIN
+      	
+      
+      // Supprime dans les tableaux
+      TableauSupprimeLigne(gStPanier.tabPanier,nRangDansPanier)
+      TableauSupprimeLigne(gStPanier.taProduit,sRefProduit)
+      
+      // Actualise les index dans le tableau associatif
+      POUR TOUT nRang de gStPanier.taproduit
+      	SI nRang>nRangDansPanier ALORS
+      		nRang--
+      	FIN
+      FIN
+     type : 458752
+   -
+     name : PanierSupprime
+     procedure_id : 2166764353206495651
+     type_code : 15
+     code : |1+
+      // Résumé : Supprime un produit du panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierSupprime (<sRefProduit> est chaîne, <nNbSuppr> est entier)
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne ANSI) : Référence du produit
+      //	nNbSuppr (entier) : Quantité à supprimer
+      // Valeur de retour :
+      // 	chaîne ANSI : Référence du produit
+      
+      PROCEDURE PanierSupprime(LOCAL sRefProduit est une chaîne, nNbSuppr est un entier )
+      
+      RENVOYER PanierModifieNombre(sRefProduit,-nNbSuppr,*,null)
+     type : 458752
+   -
+     name : PanierModifieNombre
+     internal_properties : CAAAAAgAAABdZrC4apQMczJPvMoE+dnEO055uAYAt23WCmZ2RXIU2V5UvFo6SDCjsiXxFhqggMDmCW11tHFjdNFxdXxkSQv23bjZCZLeTzxAC4xgonTk6bScRxYB3vwtScEaO9vH5F3hxoYhUOYH6esUVjwsbc0AVowzeDyhTMY81ubUFADx8AxFxNlaIAuxyOvs0Vd0zganHlUTZrjVilChw5j7MILWSMFJUSykpXyzyj4626HNIsiQM1B7vU3Tw9/VvO8H3BMhPM7q6KG4EPco4mxuWbckYPewEDYaDzulfjOrM38/OiQgyNekQR7Jd8bpT12KS36n92+F6C99kA2XOMfkz7DhFKhumtl36xl5vIpRKFMyAyONcyKR5S8XDcyGN0PSXEdkEOF2DEQkXstrurKruP1UAxdVb91lmAIbNFHVXOBtRCg9tGY6Gmol0l/lmuhRG/0igSPqeIdayOhYAaD3MHqdjgrQH3fKYkZK/0yGMNhQP+GNLvAiXnIZBk1gPTIwtv9mGfld3SQ9O6/w4q0qoL6SeXeQwjk4TOLycwK1z2Bsqq0/tQ8rgb42r649Sc/xQ7mAwpwERiw1pxdtYdLwF1k/asdEUEdgYmwnodU303TcYFXqSSKEg0i/QupO7NFYSHOyQOx0g4xf6vOchxNYQmQonEEmxckhalXgfcl63rWwsp7SzQdyxXDQAvNZXBDAke1QElYBSET+pDNlaUJ1j4UPuUCgb6fV+rGildRRxnNverszD8Btz9EHQPaGR4jrDvPXY6DUJDCKIwxM5zjBbVwk34WRungYzWdTP6YEJ+0Toi9D0FUVOVzcUfrgo4BF97+l35+P/qXfNCwVrWlAhRlvqU+R7Wz/Zf8fvoTcTPGUYkX7acxCb5ITDETcywD4gNwIWDa1qzjWE9QHUPA9YJNQFwZq7aNB8LMTHCfXmhthUSg9czyqPwb+qDkZy2LfV/eDldiu5ZgIWqS6r/rGAJhtpQS3/gKTeDkQd4LEmV9L7ak/vzgpAxb5BcikGOzYihG21sAE99yJcT8BnKoLwtXPri5cfTAMfZoe+CClZT1IQPS+rER8J3/cI2WJZ0LewgKjTrmYpk4/vl5X2c+a9jlKU6YbiLbpTIjPsgH76ddYZuT94EYZ0O7oBT6tJ1tJgztIZ7uuGV0KhGDoJs6nfbawcHsdWSJAHFQdMdcU5lZZ79Jmbumku0OvHTKGE72jRz7suFChV49kTgHV3Qb9k8Nq2exepTDaZ4fkRYUT6u0hn6Ls6aEkLRy298XmSsa9Q0t1j3gnaEDfDM2sXsP9rQuimEHF84YU1lrkBYogl2+WGhvR8zkU1O9KzsthkDaIYfjtnBrOXh3I0psrt+K4i0Kb0Z5NjSXJMVixVqm2Lwv/q0/SRr0KCXyBZXN0F3/Y53Kvf/MiajePdxWRXtxVndD13VNia4yEOAsYA14BKow5wr1PJ3Fq+uaaClbceX+hOBDetYRu2LMGi2TjKZw3yKSXfgswCf3PC7D1d1R81EJfCXQleyckNSXvuhFr4V1duoI4FCnFZA6VGGb0zFnI6RcqCPVC6tDmFTbGqwcv5SKsyuH9mIBeY2W2RiQMkIA1FeMT3AMJq7Zrzm5Y+A+n3CvME7Dcr7aLVYX8H5Y5+uFWpZzKNovF3xKQvVjmwHmGtyu+uQNqKJLB1UP6UQlJIcqvLfeEqaZ/9EHtkJV0DfA8E6nYrMrRu+A6HHH2+zUUbrd625MGiLb8XglNTsQ23HqgFrbTPu+00R3y+eDwNLTJ/+t5gntNtkmqmARHULLA7yifVGnM2I8OIB9RKFEUFbqO851Mzno=
+     procedure_id : 2166764460580769259
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la quantité d'un produit dans le panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierModifieNombre (<sRefProduit> est chaîne, <nNbModif> est entier [, <bSupprimeSiNul> est booléen [, <taCaractéristique> est tableau associatif [, <moPrixSpecifique> est monétaire [, <nIDPromotion> est entier [, <nIDDéclinaison> est entier]]]]])
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne ANSI) : Référence du produit
+      //	nNbModif (entier) : nouvelle quantité
+      //	bSupprimeSiNul (booléen - valeur par défaut=1) : Vrai pour supprimer la ligne si la quantité devient zéro
+      //	taCaractéristique (tableau associatif - valeur par défaut=0) : Caractéristiques du produit
+      //	moPrixSpecifique (monétaire - valeur par défaut=-1) : Prix du produit
+      //	nIDPromotion (entier - valeur par défaut=0) : Identifiant de la promotion
+      //	nIDDéclinaison (entier - valeur par défaut=0) : Identifiant de la déclinaison produit
+      // Valeur de retour :
+      // 	chaîne ANSI : Référence du produit 
+      //
+      
+      PROCEDURE PanierModifieNombre(LOCAL sRefProduit est une chaîne, nNbModif est un entier , bSupprimeSiNul est un booléen = Vrai,taCaractéristique est un tableau associatif de variants = null, moPrixSpecifique est un monetaire=-1, nIDPromotion est un entier = 0, nIDDéclinaison est un entier = 0)
+      
+      nNbModifReel est un entier // Nombre d'article à ajouter réellement (en tenant compte de l'absence éventuelle de stock)
+      nNbEnStock est un entier
+      nNbArticleAvant est un entier
+      bProduitEstLimité est un booleen = faux
+      
+      // Recherche le produit et son taux de taxe dans la base
+      SI bLitProduitSelonReference(sRefProduit)  = Faux ALORS
+      	RENVOYER ""
+      FIN
+      
+      // Cherche le produit dans le panier
+      nRangDansPanier est un entier = gStPanier.taProduit[sRefProduit]
+      SI nRangDansPanier=0 ALORS
+      	// Si on est en suppression, c'est une erreur
+      	SI nNbModif<0 ALORS
+      		dbgAssertion(Faux,"Suppression d'un produit qui n'est pas dans le panier")
+      		RENVOYER ""
+      	FIN
+      	
+      	// Ce produit n'existe pas encore dans le panier, on l'ajoute
+      	// Recherche le taux de taxe dans la base
+      	SI HLitRecherchePremier(TauxTaxe,IDTauxTaxe,Produit.IDTauxTaxe) = Faux ALORS
+      		dbgAssertion(Faux,"Le produit n'est pas associé à un taux de taxe")
+      		RENVOYER ""
+      	FIN
+      	
+      	// Mémorise le nombre de produit à ajouter
+      	nNbModifReel = nNbModif
+      	// Le produit a-t-il des stocks limités ?
+      	bProduitEstLimité = bProduitEstEnQuantitéLimitée(produit.idproduit)
+      	// Vérifie que le produit ou la déclinaison soit en stock
+      	si nIDDéclinaison > 0 ALORS
+      		si bDéclinaisonEstEnStock(nIDDéclinaison) = faux ALORS
+      			gsPanierErreur = LireTextePanierProduitStockInsuffisant()
+      			renvoyer ""
+      		SINON
+      			nNbEnStock = nNbDéclinaisonEnStock(nIDDéclinaison)
+      		FIN
+      	SINON
+      		SI bproduitEstEnStock(produit.IDProduit) = Faux ALORS
+      			gsPanierErreur = LireTextePanierProduitStockInsuffisant()
+      			RENVOYER ""
+      		SINON
+      			nNbEnStock = nNbProduitEnStock(produit.IDProduit)
+      		FIN
+      	FIN
+      	
+      	// S'il reste du stock, on mémorise la valeur de stock disponible si la demande est trop importante
+      	SI bProduitEstLimité _et_ nNbEnStock < nNbModif ALORS nNbModifReel = nNbEnStock
+      	
+      	// Création de la ligne de panier
+      	stNouvelleLigne est une STLignePanier 
+      	// Si aucun prix spécifique n'est renseigné  (promotion, remise, gratuité, ...)
+      	si moPrixSpecifique = -1 alors
+      		// Récupère le prix HT du produit
+      		stNouvelleLigne.moPrixUnitaireHT = Produit.PrixUnitaireHT
+      	SINON
+      		// Récupère le prix spécifique indiqué
+      		stNouvelleLigne.moPrixUnitaireHT = moPrixSpecifique
+      	FIn
+      	stNouvelleLigne.moTaxeUnitaire = (stNouvelleLigne.moPrixUnitaireHT * TauxTaxe.Taux) / 100
+      	stNouvelleLigne.moPrixUnitaireTTC = stNouvelleLigne.moPrixUnitaireHT + stNouvelleLigne.moTaxeUnitaire
+      	stNouvelleLigne.nNbArticle = nNbModifReel
+      	stNouvelleLigne.sLibArticle = Produit.LibelleProduit
+      	stNouvelleLigne.sRefProduit = sRefProduit
+      	stNouvelleLigne.nIDPromotion = nIDPromotion
+      	stNouvelleLigne.nIDDéclinaison = nIDDéclinaison
+      	// Mémorisation de la caractéristiques s'il y en a une
+      	SI taCaractéristique <> Null alors
+      		stNouvelleLigne.taCaractéristique = taCaractéristique
+      	FIN
+      	
+      	nRangDansPanier = TableauAjouteLigne(gStPanier.tabPanier,stNouvelleLigne)
+      	dbgAssertion(nRangDansPanier<>-1,"Echec de l'ajout dans le tableau")
+      	SI nRangDansPanier>0 ALORS
+      		gStPanier.taProduit[sRefProduit] = nRangDansPanier
+      	SINON
+      		RENVOYER ""
+      	FIN
+      SINON
+      	
+      	// Mémorise la déclinaison (son identifiant)
+      	nIDDéclinaison = gStPanier.tabPanier[nRangDansPanier].nIDDéclinaison
+      	// Mémorise la valeur de modification
+      	nNbModifReel = nNbModif
+      	// Le produit a-t-il un stock limité ?
+      	bProduitEstLimité = bProduitEstEnQuantitéLimitée(produit.idproduit)
+      	// Vérifie que le produit ou la déclinaison ait suffisamment de stock
+      	SI nIDDéclinaison > 0 ALORS
+      		SI bDéclinaisonEstEnStock(nIDDéclinaison) = Faux ALORS
+      			<compile si TypeConfiguration<>Webservice>
+      				Erreur(LireTextePanierProduitStockInsuffisant())				
+      			<fin>
+      			PanierSupprimeProduit(sRefProduit)
+      			RENVOYER sRefProduit
+      		SINON
+      			nNbEnStock = nNbDéclinaisonEnStock(nIDDéclinaison)
+      		FIN
+      	SINON
+      		SI bProduitEstEnStock(produit.IDProduit) = Faux ALORS
+      			<COMPILE SI TypeConfiguration<>Webservice>
+      				Erreur(LireTextePanierProduitStockInsuffisant())
+      			<FIN>
+      			PanierSupprimeProduit(sRefProduit)
+      			RENVOYER sRefProduit
+      		SINON
+      			nNbEnStock = nNbProduitEnStock(produit.IDProduit)
+      		FIN
+      	FIN
+      	
+      	// Si le stock est limité pour ce produit ET que le nombre d'article n'est pas vide
+      	si bProduitEstLimité _et_ gStPanier.tabPanier[nRangDansPanier].nNbArticle > 0 alors
+      		// Mémorise le nombre d'article
+      		nNbArticleAvant = gStPanier.tabPanier[nRangDansPanier].nNbArticle
+      		// Le produit existe déjà dans le panier, on se contente de modifier le nombre
+      		gStPanier.tabPanier[nRangDansPanier].nNbArticle = min(nNbEnStock, nNbArticleAvant+nNbModif)
+      		// Mémorise la modification réelle
+      		nNbModifReel = gStPanier.tabPanier[nRangDansPanier].nNbArticle - nNbArticleAvant
+      	SINON
+      		// Le produit existe déjà dans le panier, on se contente de modifier le nombre
+      		gStPanier.tabPanier[nRangDansPanier].nNbArticle += nNbModif
+      	Fin
+      	
+      FIN
+      
+      // Si le nombre d'élément est à 0, on retire l'article du panier
+      SI gStPanier.tabPanier[nRangDansPanier].nNbArticle=0 _ET_ bSupprimeSiNul ALORS
+      	PanierSupprimeProduit(sRefProduit)
+      	RENVOYER sRefProduit
+      FIN
+      
+      
+      // Actualise les compteurs globaux
+      gStPanier.nNbArticle += nNbModifReel
+      gStPanier.moPrixTotalHT += nNbModifReel*gStPanier.tabPanier[nRangDansPanier].moPrixUnitaireHT
+      gStPanier.moTaxeTotal += nNbModifReel*gStPanier.tabPanier[nRangDansPanier].moTaxeUnitaire
+      gStPanier.moPrixTotalTTC += nNbModifReel*gStPanier.tabPanier[nRangDansPanier].moPrixUnitaireTTC
+      
+      // Si le nombre d'article modifié réellement est différent du nombre demandé (cas où l'article n'est pas disponible en quantité suffisante en stock)
+      si bProduitEstLimité _et_ nNbModifReel <> nNbModif ALORS
+      	// Avertit l'utilisateur
+      	<COMPILE SI TypeConfiguration<>Webservice>
+      		erreur(LireTextePanierProduitStockMax())
+      	<FIN>
+      FIN
+      
+      RENVOYER sRefProduit
+     type : 458752
+   -
+     name : PanierQuantite
+     internal_properties : CAAAAAgAAAA19A7IYD8qSVA6CYbxdFTU7z9kfZEKXOrKPCzKkLSi9BPPgEVFUBRul/Bc/agkRY8x0sFeKsxD0v4C070JPm7AxdP3SH05xeP5odhpl/JWp6ecfKBW6KebcnZvuooKhd1tpqTyHdoKVpoPWQBM4jIKjjMe3q4Ij24l9+EYetEucjQ0PHwK3kURE1ET9JBY6Tfr/5Km1DLdAPBkE70eLIWXU8aEp73my7wsx1pa7Az6Z6wFPNLB4OMCMyGN8WLgA36aEB6F1EPXGzJkr7iFNbnSWCTPmWwIEm8f7DnIUyyX/N+ovyAppgEOwJ5lLM6xnZ9pswVjwVac0sbW/mex6heojqp1IxSlc8YO1x4MabciGmb1AYUzbKPIf+Im+EnXcDaEh3Qgjc2TXl44ymlWmCI=
+     procedure_id : 2167150771419152443
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le nombre de produits d'un panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierQuantite (<nRang> est entier)
+      //
+      // Paramètres :
+      //	nRang (entier) : indice du panier
+      // Valeur de retour :
+      // 	entier : Nombre de produits
+      //
+      
+      PROCEDURE PanierQuantite( nRang est un entier )
+      
+      RENVOYER COL_ECommerce.gStPanier.tabPanier[nRang].nNbArticle
+     type : 458752
+   -
+     name : MonétaireVersChaine
+     internal_properties : CAAAAAgAAABATHtnuELEfiZXMB2sjiCWAl4mfTNNbBJftxGtuvOsS8zB4xBjtdigGcRkqm/lBbcuCsPmAEWqC4hdu6lBjZg7uVbuVmGFjSA0JcL6a9xAToEyAMGFMUhjW8IRbuL2oIN1GkXXsYMXsfSEutNjkXFfvDP5G3idsZdzBF1Dl0FBdljsb1afJ0hXHNQiQod8+GpLmo8nLRDsj+jI/gqqleVOQP8A8zN/F3zzme5/H8DwCCB4AdH839hyBFXcKYcfDwZjxTLFnM+ARD/FvNp425Yt6jqmDXL6cr3ePIZEo0JoS29EMF6q7nDm7Xe/dqi1osBXGRl3N+dXvkkJBT1Pf3t5a8ovJuZ1zEgWKPyXMAF6/3EUiH5AcbOUqzfc1jNHPb2R4pHAXxnqHEuKsNm0Eygxd7P1bbbbb5/q7Tf0pOw/HsCm2XL7yVOm/P0aZz1s8SOw5nMioZSaIdhoBTLz/qxTikVF+Ph4fy4C9zUJXEQoWZjSl+k6VvLCUujrxDxA0RTavXcixPGzJso4ZvqHMCz0IzvC9WB+frmxdpggh/6fUV4XPlvnlcCfSaIyM5zHPUZVbnSp9YK3EI1poQ==
+     procedure_id : 2167395417038990332
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie le texte d'un montant
+      // Syntaxe :
+      //[ <Résultat> = ] MonétaireVersChaine (<moValeur> est monétaire)
+      //
+      // Paramètres :
+      //	moValeur (monétaire) : montant
+      // Valeur de retour :
+      // 	chaîne : Texte du montant
+      PROCEDURE MonétaireVersChaine( LOCAL moValeur est un monétaire )
+      
+      
+      sResultat est une chaîne = NumériqueVersChaîne(Arrondi(moValeur,2),maskMonétaireSystème)
+      
+      RENVOYER sResultat
+      
+     type : 458752
+   -
+     name : PanierTotalTaxe
+     internal_properties : CAAAAAgAAACG+A3MkbqWDH03Yb92nSzM/uBnrd8EfHHfL4Pf47A0Dk9c2jzhZPUSCjzLgnl0zZ1vfh4yu09VC+nD/Qd1S0w5oDSNsrlj2pIkWuxHIhCN2YpMeeOzS1Fjeg+OUJex+5BNCLD6Vd6wGilmtvdnry0GftxBiwL1orUJSpoGRDVRPOq+1WvmmYKF0SUXAWMehsxQgv63ERiBgjJ4Wh/Z96ibsYCVJllz4Uuus91Gbfntp95l5mY3K8cfmaCzFxWIKvfZ3Yj7fhAqIOZRtrtIGjSWm7xk1EM44jZHw/9Tqu+abeMUhStKvRT1ex0gm2RG1FvUbLNnsnf3KT8mIJIIOLI6BqZ/6TV0T3Ume42IeOYCzuwsovxd/XCLq+VWod9e/9rARx1PWTjLTBHuBZ8RSNtNjZU=
+     procedure_id : 2167461297573410816
+     type_code : 15
+     code : |1+
+      // Résumé : Valeur totale HT du panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierTotalTaxe ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne : Valeur totale HT du panier
+      
+      PROCEDURE PanierTotalTaxe()
+      
+      RENVOYER MonétaireVersChaine(gStPanier.moTaxeTotal)
+     type : 458752
+   -
+     name : PanierValeurHT
+     internal_properties : CAAAAAgAAAANU/L63rgfcwNTPovMqugCjRzBjFaefqr0UGCrR4zudFAJt6cdy9PLdVhAkUvYnWEMETG7GF9tDZ0nBu8EDDeBfqkOi/fgah3rCOvR/41TKUWIvhkWaMHIDZkpzQtKgsNKk6ve/tluVQDThDUHScpaWL1hunhltrtsrlpDS2V8Ux4+sSXflKQxu8afG5whQjlKLg3xatUluCwoC2ZuDgXtaKHxFFoGLWnMiCttMrpY6qW3zdoB6RJ1UCOQAh+XXOKLxGBKFjPy8pdVvJb+H7H0ngTEw9CCl2ziM7VwO0GEoxAkn91E0ECGvpm50MNJk8Qml61uFHn4zDdUAj3rpoqyumrlBJPOw2lunqSMDUNPGxv3x7yK23aa5MbgbQsCf5ZlvqD4cOhvA0a0iskQn0Si3Q/Fy2gT60wodt9OGndNJClRMVWstsIivpbKM3lNqDHSnAQ93WX5cLBYdOa5QdxiR6F6xCpq0GSbdLSQ2aLcLOmR5eZR6kbdTc74B6uKAC5zLu8+PnVHM4hgkdevoSTGACIEYfZGT6LlHwY647ZzUYN/yLb2bu3CwHZFJSKou8FYb3SZ4ir5z9P+1YlFY/aLkL/cMQsZ9HQXiASLTiOqmbyHc2lSE0UdFhj1zWkzoKy1fijg9p7QIvBdeAT8I07e6Jz39OQr7dwUZie+1S8+X8ZB4AIfeyhIc1kJS/T376xsjmk5OKBUMyD1lM7a5blGlg7bUdJtOy8F
+     procedure_id : 2167464948303867655
+     type_code : 15
+     code : |1+
+      // Résumé : Valeur HT du panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierValeurHT ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne : Valeur HT du panier
+      
+      PROCEDURE PanierValeurHT()
+      
+      RENVOYER MonétaireVersChaine(gStPanier.moPrixTotalHT)
+     type : 458752
+   -
+     name : CommandeRèglementVersChaîne
+     procedure_id : 2167831699855264213
+     type_code : 15
+     code : |1-
+      // Résumé : Permet de récupérer le règlement en lettre à partir de sa valeur
+      // Syntaxe :
+      //[ <Résultat> = ] CommandeRèglementVersChaîne (<nTypeReglement>)
+      //
+      // Paramètres :
+      //	nTypeReglement : Type de règlement (constantes REGL_XXX)
+      // Valeur de retour :
+      // 	chaîne : règlement en lettre à partir de sa valeur
+      //
+      
+      PROCEDURE CommandeRèglementVersChaîne(nTypeReglement)
+      
+      sTypeRèglement est une chaîne
+      
+      SELON nTypeReglement 
+      	CAS REGL_CB
+      		sTypeRèglement = "CB"
+      	CAS REGL_CHEQUE
+      		sTypeRèglement = "Chèque"
+      	CAS REGL_VIREMENT
+      		sTypeRèglement = "Virement bancaire"
+      	CAS REGL_PAYPAL
+      		sTypeRèglement = "Paypal"
+      	AUTRE CAS
+      		dbgAssertion(Faux,"Impossible de trouver le type de règlement")
+      		sTypeRèglement = "< Inconnu >"				
+      FIN
+      
+      
+      RENVOYER sTypeRèglement
+     type : 458752
+   -
+     name : CommandeEtatVersChaine
+     internal_properties : CAAAAAgAAABCA12V4/6G3U4OP5iHPeNe2LWqddonAUiFr9oU6DWAr+ZvNSmPWxl44TKL+dD0FpGEDzHQ+mxjxhHJxigtTOvuq8mRBqZcQdC5skijgTzBxhU6WfAjjiECMFr/WGHUIdhFaiirAJV2HfoOZn2Z
+     procedure_id : 2167832163711839619
+     type_code : 15
+     code : |1-
+      // Résumé : Permet de récupérer l'état de la commande en lettre
+      // Syntaxe :
+      //[ <Résultat> = ] CommandeEtatVersChaine (<nEtatCommande>)
+      //
+      // Paramètres :
+      //	nEtatCommande : état de la commande
+      // Valeur de retour :
+      // 	chaîne : état de la commande en lettre
+      //
+      
+      PROCEDURE CommandeEtatVersChaine(nEtatCommande)
+      
+      sEtat est une chaîne
+      
+      SELON nEtatCommande
+      
+      	CAS CDE_ATTENTEREGLEMENT // Commande en attente de règlement
+      		sEtat = "En attente de règlement"
+      	CAS CDE_PREPARATION // Commande réglée, en cours de préparation
+      		sEtat = "En cours de préparation"
+      	CAS CDE_LIVRAISON // Commande en cours de livraison
+      		sEtat = "En cours de livraison"
+      	CAS CDE_LIVREE // Commande livrée
+      		sEtat = "Livrée"
+      	CAS CDE_PAYEE_CB_NONVERIFIE
+      		sEtat = "Réglée, en cours de vérification"
+      	CAS CDE_PAYEE_CB_VERIFIE
+      		sEtat = "Réglée et vérifiée"	
+      	CAS CDE_PAYEE_CB_SUSPECTE
+      		sEtat = "Réglée, en cours de vérification"	
+      	CAS CDE_COMMANDE_ANNULEE
+      		sEtat = "Commande annulée"
+      	AUTRE CAS
+      		sEtat = "< Inconnu >"		
+      		dbgAssertion(Faux,"Etat de commande inconnu")
+      FIN
+      
+      
+      RENVOYER sEtat
+     type : 458752
+   -
+     name : CommandeCrée
+     internal_properties : CAAAAAgAAAB7htSRJ1XYJdAfid2nFs9kOZKfJ7FK6sHgHZKvKHs32PYmOc3qeJ01cp6RwCpa+Rf3Kd5aZkP1ATuFzoKuH7gFup8INAF3BQEW/u6Utj1fMaF/iWisgGzbSDPl3E+Yy3qeKetiVM4vIg0Yo36kQZ4ct2ASBaC5TA1eu2UGpVssdSOL4iZf6cQZSIWSppn1Ne2TjcUfJGM+Z7vYehXaFeC9Z1exB/5cRiORIv6W57FXe7GJopUui1J9WhyDdt6gqpG9qbmhAXA6Coc0mLY+587qGg/RWAayhPt2ljxE08pKCX3p6W+W4r+vSveXae1G80ILtUr/Q/xOxrEnN+YOWUpvcGtMKxymLiAKhcUCNCCKZqdiOxgzBDBNfOu8uL2zjtygVkbWimGy8PYc+h8fUEFnE7gYuNCPDOFsfzNtMhgUkmVBWkfEsV4+sWz4
+     procedure_id : 2170049195742797771
+     type_code : 15
+     code : |1-
+      // Résumé : Crée une nouvelle commande avec un numéro séquentiel par jour
+      // Syntaxe :
+      //[ <Résultat> = ] CommandeCrée ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne : Numéro de la nouvelle commande
+      
+      PROCEDURE CommandeCrée()
+      
+      // Les numéros générés sont de la forme :
+      // BC01-AAAAMMJJ-numseq
+      // BC01 : bons de commandes du site web
+      // AAAAMMJJ : date de création du bon de commande
+      // numseq : numéro séquentiel du BC
+      
+      // On tente de se positionner sur l'enregistrement du jour et de le bloquer
+      TANTQUE HLitRecherchePremier(NumCommande,DateCommande,DateSys(),hBlocageEcriture)=Faux
+      	// Si on n'a pas trouvé d'enreg, on l'ajoute
+      	SI HTrouve()=Faux ALORS
+      		NumCommande.DateCommande = DateSys()
+      		NumCommande.Numero = 0
+      		HAjoute(NumCommande)
+      	SINON
+      		// Enregistrement trouvé mais le blocage n'est pas possible
+      		SI HErreurBlocage() ALORS
+      			CONTINUER
+      		SINON
+      			// Autre erreur
+      			RENVOYER ""
+      		FIN
+      	FIN
+      FIN
+      
+      // Lit le numéro de séquence, l'incrémente et met à jour le fichier
+      nNumSequence est un entier = NumCommande.Numero + 1
+      NumCommande.Numero++
+      SI HModifie(NumCommande)=Faux ALORS
+      	gsErreurEnCours = ErreurInfo(errComplet)
+      	
+      	<COMPILE SI Configuration="eCommerce">
+      		PageAffiche(page_erreur)	
+      	<FIN>
+      
+      FIN
+      
+      // Génère le numéro de BC
+      sNumCommande est une chaîne = "BC01-"+DateSys()+NumériqueVersChaîne(nNumSequence,"08d")
+      
+      // Crée l'enregistrement de commande
+      HRAZ(Commande)
+      commande.NumCommande = sNumCommande
+      Commande.NumFacture = Null
+      Commande.IDAdresseFacturation = Null
+      Commande.IDAdresseLivraison = Null
+      Commande.DateCommande = DateSys()
+      Commande.HeureCommande = HeureSys()
+      commande.EtatCommande = CDE_ATTENTEREGLEMENT
+      SI HAjoute(Commande)=Faux ALORS
+      	// Echec de l'ajout
+      	sNumCommande = ""
+      FIN
+      
+      RENVOYER sNumCommande
+      
+      FIN:
+      // Dans tous les cas, on débloque le compteur de numéros
+      HDébloqueNumEnr(NumCommande,hNumEnrEnCours)
+     type : 458752
+   -
+     name : PanierVersCommande
+     internal_properties : CAAAAAgAAAA3fv3645HsnGxJQKwoQh4X0o3FNYnc3PcLcEduDXMM4T4LgC8MLB/hpvWgd9AzMzo9fNOs3gckWHVjNlPreV008t6F6lJov5i7px+xJGZDvmWGqBAF7RFMntp43nw62Tz5BdpmDvYVff7Sn165ephOKDTkWeYHptaU/ZtR9vfQ+XAHLTun37SuNQJxIH/AS1Ovijap/5Ys70uRyDvulke/ifwTxGLgClZn++MJL32xVbbDH1xwoH1jds/qckFOC0VeZ6b4LBReWr1BJNzjahWaAHE1c+C1CQ2JurniWWLofu7fOVKBw7/Z5FijsTn/JwF6zECHruyhrKl/z+IV91vR/RfirhZnUWfXa4ct9qEwwLJo1qdudjrHnQ/hG5WH73aMAlAgLza+Nw5557VS7L/FZtnbWMAGO+U0ZXAj6mLSKDlfz1uVfVJ8VL+HoJ/ieLsjDL/HYwvjF3wYX1BO8NvdeLMoYyPSi+xkhKW/HhS4aVG8+NUYt4KRm8fW/SBMwJDjYPwV/WOS9oZXfOlGYasSsqyXEiavt9EKkZl507ZmIEyAXviJOVnngElbUzYzLwouKLWaxSjBLXaJTPbT/Ske1HrpBKmaEqVgEA5sVlCDn6hYSMLqxTJmaAro8IBdyc2/Qt0Z52blUHMvVJC0IxPkLHKpWhJLQf47aTuMonv+Uta7i7kooqB8bLXEqX6K0glg9Nx8ZBYcdTAs/NdReC8+8jqV0zzsA+BDnXpUkXiBF5DROYSU8i+SGmJ9T/HBDcZuJTPiMSNw2EvhbSCPaoa6ZvMoHCWjUwoIukb3fIxzoEUfcmxoEVkZxSSxFgpRnOUCMDnIjpnhX3pFQWiRXLZ2rNVMUx0le/+PxzJM5oO7TrhrESpYenSLjFU8kukIgjJd3/q/2w4pYUXccQDlvNDRjjz+P4RTjwNUemzatE0ir6WDr5gW6Xdm9TligEqtzqKLz7s9r2muyEIPtYD59y/KcorGsl23kfLN9b5cTFNm5BsrFvQVTh0ZcTlN/rNfoaDQYm3kTV4sk8O72OO3PfxFFyVebUU8RcUopm404zE4Ow==
+     procedure_id : 2170073797317133652
+     type_code : 15
+     code : |1+
+      // Résumé : Transforme le panier en cours en une commande ou met à jour la commande
+      // Syntaxe :
+      //[ <Résultat> = ] PanierVersCommande ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération est effectuée, Faux en cas d'erreur
+      
+      PROCEDURE PanierVersCommande()
+      
+      // Création de la commande ou recherche de celle-ci
+      SI gStPanier.nIDCommande <> 0 ALORS
+      	SI HLitRecherchePremier(Commande,IDCommande,gStPanier.nIDCommande)=Faux ALORS
+      		// Commande expiré, on détache le panier
+      		gStPanier.nIDCommande = 0
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      SI gStPanier.nIDCommande = 0 ALORS
+      	// Création de la commande
+      	SI CommandeCrée() = "" ALORS
+      		// Si la création de la commande échoue, c'est une erreur fatale pour le site
+      		gsErreurEnCours = ErreurInfo(errComplet)
+      		
+      		<COMPILE SI Configuration="eCommerce">
+      			PageAffiche(page_erreur)	
+      		<FIN>		
+      		
+      		RENVOYER Faux	
+      	FIN
+      	// A partir de maintenant le panier est relié à une commande
+      	gStPanier.nIDCommande = Commande.IDCommande
+      FIN
+      
+      // Supprime les lignes de commande s'il y en a déjà
+      REQ_VideCommande.pIDCommande = gStPanier.nIDCommande
+      SI HExécuteRequête(REQ_VideCommande) = Faux ALORS
+      	gsErreurEnCours = ErreurInfo(errComplet)
+      	
+      	<COMPILE SI Configuration="eCommerce">
+      		PageAffiche(page_erreur)	
+      	<FIN>	
+      	
+      	RENVOYER Faux	
+      FIN
+      
+      // Actualise les valeurs en cache dans le panier
+      PanierActualise()
+      
+      // Création des lignes de commande
+      Commande.TotalHT = 0
+      Commande.TotalTTC = 0
+      POUR TOUT stLigne de gStPanier.tabPanier
+      	// Recherche du produit et de son taux de taxe
+      	SI bLitProduitSelonReference(stLigne.sRefProduit)=Faux _OU_ HLitRecherchePremier(TauxTaxe,IDTauxTaxe,Produit.IDTauxTaxe)=Faux ALORS
+      		
+      		<COMPILE SI Configuration="eCommerce">
+      			PageAffiche(page_erreur)	
+      		<FIN>		
+      		
+      		RENVOYER Faux	
+      	FIN
+      	
+      	// Création de la ligne de commande
+      	HRAZ(LigneCde)
+      	LigneCde.LibelleProduit = stLigne.sLibArticle
+      	LigneCde.Quantite = stLigne.nNbArticle
+      	LigneCde.PrixUnitaireHT = stLigne.moPrixUnitaireHT
+      	LigneCde.TauxTaxe = TauxTaxe.Taux
+      	LigneCde.TotalLigne = (stLigne.moPrixUnitaireHT+stLigne.moTaxeUnitaire) * stLigne.nNbArticle
+      	LigneCde.IDCommande = gStPanier.nIDCommande
+      	bLitProduitSelonReference(stLigne.sRefProduit)
+      	LigneCde.Reference = produit.Référence
+      	lignecde.remise = (produit.PrixUnitaireHT - stLigne.moPrixUnitaireHT) * stLigne.nNbArticle
+      	
+      	LigneCde.IDDéclinaisonProduit = stLigne.nIDDéclinaison
+      	
+      	SI HAjoute(LigneCde)=Faux ALORS
+      		gsErreurEnCours = ErreurInfo(errComplet)
+      		
+      		<COMPILE SI Configuration="eCommerce">
+      			PageAffiche(page_erreur)	
+      		<FIN>	
+      		
+      		RENVOYER Faux
+      		
+      	SINON
+      		
+      		// La gestion des stocks est-elle active pour ce produit ?
+      		si bProduitEstEnQuantitéLimitée(produit.idproduit) ALORS
+      			
+      			// Modifie le stock de la déclinaison ou du produit
+      			si stLigne.nIDDéclinaison > 0 ALORS
+      				// Si la déclinaison est en stock
+      				SI bDéclinaisonEstEnStock(produit.idproduit) ALORS
+      					// Diminue son stock
+      					DiminuerStockDéclinaison(stLigne.nIDDéclinaison, stLigne.nNbArticle)
+      				SINON
+      					// Il faut annuler la commande : le produit n'est plus dispo
+      					RENVOYER Faux
+      				FIn
+      			SINON 
+      				// Si le produit est en stock
+      				SI bProduitEstEnStock(produit.idproduit) alors
+      					// Diminue son stock
+      					DiminuerStockproduit(produit.idproduit, stLigne.nNbArticle)
+      				SINON
+      					// Il faut annuler la commande : le produit n'est plus dispo
+      					renvoyer faux
+      				FIN
+      			FIN
+      			
+      		FIN
+      		
+      	FIN
+      	
+      	Commande.TotalHT += (stLigne.moPrixUnitaireHT*stLigne.nNbArticle)
+      	Commande.TotalTTC += (stLigne.moPrixUnitaireHT+(stLigne.moPrixUnitaireHT * TauxTaxe.Taux) / 100) * stLigne.nNbArticle
+      	
+      FIN
+      
+      // Ajout des frais de port
+      Commande.FraisPortTTC = gStPanier.moFraisDeLivraisonTTC
+      Commande.FraisPortHT = 	gStPanier.moFraisDeLivraisonHT
+      
+      SI HModifie(Commande)=Faux ALORS
+      	gsErreurEnCours = ErreurInfo(errComplet)
+      	
+      	<COMPILE SI Configuration="eCommerce">
+      		PageAffiche(page_erreur)	
+      	<FIN>	
+      	
+      	RENVOYER Faux
+      FIN
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : PanierActualise
+     internal_properties : CAAAAAgAAAApOF7xKm9iIoY+SbMJx+Q6+eMZdM3rQf2N/a4xJRerABccPVP5+8nRry3lRonXnRW+LDFaJO6LKpRiT5/3VbQNmaZoExmw+rjveOMFo8fcYm28TXzaHydk4sIhgSfTXeobQa/wVgsqr18IjQo8VVO6ayy1iSsqEGupwwhek7tE5lwYkE65g5c34KAQ12k8CrJmbsTfL66fCWhDDldKwTL7rR8T14tcJSctZTg/4z7W86i5mfyhZ5bljk/rWvAFD33NMOY9TP5KUmoEz7Bs/YBWCW8k91/HunIbdJvLhoTE90Mq7l58NTk7LXPlRqYTb+IwKed4AhBwQLerYm4SUybO//N206G9WeRv7J0HZD/F2KGAwL5O7wDpOCvfeboUTg==
+     procedure_id : 2170082735144257022
+     type_code : 15
+     code : |1-
+      // Résumé : Actualise le panier
+      // Syntaxe :
+      // PanierActualise ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      
+      PROCEDURE PanierActualise()
+      
+      POUR TOUT stLigne de gStPanier.tabPanier
+      	// Recherche du produit et de son taux de taxe
+      	SI bLitProduitSelonReference(stLigne.sRefProduit)=Faux _OU_ HLitRecherchePremier(TauxTaxe,IDTauxTaxe,Produit.IDTauxTaxe)=Faux ALORS
+      		
+      	<COMPILE SI Configuration="eCommerce">
+      		PageAffiche(page_erreur)	
+      	<FIN>
+      			
+      	FIN
+      	
+      	// Mise à jour du panier			
+      	stLigne.sLibArticle = produit.LibelleProduit
+      	stLigne.moPrixUnitaireHT = produit.PrixUnitaireHT
+      	stLigne.moTaxeUnitaire = (produit.PrixUnitaireHT * TauxTaxe.Taux) / 100
+      	
+      	// Si une promotion est définie
+      	si stLigne.nIDPromotion > 0 ALORS
+      		// Recherche la promotion
+      		hlitrecherchepremier(promotion,idpromotion,stLigne.nIDPromotion)
+      		si htrouve(promotion) ALORS
+      			// Récupère le prix défini pour la promotion
+      			stLigne.moPrixUnitaireHT = Promotion.PrixUnitaireHT
+      			stLigne.moTaxeUnitaire = (Promotion.PrixUnitaireHT * TauxTaxe.Taux) / 100	
+      		FIN
+      	FIN
+      	
+      FIN
+     type : 458752
+   -
+     name : CommandeModifieAdresse
+     internal_properties : CAAAAAgAAACtrxIsUfTct7L16RR5U59FY0YdTtv7qBiRYBradEd1JuuAX4Jum/73QhQKYBu9LsFk1CcVKvx4W+1YCfaC2qDkI0x6YByH9kuoYoWjW4d65+4xMFooj4v2i7KmFT1E9xp7z2TbCF1geSrBti+dun0MaiSXVYtnx4tgLK8SP2NZKSLLd/7TZp+JjZ9O9W+yxHhwnNzhV93N7Wf9Otj3/68WXInAEHEBSRygqV8aqwsUbdiiMfRwALNkPbFR9Xpxuu8ctPdWNlTTmV6hXFekyFCQu9/HOgy5U/3ejB064Yt81p72HTHRnCY3sewJ8tt3femtSsXYcyWZrrIBGUB8v5LwlLNtRHWVQbHaI8oMMFtjO0kZVd+mLc0mnlVfdbCiYezZqnhZ6fAq6brCC2vc4YljBFEfwP2qEquxk3FE/E4PhcotrGirsIhdFNt8plZUcFvoqQcE+S2b6mMyVOINfMhTRW0s5ebDGZdE9hJrb81bxOU0XgNW2FCZQDCtHr4cfVTQ+HOq8P4XeTTd8TCgxXzY14rMIcsOd4qgyl7VOrPXEIylgu/jNwMRXiwF4i1nsPrdtmSEnL8maUZRK3YXJx5jsD7IY86WhxssrXKAMNg9QhpR0udfd0QBjk4CTvToSRLxIlUkqcoWSqItcAOkZ/DDCnejxYU0hIyfgD2z6SI98ua8Qp4GDjjvDziXsUAsB+N4eRXf1jBPFdgaU5gUMVvg94Eulh/nRqEgw1UdoKX2l61mT1GEGIxsS+KN23MbUOzpauMCrCaC2FdITcdpEtvHXQneukUd/GKKLQ7KncdVy3xD4BI16fS52W2BtkIFyaqQ5WXkcvWP4IUilnzW5GpFbBt/t2aP82fP6jmeK8UseOYfAhkhPlMapf7ViJZ6nWqTnYQBt+uRvJmyceSvLgIuXcZp8KyuIaGO1ukmBaPk6bQhuqz5/q9YZyFceLifaSjRQPTutWeSqe+kpxDVjwUbEzFSC7tb1Ehra2NGKDFMMpDMO/KmLv18AZEO8MT26pldGIpLodKNVHrBnAPl4f642SisMV4XTcYLTM8WBBx5u2d5iEFWZ8D+NWa55nBIdUAE5/p9vzmcetOVD5oW2rrN0Ih1Wfc3f7xQIAuMq3ph0/K7NfUIi4RT8WIFIJnPkDLD0uF1IeDmCs2rXIbZ9xfSEF/pZ8bRVx68Jd1/TCGk67Io/Jvd4WCYOXeiB4tHsV3ILB8nR2WKl2ZVZHinIDFFWD/I3oPHHLrHycfqOwSKEQSRea0YoQxomBXUg3oQtNS4vA==
+     procedure_id : 2170097196305458649
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse d'une commande
+      // Syntaxe :
+      //[ <Résultat> = ] CommandeModifieAdresse ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      PROCEDURE CommandeModifieAdresse()
+      
+      dbgAssertion(COL_ECommerce.gStPanier.nIDCommande<>0,"Une commande doit être en cours de traitement pour utiliser cette fonction")
+      SI COL_ECommerce.gStPanier.nIDCommande=0 ALORS	
+      	RENVOYER Faux
+      FIN
+      
+      // Variables locales
+      bModifAdresse est un booléen 
+      
+      // Se positionne sur la commande
+      SI HLitRecherchePremier(Commande,IDCommande,gStPanier.nIDCommande)=Faux ALORS
+      	gsErreurEnCours = ErreurInfo(errComplet)
+      	
+      	<COMPILE SI Configuration="eCommerce">
+      		PageAffiche(page_erreur)	
+      	<FIN>
+      		
+      	RENVOYER Faux
+      FIN
+      
+      // Si on a une adresse de facturation
+      SI gStPanier.nIDAdresseFacturation<>0 ALORS
+      	// On se positionne dessus
+      	SI HLitRecherchePremier(Adresse,IDAdresse,gStPanier.nIDAdresseFacturation) ALORS
+      		dbgAssertion(Adresse.IDClient=gStPanier.nIDClient,"L'adresse de facturation n'appartient pas au client en cours")
+      		// Si l'adresse avait déjà été fixée
+      		bModifAdresse = Commande.IDAdresseFacturation<>0
+      		SI bModifAdresse ALORS
+      			SI HLitRecherchePremier(AdresseArchive,IDAdresse,commande.IDAdresseFacturation)=Faux ALORS
+      				bModifAdresse = Faux
+      			FIN
+      		FIN
+      		// Recopie les valeurs
+      		HCopieEnreg(AdresseArchive,Adresse)
+      		SI bModifAdresse ALORS
+      			SI HModifie(AdresseArchive)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>				
+      				
+      				RENVOYER Faux
+      			FIN
+      		SINON
+      			SI HAjoute(AdresseArchive)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>
+      							
+      				RENVOYER Faux
+      			FIN
+      			Commande.IDAdresseFacturation = AdresseArchive.IDAdresse
+      			SI HModifie(Commande)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>				
+      						
+      				RENVOYER Faux
+      			FIN
+      		FIN
+      	FIN	
+      FIN
+      
+      // Si on a une adresse de livraison
+      SI gStPanier.nIDAdresseLivraison<>0 ALORS
+      	// On se positionne dessus
+      	SI HLitRecherchePremier(Adresse,IDAdresse,gStPanier.nIDAdresseLivraison) ALORS
+      		dbgAssertion(Adresse.IDClient=gStPanier.nIDClient,"L'adresse de livraison n'appartient pas au client en cours")
+      		// Si l'adresse avait déjà été fixée
+      		bModifAdresse = Commande.IDAdresseLivraison<>0
+      		SI bModifAdresse ALORS
+      			SI HLitRecherchePremier(AdresseArchive,IDAdresse,Commande.IDAdresseLivraison)=Faux ALORS
+      				bModifAdresse = Faux
+      			FIN
+      		FIN
+      		// Recopie les valeurs
+      		HCopieEnreg(AdresseArchive,Adresse)
+      		SI bModifAdresse ALORS
+      			SI HModifie(AdresseArchive)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>							
+      				
+      				RENVOYER Faux
+      			FIN
+      		SINON
+      			SI HAjoute(AdresseArchive)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>						
+      
+      				RENVOYER Faux
+      			FIN
+      			Commande.IDAdresseLivraison = AdresseArchive.IDAdresse
+      			SI HModifie(Commande)=Faux ALORS
+      				gsErreurEnCours = ErreurInfo(errComplet)
+      				
+      				<COMPILE SI Configuration="eCommerce">
+      					PageAffiche(page_erreur)	
+      				<FIN>				
+      				
+      				RENVOYER Faux
+      			FIN
+      		FIN
+      	FIN	
+      FIN
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : PanierSupprimeTout
+     procedure_id : 2185673844885313027
+     type_code : 15
+     code : |1+
+      // Résumé : Supprime tout le contenu d'un panier
+      // Syntaxe :
+      // PanierSupprimeTout ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE PanierSupprimeTout()
+      
+      // Contenu du panier
+      TableauSupprimeTout(gStPanier.tabPanier)
+      // Variables "cache" pour limiter le nombre de calculs sur le serveur
+      TableauSupprimeTout(gstPanier.taProduit)
+      gStPanier.nNbArticle = 0
+      gStPanier.moPrixTotalHT = 0
+      gStPanier.moTaxeTotal = 0
+      // Variables de livraison
+      gStPanier.moFraisDeLivraisonHT = 0
+      gStPanier.moFraisDeLivraisonTTC = 0
+      // Valeur totale du panier TTC, y compris les frais de livraison (montant à payer)
+      gStPanier.moPrixTotalTTC = 0
+      
+      // Variables utilisées par le tunnel de conversion
+      // gStPanier.nIDClient  // seule cette variable est conservée (la fin de la commande n'entraine pas la déconnexion)
+      gStPanier.nIDAdresseLivraison = 0
+      gStPanier.nIDAdresseFacturation = 0
+      gStPanier.nIDCommande = 0
+     type : 458752
+   -
+     name : ProduitRecupèrePhoto
+     internal_properties : CAAAAAgAAADgC4xaw+QIAVZGWyWKOgu+QzBE/LKvGQ7ULmDFpcDSXxLHYUypNmQFHKT2iBbCFerIcBTlluLhI0Tw4X6cyOyRg7TKAiS+szIKop7GcNnK8RKP9ZHJUifEQC0oImdgkvs3nr0PEJV5MmSXslkgxIUsuY+bHqT5/KNckXDaOc2Tguo0Zt7r2jkkyO1/nTBQSalHCi3AU3g=
+     procedure_id : 2186324239871913369
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie la photo d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] ProduitRecupèrePhoto ( [<sRefProduit> est chaîne[, <nIDProduit> est entier [, <nRolePhoto> est entier [, <bChemin> est booléen]]]])
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne- valeur par défaut="") : Référence du produit
+      //	nIDProduit (entier - valeur par défaut=-1) : Identifiant du produit
+      //	nRolePhoto (entier - valeur par défaut=0) : Rôle de la photo (constantes ROLE_XXX)
+      //	bChemin (booléen - valeur par défaut=1) : Vrai pour renvoyer un chemin, Faux sinon
+      // Valeur de retour :
+      // 	Type indéterminé : Photo du produit
+      
+      PROCEDURE ProduitRecupèrePhoto( LOCAL sRefProduit est une chaîne = "" , LOCAL nIDProduit est un entier = -1 , LOCAL nRolePhoto est un entier = ROLE_PHOTO_NORMAL, LOCAL bChemin est un booleen = vrai  )
+      
+      // Variables locales
+      nNumPhoto		est un entier
+      
+      // Recherche par référence
+      SI nIDProduit=-1 ALORS
+      //	HLitRecherchePremier(Produit,Reference,sRefProduit)
+      	SI bLitProduitSelonReference(sRefProduit) = vrai alors
+      	//Si Htrouve(Produit) = Faux alors
+      		nIDProduit = Produit.IDProduit
+      	Fin
+      FIN
+      
+      // On recherche la photo par défaut (pour avoir son numéro)
+      HLitRecherchePremier(PhotoProduit,ParDéfautIDProduit,[Vrai,nIDProduit])
+      SI HTrouve(PhotoProduit) = vrai alors
+      	nNumPhoto = PhotoProduit.NumeroPhoto
+      FIN
+      
+      // Recherche de la photo correspondant au rôle demandé
+      HLitRecherchePremier(PhotoProduit,IDDéclinaisonProduitRoleNumeroPhoto,[PhotoProduit.IDDéclinaisonProduit,nRolePhoto,nNumPhoto])
+      SI HTrouve(PhotoProduit) = Faux alors
+      	// On tente sur les autres photos
+      	// Recherche de la photo correspondant au rôle demandé
+      	HLitRecherchePremier(PhotoProduit,IDProduitRole,[nIDProduit,nRolePhoto])
+      	SI HTrouve(PhotoProduit) = Faux alors	
+      		// On recherche la photo par défaut
+      		HLitRecherchePremier(PhotoProduit,ParDéfautIDProduit,[Vrai,nIDProduit])
+      		SI HTrouve(PhotoProduit) = Faux alors
+      			// On prend la première photo que l'on trouve
+      			dbgAssertion(Faux,"On recherche une image alors que ce n'est pas celle du rôle, ni celle par défaut")
+      			HLitRecherchePremier(PhotoProduit,IDProduit,nIDProduit)	
+      			Si Htrouve(PhotoProduit) = Faux alors
+      				PhotoProduit.Photo =""		
+      			FIN
+      		FIN	
+      	FIN
+      FIN
+      
+      si bChemin ALORS
+      	dbgAssertion(PhotoProduit.Photo<>"","Aucune photo n'a été trouvée")
+      	SI EnModeAWP() = vrai alors
+      		RENVOYER PhotoProduit.Photo	
+      	SINON
+      		RENVOYER "FR/"+PhotoProduit.Photo
+      	FIN
+      	
+      	
+      SINON
+      	dbgAssertion(PhotoProduit.Binaire<>"","Aucune photo n'a été trouvée")
+      	//dbgAssertion("L'utilisation d'image générée est déconseillée : les traitements sont plus lents, les images non référencées et non gérées par le cache du navigateur")
+      	RENVOYER PhotoProduit.binaire
+      FIN
+     type : 458752
+   -
+     name : PanierModifieCaracteristiqueProduit
+     procedure_id : 2216473600562732531
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie les caractéristiques d'un produit du panier
+      // Syntaxe :
+      //PanierModifieCaracteristiqueProduit (<sRefProduit> est chaîne, <sNomCaractéristique> est chaîne, <vValeurCaractéristique>)
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne) : Référence du produit
+      //	sNomCaractéristique (chaîne) : Nom de la caractéristique
+      //	vValeurCaractéristique : Valeur de la caractéristique
+      // Valeur de retour :
+      // 	Aucune
+      //
+      // Exemple :
+      // PanierModifieCaracteristiqueProduit("REF1","taille","XL")
+      //
+      PROCEDURE PanierModifieCaracteristiqueProduit(sRefProduit est une chaîne, sNomCaractéristique est une chaine, vValeurCaractéristique)
+      
+      // Récupère le rang du produit dans le panier
+      nRangDansPanier est un entier = gStPanier.taProduit[sRefProduit]
+      dbgAssertion(nRangDansPanier>0,"Suppression d'un article inexistant")
+      
+      // Modifie la caractéristique pour le produit du panier
+      gstpanier.tabPanier[nRangDansPanier]:taCaractéristique[sNomCaractéristique] = vValeurCaractéristique
+     type : 458752
+   -
+     name : PanierEstVide
+     procedure_id : 2217189034939119906
+     type_code : 15
+     code : |1-
+      // Résumé : Indique si le panier est vide
+      // Syntaxe :
+      //[ <Résultat> = ] PanierEstVide ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : VRAI si le panier est vide (aucun article), FAUX dans le cas contraire
+      //
+      
+      PROCEDURE PanierEstVide()
+      
+      renvoyer (gStPanier.nNbArticle=0)
+     type : 458752
+   -
+     name : PanierRecupereCaracteristiqueProduit
+     internal_properties : CAAAAAgAAAB/avsxRcaqSwKugTRVsznrP+b18z7B9ckLCkhGVJ80z2I4nEfEDJVF7a9OpkfbdCwZHaFY3tdMzzwfyN8TlSH+uS4ha58tRE6V+SoYxIC1hkdtxbW0IuuIEZo5r+PxuzHvSZk0S1dughhDkBxl7WINBYUTO35XeA2j2iKrHB/bExCAqlO1IEq2kIupNg==
+     procedure_id : 2217490317991046639
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie les caractéristiques d'un produit du panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierRecupereCaracteristiqueProduit (<sRefProduit> est chaîne[, <sNomCaractéristique> est chaîne])
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne) : Référence du produit
+      //	sNomCaractéristique (chaîne- valeur par défaut="") : Nom de la caractéristique à récupérer, chaine vide pour tout récupérer
+      // Valeur de retour :
+      // 	Type indéterminé : Valeur de la caractéristique ou chaine de la forme <nom>+tab+valeur+RC+<nom>+tab+<valeur>...
+      //
+      // Exemple :
+      // PanierRecupereCaracteristiqueProduit("REF1","taille")
+      //// Traitement automatique des erreurs : RENVOYER ""
+      //
+      
+      PROCEDURE PanierRecupereCaracteristiqueProduit(sRefProduit est une chaîne, sNomCaractéristique est une chaine="")
+      
+      // Récupère le rang du produit dans le panier
+      nRangDansPanier est un entier = gStPanier.taProduit[sRefProduit]
+      dbgAssertion(nRangDansPanier>0,"Suppression d'un article inexistant")
+      
+      
+      // Si on souhaite récupérer une caractéristique
+      si sNomCaractéristique <> "" ALORS
+      	
+      	// Renvoie la caractéristique du produit
+      	RENVOYER gStPanier.tabPanier[nRangDansPanier]:taCaractéristique[sNomCaractéristique]	
+      	
+      SINON // Si on souhaite récupérer toutes les caractéristiques
+      	
+      	sListe est une chaine
+      	pour tout element vValeur, sNom de gStPanier.tabPanier[nRangDansPanier]:taCaractéristique
+      		sListe += [RC] + snom +tab+ vvaleur
+      	fin
+      	renvoyer sListe
+      	
+      FIN
+     type : 458752
+   -
+     name : _sConstruitReference
+     procedure_id : 2218620371346708908
+     type_code : 15
+     code : |1-
+      // Résumé : Construit la référence du produit en fonction de caractéristiques
+      // Syntaxe :
+      //[ <Résultat> = ] _sConstruitReference (<sRefProduit> est chaîne, <taCaractéristiques> est tableau associatif)
+      //
+      // Paramètres :
+      //	sRefProduit (chaîne) : Référence originale du produit
+      //	taCaractéristiques (tableau associatif) : Tableau de caractéristiques
+      // Valeur de retour :
+      // 	Type indéterminé : Référence du produit
+      //
+      
+      PROCEDURE PRIVE _sConstruitReference(sRefProduit est une chaine, taCaractéristiques est un tableau associatif de variants)
+      
+      // Variables locales
+      bufChaineCaracteristique	est un buffer
+      
+      // Sérialisation du tableau des caractéristiques
+      Sérialise(taCaractéristiques,bufChaineCaracteristique,psdXML)
+      
+      // On renvoie la référence unique
+      RENVOYER sRefProduit+csSeparateurReference+HashChaîne(HA_CKSUM_16,bufChaineCaracteristique)
+     type : 458752
+   -
+     name : bLitProduitSelonReference
+     procedure_id : 2218627273697091470
+     type_code : 15
+     code : |1-
+      // Résumé : Lit un enregistrement de la base produit en fonction de sa référence
+      // Syntaxe :
+      //[ <Résultat> = ] bLitProduitSelonReference (<sRéférence> est chaîne ANSI)
+      //
+      // Paramètres :
+      //	sRéférence (chaîne ANSI) : Référence du produit à lire
+      // Valeur de retour :
+      // 	booléen : Vrai si le produit a été lu, Faux sinon
+      PROCEDURE bLitProduitSelonReference(LOCAL sRéférence est une chaine)
+      
+      SI Position(sRéférence,csSeparateurReference,1)>=0 ALORS
+      	SI HLitRecherchePremier(produit,Reference,ExtraitChaîne(sRéférence,1,csSeparateurReference))=Faux ALORS
+      		dbgAssertion(Faux,"On essaie de lire un produit inconnu")
+      		RENVOYER faux
+      	FIN
+      SINON
+      	SI HLitRecherchePremier(produit,Reference,sRéférence)=Faux ALORS
+      		dbgAssertion(Faux,"On essaie de lire un produit inconnu")
+      		RENVOYER faux
+      	FIN
+      FIN
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : AdresseAffichable
+     procedure_id : 2167503195004416927
+     type_code : 15
+     code : |1-
+      // Résumé :  Permet de récupérer une adresse affichage
+      // Syntaxe :
+      //[ <Résultat> = ] AdresseAffichable (<nIDAdresse> est entier, <nOption> est entier)
+      //
+      // Paramètres :
+      //	nIDAdresse (entier) : L'identifiant de l'adresse
+      //	nOption (entier) : option de choix d'adresse (adresse archivée ou non)
+      
+      PROCEDURE AdresseAffichable(nIDAdresse est un entier, nOption est un entier )
+      
+      bAdresseArchivée est un booléen = (ETBinaire(nOption,ADR_ARCHIVE)>0)
+      
+      sdAdresse est une source de données
+      sAdresse est une chaîne
+      // On crée un alias sur le bon fichier et c'est cet alias que l'on va manipuler
+      SI bAdresseArchivée ALORS
+      	HAlias(AdresseArchive,sdAdresse)
+      	HChangeNom(sdAdresse, AdresseArchive..NomPhysique)
+      SINON
+      	HAlias(Adresse,sdAdresse)
+      	HChangeNom(sdAdresse, Adresse..NomPhysique)
+      FIN
+      
+      // Recherche de l'adresse
+      HLitRecherchePremier(sdAdresse,IDAdresse,nIDAdresse)
+      SI HTrouve(sdAdresse) ALORS
+      	
+      	// Formatage de l'adresse
+      	sAdresse = FormateAdresse("",sdAdresse.Societe,sdAdresse.Voie, sdAdresse.Complement, sdAdresse.CodePostal, sdAdresse.Ville, sdAdresse.EtatProvince, sdAdresse.Pays)
+      	
+      FIN
+      
+      // on renvoie l'adresse formatée
+      RENVOYER sAdresse
+      
+      FIN:
+      HAnnuleAlias(sdAdresse)
+     type : 458752
+   -
+     name : CivilitéVersChaine
+     procedure_id : 2167851916271032879
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la civilité en clair à partir d'un indice
+      // Syntaxe :
+      //[ <Résultat> = ] CivilitéVersChaine (<nCivilité> [, <bAbrégée>])
+      //
+      // Paramètres :
+      //	nCivilité : Indice de civilité (1, 2 ou 3)
+      //	bAbrégée (valeur par défaut=1) : VRAI pour obtenir une forme abrégé (M., Mme, Mlle), FAUX pour obtenir la civilité complète (Monsieur, Madame, Mademoiselle)
+      // Valeur de retour :
+      // 	chaîne: Civilité en clair
+      //
+      PROCEDURE CivilitéVersChaine(nCivilité, bAbrégée = Vrai)
+      
+      
+      // Forme abrégée
+      SI bAbrégée ALORS
+      	// Selon la civilité
+      	SELON nCivilité
+      		CAS 1 // Monsieur
+      			RENVOYER "M."
+      		CAS 2 // Madame
+      			RENVOYER "Mme"
+      		CAS 3 // Mademoiselle
+      			RENVOYER "Mlle"
+      		AUTRE CAS
+      			dbgAssertion(Faux,"Civilité inconnue")
+      			RENVOYER ""
+      	FIN
+      
+      SINON // Forme complète
+      	
+      	// Selon la civilité
+      	SELON nCivilité
+      		CAS 1 // Monsieur
+      			RENVOYER "Monsieur"
+      		CAS 2 // Madame
+      			RENVOYER "Madame"
+      		CAS 3 // Mademoiselle
+      			RENVOYER "Mademoiselle"
+      		AUTRE CAS
+      			dbgAssertion(Faux,"Civilité inconnue")
+      			RENVOYER ""
+      	FIN
+      	
+      FIN
+     type : 458752
+   -
+     name : AdresseNomComplet
+     procedure_id : 2217139746101713871
+     type_code : 15
+     code : |1-
+      // Résumé :  Permet de récupérer le nom complet d'une adresse
+      // Syntaxe :
+      //[ <Résultat> = ] AdresseNomComplet (<nIDAdresse> est entier, <nOption> est entier)
+      //
+      // Paramètres :
+      //	nIDAdresse (entier) : L'identifiant de l'adresse
+      //	nOption (entier) : option de choix d'adresse (adresse archivée ou non)
+      
+      PROCEDURE AdresseNomComplet(nIDAdresse est un entier, nOption est un entier )
+      
+      // Variables locales
+      bAdresseArchivée est un booléen = (ETBinaire(nOption,ADR_ARCHIVE)>0)
+      sdAdresse est une source de données
+      
+      // On crée un alias sur le bon fichier et c'est cet alias que l'on va manipuler
+      SI bAdresseArchivée ALORS
+      	HAlias(AdresseArchive,sdAdresse)
+      	HChangeNom(sdAdresse, AdresseArchive..NomPhysique)
+      SINON
+      	HAlias(Adresse,sdAdresse)
+      	HChangeNom(sdAdresse, Adresse..NomPhysique)
+      FIN
+      
+      // Recherche de l'adresse
+      HLitRecherchePremier(sdAdresse,IDAdresse,nIDAdresse)
+      SI HTrouve(sdAdresse) ALORS
+      	// On renvoie le nom complet
+      	renvoyer sdAdresse.NomComplet
+      FIN
+      
+      // On renvoie une chaîne vide
+      RENVOYER ""
+      
+      FIN:
+      HAnnuleAlias(sdAdresse)
+     type : 458752
+   -
+     name : ValidePaiementCommande
+     internal_properties : CAAAAAgAAADzaoYqqp37suJJoVtQRZAB+gwmFvnox+EjhLTlyekxzeaeQGAkEifLJ93hBsK36A06Pvf1Sbx8mq2HOAj5Nlf2oI/4frvIMk86PTNXFbA21xVzGbCyUo5ooTJmhcpAu+/Fzd0e4YFZJyEWizkYBfAo3p5221/RDSn3ajzrFQ9gaYaVkcx7vory/RAD/j5T39NDEt4GyMHZV5JA2B20bkIO8JIpzrwdgxVnuqgAsyAZC1YZ5fOB3YeyC4z7njVByVXhorVLM9wNT//kv7R7hCjEDIpfwvgUUoGycgqgD+fHNJbHTcT9ANWvk7qy
+     procedure_id : 2223907299826700575
+     type_code : 15
+     code : |1+
+      // Résumé : Enregistre une commande en "payée"
+      // Syntaxe :
+      //ValidePaiementCommande (<nIDCommande> est entier, <sListeParam> est chaîne ANSI, <nEtatCommande> est entier, <nModePaiement> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      //	sListeParam (chaîne ANSI) : Liste des paramètres reçus
+      //	nEtatCommande (entier) : Nouvel état de la commande
+      //	nModePaiement (entier) : Méthode de paiement
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      PROCEDURE ValidePaiementCommande(nIDCommande est un entier, sListeParam est une chaine,  nEtatCommande est un entier, nModePaiement est un entier)
+      
+      // Recherche de la commande
+      HLitRecherchePremier(Commande,IDCommande,nIDCommande)
+      SI HTrouve(Commande) = Faux alors
+      	AjouteErreur("Impossible de trouver la commande")
+      	RETOUR
+      FIN
+      
+      // Configuration de la commande
+      Commande.EtatCommande = nEtatCommande
+      Commande.ListeParametresReglement = sListeParam
+      SI HModifie(Commande) = Faux ALORS
+      	AjouteErreur("Impossible de sauvegarder la commande : "+Commande.NumCommande)
+      	RETOUR
+      FIN
+      	
+      // La confirmation de commande est envoyée immédiatement		
+      EnvoyerConfirmationCommande(Commande.IDCommande,nModePaiement)
+      
+      // Vide le panier
+      COL_ECommerce.PanierSupprimeTout()
+      
+      // Notification en cas d'erreur
+      SI LireNotificationSiCommandeActif() = Vrai ALORS
+      	EnvoieMessageWebMaster("Nouvelle commande sur le site",...
+      	ChaîneConstruit("Une commande a été passée  sur le site le %1 à %2 : %3 €",DateVersChaîne(DateSys(), maskDateSystème),HeureVersChaîne(HeureSys(),maskHeureSystème),Commande.TotalTTC))
+      FIN
+      
+      <COMPILE SI Configuration="eCommerce">
+      	PageAffiche(client_commandes)	
+      <FIN>
+     type : 458752
+   -
+     name : PanierContrôleDisponibilité
+     internal_properties : CAAAAAgAAADrjArzU14fteiCf3Cq2+UZcZj/MXkRikCZNOTBWJ2XH61iApD3DDT0nedI6WSy+C4RSDjL78cCbCvFglRbIkH1OUqNNBSQKlFqwuL8v25TMPJoe0wKsaAzqudT4N9Zi3xSXzum+xxZely6VfC4ZKM/L6GMaaNChJo8hq54r9hzfRyZrCmvtPcdIto8So9Ib1u28x5f2Xg6F06PYnnGwHs8J+nrTnHW4//i3IJxgZhYPBBEabuFcCIqbDKCfLNs1OL3LsAVTYi8yudaBB17mKYTMJ88ilzNOA4BkFrETS9Xn9ngZNztHvDJCMsh78KFd6Mbf5VXlazAuSOhVT2hwqG67Rz9Xcd7IsPzQuNYR1NlqP9JURPPGAympJmPsK8RnnPcYcjzZvO3vjfBgO5bBXBBgunBYUV+ttn/IcMHWD8=
+     procedure_id : 1223108787128385803
+     type_code : 15
+     code : |1+
+      // Résumé : Contrôle le contenu du panier pour vérifier si un produit est passé sans stock (ou si une quantité d'un produit dépasse le stock)
+      // Syntaxe :
+      //[ <Résultat> = ] PanierContrôleDisponibilité ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Liste des produits modifiés, au format REFERENCE<TAB>LIBELLE<TAB>IDDeclinaison<TAB>CARACTERISTQUES<TAB>MODIF/SUPPR
+      //
+      
+      PROCEDURE PanierContrôleDisponibilité()
+      
+      // Si le panier est vide, aucun contrôle à effectuer
+      SI PanierEstVide() ALORS renvoyer ""
+      
+      
+      sListeProduitPlusEnStock est une chaîne
+      bProduitStock est un booléen
+      sUnProduitPlusEnStock est une chaîne
+      sCaractéristiques est une chaîne
+      nNbStock est un entier
+      bQuantitéModifiée est un booleen
+      bProduitSupprimé est un booleen
+      
+      
+      // Parcourt les lignes du panier
+      POUR TOUT stLigne DE COL_ECommerce.gStPanier.tabPanier
+      	
+      	sUnProduitPlusEnStock = ""
+      	bQuantitéModifiée = faux
+      	bProduitSupprimé = faux
+      	bProduitStock = Faux
+      	nNbStock = 0
+      	
+      	// Recherche du produit
+      	SI bLitProduitSelonReference(stLigne.sRefProduit) ALORS
+      		
+      		// Le produit est-il en quantité limité ?
+      		si bProduitEstEnQuantitéLimitée(produit.idproduit) = faux alors continuer
+      		
+      		// Il faut vérifier si le produit ou la déclinaison en cours est toujours disponible en stock
+      		SI stLigne.nIDDéclinaison > 0 ALORS
+      			
+      			// Mémorise la disponibilité de la déclinaison
+      			bProduitStock = bDéclinaisonEstEnStock(stLigne.nIDDéclinaison)
+      			si bProduitStock alors nNbStock = nNbDéclinaisonEnStock(stLigne.nIDDéclinaison)
+      			
+      		SINON
+      			
+      			// Mémorise la disponibilité du produit
+      			bProduitStock = bProduitEstEnStock(produit.idproduit)
+      			SI bProduitStock ALORS nNbStock = nNbproduitenStock(produit.idproduit)
+      			
+      		FIN
+      	
+      	FIN
+      	
+      	// Définit une ligne pour le produit
+      	sUnProduitPlusEnStock = ExtraitChaîne(stLigne.sRefProduit, 1, csSeparateurReference) +TAB+ stLigne.sLibArticle +TAB+ stLigne.nIDDéclinaison
+      	// Récupère toutes les caractéristiques, sauf le numéro de photo (permet de récupérer taille et couleur ici)
+      	POUR TOUT ELEMENT vValeur,sNom DE stLigne:taCaractéristique
+      		SI sNom DANS (CS_CARACTERISTIQUE_PHOTO) ALORS CONTINUER
+      		sCaractéristiques += [", "] + sNom+" : "+vValeur
+      	FIN
+      	// Ajoute les caractéristiques
+      	SI sCaractéristiques <> "" ALORS sUnProduitPlusEnStock += [TAB] + sCaractéristiques
+      	
+      	// Le produit ou la déclinaison de cette ligne de panier n'est plus en stock
+      	SI bProduitStock = Faux ALORS
+      		
+      		// Supprime le produit
+      		PanierSupprimeProduit(stLigne.sRefProduit)
+      		// Le produit a été supprimé
+      		bProduitSupprimé = Vrai
+      		
+      	SINON // Si le produit est en stock, il faut vérifier qu'il existe suffisamment de stock
+      		
+      		// Vérifie que la quantité en stock soit suffisante
+      		si stLigne.nNbArticle > nNbStock ALORS
+      			
+      			// Modifie le nombre pour être raccord avec le stock
+      			PanierSupprime(stLigne.sRefProduit, val(stLigne.nNbArticle-nNbStock))
+      			// La quantité a été modifiée
+      			bQuantitéModifiée = vrai
+      			
+      		FIN
+      		
+      	FIN
+      	
+      	// Si le produit a été supprimé ou la quantité modifiée
+      	si bProduitSupprimé ou bQuantitéModifiée ALORS
+      				
+      		// Mémorise le produit (pour prévenir l'Internaute)
+      		sListeProduitPlusEnStock += [RC] + sUnProduitPlusEnStock
+      		si bProduitSupprimé ALORS sListeProduitPlusEnStock += [TAB] + "SUPPR"
+      		si bQuantitéModifiée ALORS sListeProduitPlusEnStock += [TAB] + "MODIF"
+      		
+      	FIN
+      	
+      FIN
+      
+      // Renvoie la liste
+      renvoyer sListeProduitPlusEnStock
+     type : 458752
+   -
+     name : VerifieStocks
+     internal_properties : CAAAAAgAAAAAaLHJS3cxzf5JlnRZgpXOu9aZ/15VhufAoD6+hXesadpirqbXjkZyC/ID4PyP1ZbafQeqLykDfisuqO5qBjiiA++UcSKpT0s456f7hccZYaBTvKXRlFnmoDUgxmFi3EFTghlr0NPHAAI9iOuKjPOWMSerBsBfQ+w3ZHOPNB/1aNsFNefEIYLfmwgaOp/DstB8KDHMb7uVvaB3TRmm8W01t1aGHvbj
+     procedure_id : 1224201744039961891
+     type_code : 15
+     code : |1-
+      // Résumé : Vérifie les stocks des produits d'une commande
+      // Syntaxe :
+      //VerifieStocks (<nIDCommande> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      // Valeur de retour :
+      // 	Aucune
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE VerifieStocks(LOCAL nIDCommande est un entier)
+      
+      // Variables locales
+      sCompteRendu 	est une chaine
+      sModeleCR		est une chaine
+      
+      // Initialisation du modèle de compte rendu
+      sModeleCR = "Ref %1 - %2 : stock restant : %3 (seuil : %4)"
+      
+      // Recherche de la commande
+      HLitRecherchePremier(Commande,IDCommande,nIDCommande)
+      Si Htrouve(Commande) = Faux alors
+      	AjouteErreur("Commande spécifiée non trouvée")
+      	RETOUR
+      FIN
+      
+      // Parcours des produits de la commande
+      Pour TOUT LigneCde avec IDCommande = Commande.IDCommande
+      	// Est-ce que ce produit à des stocks ?
+      	HLitRecherchePremier(Produit,Référence,LigneCde.Référence)
+      	SI HTrouve(Produit) = Faux alors
+      		AjouteErreur("Produit spécifié non trouvée")
+      		RETOUR
+      	FIN
+      	
+      	SI Produit.QuantitéLimitée = Vrai alors
+      		// est-ce un produit avec déclinaison ?
+      		SI LigneCde.IDDéclinaisonProduit > 0 alors
+      			HLitRecherchePremier(DéclinaisonProduit,IDDéclinaisonProduit,LigneCde.IDDéclinaisonProduit)
+      			SI Htrouve(DéclinaisonProduit) = Faux alors				
+      				AjouteErreur("Déclinaison spécifiée non trouvée")
+      				RETOUR
+      			FIN
+      			
+      			SI DéclinaisonProduit.Quantité <= DéclinaisonProduit.SeuilAlerteStock alors
+      				sCompteRendu = sCompteRendu + [RC] + ChaîneConstruit(sModeleCR,produit.Référence,produit.LibelléProduit, DéclinaisonProduit.Quantité, DéclinaisonProduit.SeuilAlerteStock)
+      			FIN
+      		SINON
+      			// Produit direct
+      			SI Produit.Quantité <= Produit.SeuilAlerteStock alors
+      				sCompteRendu = sCompteRendu + [RC] + ChaineConstruit(sModeleCR,produit.Référence,Produit.LibelléProduit, produit.Quantité, produit.SeuilAlerteStock)
+      			FIN
+      		FIN
+      	FIN
+      	
+      FIN
+      
+      // Est-ce que des produits ont atteints leurs stocks limites ?
+      SI sCompteRendu <> "" alors
+      	// Envoie d'un email 
+      	EnvoieMessageWebMaster("Alerte stock","Liste des produits dont les stocks ont atteints le seuil d'alerte "+RC+sCompteRendu)
+      FIN
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RETOUR
+     type : 458752
+   -
+     name : PanierErreurInfo
+     procedure_id : 1224555511845835471
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'erreur en cours sur le panier
+      // Syntaxe :
+      //[ <Résultat> = ] PanierErreurInfo ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Erreur
+      //
+      
+      PROCEDURE PanierErreurInfo()
+      
+      renvoyer gsPanierErreur
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f868694
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

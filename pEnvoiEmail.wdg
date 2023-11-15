@@ -1,0 +1,491 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : pEnvoiEmail
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x14a3f3d3022ef63d
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAAA2Z4Koq5yDjlM7zFk5kVgz783Vxi7k9BUNFxdQMUnHrmpx1tfPosyNXd8sPdnn/XtudL64JgiF34Rf+lAcPUuO4Hknv49ImuDqajEOh5BEPjMf/PYUj3gLdDJrxLooKF7DRpBBDyLDOPjYuM4ntBKcRw6c1olXsVLoZtk2s3uB
+  type_code : 31
+  p_codes :
+   -
+     code : |1+
+      // Contact
+      gstConfig_SMTPContact est un COL_CONFIGURATION_SITE.ST_CONFIGURATION_SMTP
+      
+      // Commandes
+      gstConfig_SMTPCommande est un COL_CONFIGURATION_SITE.ST_CONFIGURATION_SMTP
+      
+      CONSTANT
+      	cs_MARQUEUR_EMAIL_DATE					= "[DATE]"
+      	cs_MARQUEUR_EMAIL_HEURE					= "[HEURE]"
+      	cs_MARQUEUR_EMAIL_NOMCLIENT				= "[NOM_CLIENT]"
+      	cs_MARQUEUR_EMAIL_DETAIL_COMMANDE		= "[DETAIL_COMMANDE]"
+      	cs_MARQUEUR_EMAIL_RAPPEL_PAIEMENT		= "[INFOS_PAIEMENT]"
+      	cs_MARQUEUR_EMAIL_ADRESSE_LIVRAISON		= "[ADRESSE_LIVRAISON]"
+      	cs_MARQUEUR_EMAIL_ADRESSE_FACTURATION	= "[ADRESSE_FACTURATION]"
+      	
+      	cs_MODELE_EMAIL_COMMANDE				= "Commande %1, Total Article TTC : %2 dont frais de port TTC : %3"
+      	cs_MODELE_EMAIL_LIGNE_COMMANDE			= "%1 x %2 (PUTTC : %3)"
+      	
+      FIN
+     type : 720896
+  procedures :
+   -
+     name : EnvoieMessageContact
+     internal_properties : CAAAAAgAAAAY4VHFNbv7IQZOqWKszUtduUZoLDw3cMRsvgbLuL986p3MIsioOedsZUTQ54tlgiK26bdF2aog2yEARywVbjzo+IjkKwHk1SMFdHH56lerq3jHo6jKn+flNMDfoFDDANeX1eloRznamITawXH5TUUyL1J8FZqGC9IWlK7T7cGUJ5FgNdXsmRvGMVP3Vm0SvoaNvMrDGgZhPNCwCr+pSPTQAwM0S8Alc2GerEwXKAFj8RA=
+     procedure_id : 1487300471168385094
+     type_code : 15
+     code : |1-
+      // Résumé : Envoi un message de prise de contact
+      // Syntaxe :
+      //[ <Résultat> = ] EnvoieMessageContact (<sEmailClient> est chaîne, <sMessageHTML> est chaîne)
+      //
+      // Paramètres :
+      //	sEmailClient (chaîne) : Email du client
+      //	sMessageHTML (chaîne) : Texte du message
+      // Valeur de retour :
+      // 	booléen : VRAI si le message a bien été envoyé, FAUX dans le cas contraire
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE EnvoieMessageContact(sEmailClient est une chaîne, sMessageHTML est une chaîne)
+      
+      // Variables locales
+      sDestinataire		est une chaine
+      sExpéditeur			est une chaine
+      
+      // Lecture de la configuration
+      gstConfig_SMTPContact 	= COL_CONFIGURATION_SITE.LireConfigurationSMTP()
+      sDestinataire			= COL_CONFIGURATION_SITE.LireAdresseEmailDestinataireContactSociété()
+      sExpéditeur			= COL_CONFIGURATION_SITE.LireAdresseEmailExpéditeurContactSociété()
+      
+      // Réinitialisation des variables 
+      EmailRAZ()
+      
+      // Ouverture de la session SMTP
+      SI OuvreSessionSMTP(gstConfig_SMTPContact) = Faux ALORS RENVOYER Faux
+      
+      // On remplit la structure
+      Email.NbDestinataire 	= 2
+      Email.Expéditeur 		= sExpéditeur
+      Email.Destinataire[1]	= sDestinataire
+      Email.Destinataire[2]	= sEmailClient
+      Email.Sujet 			= <§Rff00005232df6eee¤fr-FR¤Formulaire contact depuis le site Internet§>
+      Email.HTML				= sMessageHTML
+      
+      // Envoi du message
+      Si EmailEnvoieMessage(gstConfig_SMTPContact.sLoginUtilisateur) = Faux alors 
+      	AjouteErreur("Le message n'a pas été envoyé",ErreurInfo())
+      	renvoyer faux
+      FIN
+      
+      // Fermeture de la session POP3
+      EmailFermeSession(gstConfig_SMTPContact.sLoginUtilisateur)	
+      
+      // Par défaut, l'envoi se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	
+      	// Fermeture de la session SMTP
+      	EmailFermeSession(gstConfig_SMTPContact.sLoginUtilisateur)	
+      		
+      	// Message non envoyé
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : EnvoiMessageClient
+     internal_properties : CAAAAAgAAADIE/+aT0jm/8/zPgUlMIWkb6SSxpYzsKoLJzUzZw/feC1U1sFvJ9g1YySMf+lBzK4pkRt4bXUKe6Zb8YeGWzSn0xL0YxxkeS/ircHLzyqp3bcjSSspPwiKVdX8QK4XqSHKWLTZYKaQkkcvVlcdsTfnx1kknHhkhzgccCZZrh8JvGuub5htwh0mlstcIFm7hWmvjGlDlhE29RUlGGYS1bAOyc3HyKuS0Q==
+     procedure_id : 1488748609637424892
+     type_code : 15
+     code : |1-
+      // Résumé : Envoi d'un message à un client
+      // Syntaxe :
+      //[ <Résultat> = ] EnvoiMessageClient (<nIDClient> est entier, <sSujet> est chaîne, <sMessageHTML> est chaîne, <tabPiècesJointes> est tableau)
+      //
+      // Paramètres :
+      //	nIDClient (entier) : Identifiant du client destinataire
+      //	sSujet (chaîne) : Sujet du message
+      //	sMessageHTML (chaîne) : Message au format HTML
+      //	tabPiècesJointes (tableau) : Tableau contenant les pièces jointes
+      // Valeur de retour :
+      // 	booléen : VRAI si l'email a bien été envoyé, FAUX dans le cas contraire
+      //
+      // Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE EnvoiMessageClient(nIDClient est un entier,sSujet est une chaine , sMessageHTML est une chaine, tabPiècesJointes est un tableau de chaines)
+      
+      // Variables locales
+      i 					est un entier
+      nBorneMax			est un entier
+      sDestinataire		est une chaine
+      sExpéditeur			est une chaine
+      
+      // Lecture de la configuration
+      gstConfig_SMTPCommande 	= COL_CONFIGURATION_SITE.LireConfigurationSMTP()
+      sDestinataire			= COL_CONFIGURATION_SITE.LireAdresseEmailDestinataireCommandeSociété()
+      sExpéditeur				= COL_CONFIGURATION_SITE.LireAdresseEmailExpéditeurCommandeSociété()
+      
+      // Recherche du client
+      HLitRecherchePremier(client, idclient, nIDClient)
+      SI HTrouve(Client) = Faux alors
+      	AjouteErreur("Impossible de trouver le client dans la base")
+      	renvoyer faux
+      FIN
+      
+      // Réinitialisation des variables 
+      EmailRAZ()
+      
+      // Ouverture de la session SMTP
+      SI OuvreSessionSMTP(gstConfig_SMTPCommande) = faux alors RENVOYER Faux
+      
+      // On remplit la structure
+      Email.NbDestinataire 	= 2
+      Email.Expéditeur 		= sExpéditeur
+      Email.Destinataire[1]	= sDestinataire
+      Email.Destinataire[2]	= client.email
+      Email.Sujet 			= sSujet
+      Email.HTML				= sMessageHTML
+      
+      // Est-ce qu'il y a des pièces jointes ?
+      SI tabPiècesJointes <> Null ALORS
+      
+      	// Traitement des pièces jointes
+      	Email.NbAttache = Dimension(tabPiècesJointes)
+      	nBorneMax = Dimension(tabPiècesJointes)
+      	// On attache les pièces jointes
+      	POUR i = 1 _A_ nBorneMax
+      		Email.Attache[i] = tabPiècesJointes[i]		
+      	FIN
+      SINON
+      	// Pas de pièce jointe
+      	Email.NbAttache = 0	
+      FIN
+      
+      
+      // Envoi du message
+      SI EmailEnvoieMessage(gstConfig_SMTPCommande.sLoginUtilisateur) = Faux alors
+      	AjouteErreur("Le message n'a pas été envoyé : ",ErreurInfo())
+      	RENVOYER faux
+      FIN
+      
+      // Fermeture de la session POP3
+      EmailFermeSession(gstConfig_SMTPCommande.sLoginUtilisateur)	
+      
+      // Par défaut, l'envoi se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	
+      	// Fermeture de la session SMTP
+      	EmailFermeSession(gstConfig_SMTPCommande.sLoginUtilisateur)	
+      
+      	// Message non envoyé
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : OuvreSessionSMTP
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2214290648974253740
+     type_code : 15
+     code : |1-
+      // Résumé : Ouvre une session SMTP
+      // Syntaxe :
+      //[ <Résultat> = ] OuvreSessionSMTP (<stConfiguration> est ST_CONFIGURATION_SMTP)
+      //
+      // Paramètres :
+      //	stConfiguration (ST_CONFIGURATION_SMTP) : <indiquez ici le rôle de stConfiguration>
+      // Valeur de retour :
+      // 	booléen : Vrai si la session a été ouverte, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE OuvreSessionSMTP(stConfiguration est un COL_CONFIGURATION_SITE.ST_CONFIGURATION_SMTP)
+      
+      // Configuration du délai maximum
+      EmailChangeTimeOut(10)
+      
+      // Ouverture de la session SMTP
+      SI stConfiguration.bModeSécurisé = vrai alors
+      	SI EmailOuvreSessionSMTP(stConfiguration.sLoginUtilisateur,stConfiguration.sMDPUtilisateur,stConfiguration.sAdresseServeur,stConfiguration.nPort,emailOptionSécuriséTLS) = Faux ALORS
+      		AjouteErreur("Impossible d'ouvrir la session SMTP",ErreurInfo(),Faux)
+      		RENVOYER Faux
+      	FIN
+      SINON
+      	SI EmailOuvreSessionSMTP(stConfiguration.sLoginUtilisateur,stConfiguration.sMDPUtilisateur,stConfiguration.sAdresseServeur,stConfiguration.nPort,emailOptionDéfaut) = Faux ALORS
+      		AjouteErreur("Impossible d'ouvrir la session SMTP",ErreurInfo(),Faux)	
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      // Par défaut, la connexion est établie
+      RENVOYER vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : EnvoieMessageWebMaster
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2221308389200340408
+     type_code : 15
+     code : |1-
+      // Résumé : Envoi un message au WebMaster
+      // Syntaxe :
+      //[ <Résultat> = ] EnvoieMessageWebMaster (<sSujet> est chaîne, <sMessage> est chaîne)
+      //
+      // Paramètres :
+      //	sSujet (chaîne) : Sujet du message
+      //	sMessage (chaîne) : Message
+      // Valeur de retour :
+      // 	booléen : Vrai si le message a été envoyé, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE EnvoieMessageWebMaster(sSujet est une chaine, sMessage est une chaine)
+      
+      // Variables locales
+      sDestinataire		est une chaine
+      sExpéditeur			est une chaine
+      
+      // Lecture de la configuration
+      gstConfig_SMTPCommande = COL_CONFIGURATION_SITE.LireConfigurationSMTP()
+      sDestinataire			= COL_CONFIGURATION_SITE.LireAdresseEmailDestinataireNotification()
+      sExpéditeur			= COL_CONFIGURATION_SITE.LireAdresseEmailExpéditeurNotification()
+      
+      // Réinitialisation des variables 
+      EmailRAZ()
+      
+      // Ouverture de la session SMTP
+      SI OuvreSessionSMTP(gstConfig_SMTPCommande) = Faux ALORS RENVOYER Faux
+      
+      // On remplit la structure
+      Email.NbDestinataire 	= 1
+      Email.Destinataire[1] 	= sDestinataire
+      Email.Expéditeur 		= sExpéditeur
+      Email.Sujet 			= sSujet
+      Email.HTML			= sMessage
+      
+      // Pas de pièce jointe
+      Email.NbAttache = 0	
+      
+      // Envoi du message
+      SI EmailEnvoieMessage(gstConfig_SMTPCommande.sLoginUtilisateur) = Faux ALORS
+      	// Fermeture de la session POP3
+      	EmailFermeSession(gstConfig_SMTPCommande.sLoginUtilisateur)	
+      	
+      	AjouteErreur("Le message n'a pas été envoyé : ",ErreurInfo())
+      	RENVOYER Faux
+      FIN
+      
+      // Fermeture de la session POP3
+      EmailFermeSession(gstConfig_SMTPCommande.sLoginUtilisateur)	
+      
+      // Par défaut, l'envoi se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      
+      	// Fermeture de la session SMTP
+      	EmailFermeSession(gstConfig_SMTPCommande.sLoginUtilisateur)	
+      
+      	// Message non envoyé
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : EnvoyerConfirmationCommande
+     internal_properties : CAAAAAgAAADHVDNgRRrrWYHO3mSeTpFClLJjwVg+Js9tJ6ix+Zz7F27K9dvXDwORM+xmFw7ZVQsYpapNn9BnI8zAT8jxi+co31xhtf14BrNlq4lEFtQ2eXdUYDxkMUvdICcq9UhczqvVuO6Vm92lMpcUWjR94vnkaWPabgWhi1Coi/UQr8EHEgEY20HbKjQ+RSHH7qa9a6ZPi9/bu00rV0vcJYrBmRcP554hhuB3jGJUPmghk/FlqXKdqp0=
+     procedure_id : 2222352306741617335
+     type_code : 15
+     code : |1-
+      // Résumé : Envoie un email de confirmation de commande
+      // Syntaxe :
+      //[ <Résultat> = ] EnvoyerConfirmationCommande (<nIDCommande> est entier, <nModePaiement> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      //	nModePaiement (entier) : mode de paiement (constantes PAIEMENT_XXX)
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération s'est déroulée normalement, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE EnvoyerConfirmationCommande(nIDCommande est un entier, nModePaiement est un entier)
+      
+      // Variables locales
+      sNomClient				est une chaine
+      sAdresseFacturation		est une chaine
+      sAdresseLivraison		est une chaine
+      sDetailCommande			est une chaine
+      sDetailPaiement			est une chaine
+      sEmailConfirmation		est une chaine
+      
+      // Chargement de la commande
+      HLitRecherchePremier(Commande,IDCommande,nIDCommande)
+      SI HTrouve(Commande) = Faux alors
+      	AjouteErreur("Commande non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // Chargement des informations client
+      HLitRecherchePremier(Client,IDClient,Commande.IDClient)
+      SI HTrouve(Commande) = Faux ALORS
+      	AjouteErreur("Client non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération du nom complet du client
+      sNomClient = GetNomCompletClient(Client.IDClient)
+      
+      // Recherche et mise en forme de l'adresse de facturation
+      sAdresseFacturation = RécupèreAdresseCommandeFormatée(Commande.IDAdresseFacturation)
+      Si sAdresseFacturation ~="" 
+      	AjouteErreur("Adresse de facturation non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche et mise en forme de l'adresse de livraison
+      sAdresseLivraison = RécupèreAdresseCommandeFormatée(Commande.IDAdresseLivraison)
+      SI sAdresseLivraison ~="" 
+      	AjouteErreur("Adresse de livraison non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // Construction du résumé de la commande
+      sDetailCommande = ChaineConstruit(cs_MODELE_EMAIL_COMMANDE,Commande.NumCommande, MonétaireVersChaine(Commande.TotalTTC), MonétaireVersChaine(Commande.FraisPortTTC))
+      sDetailCommande += RC
+      
+      // On ajoute le contenu de la commande
+      sDetailCommande += <§Rff00035232e16eee¤fr-FR¤Détail de la commande§>+RC
+      REQ_DetailsFacture.pIDCommande = Commande.IDCommande
+      SI HExécuteRequête(REQ_DetailsFacture) = Faux alors
+      	AjouteErreur("Erreur pendant le parcours de la commande")
+      	RENVOYER Faux
+      FIN
+      
+      // Parcours des lignes de commande
+      Pour TOUT REQ_DetailsFacture 
+      	sDetailCommande += ChaineConstruit(cs_MODELE_EMAIL_LIGNE_COMMANDE,REQ_DetailsFacture.Quantité,...
+      													REQ_DetailsFacture.Référence + " " +REQ_DetailsFacture.LibelléProduit,...
+      													MonétaireVersChaine(REQ_DetailsFacture.PrixUnitaireHT*(100 + REQ_DetailsFacture.TauxTaxe)/100)) + RC
+      FIN
+      
+      // gestion du mode de paiement
+      SELON nModePaiement
+      	CAS REGL_CB, REGL_PAYPAL
+      		sDetailPaiement = <§Rff00045232e36eee¤fr-FR¤Cette commande a été réglée par carte bancaire§>
+      	CAS REGL_CHEQUE
+      		sDetailPaiement = <§Rff00055232e56eee¤fr-FR¤Cette commande est en attente de réception du chèque de règlement à l'adresse suivante : §>+RC+...
+      							LireAdresseSociété()
+      	AUTRE CAS
+      		AjouteErreur(<§Rff00065232e76eee¤fr-FR¤Type de paiement non géré dans la confirmation par email§>)
+      		RENVOYER Faux
+      FIN
+      
+      // On remplace les balises prédéfinies par les textes générées
+      sEmailConfirmation = LireEmailConfirmationCommande()
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_DATE, _sConvertiTexte(DateVersChaine(Commande.DateCommande, maskDateSystème)))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_HEURE, _sConvertiTexte(HeureVersChaine(Commande.HeureCommande,maskHeureSystème)))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_NOMCLIENT, _sConvertiTexte(sNomClient))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_DETAIL_COMMANDE, _sConvertiTexte(sDetailCommande))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_RAPPEL_PAIEMENT, _sConvertiTexte(sDetailPaiement))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_ADRESSE_LIVRAISON, _sConvertiTexte(sAdresseLivraison))
+      sEmailConfirmation = Remplace(sEmailConfirmation, cs_MARQUEUR_EMAIL_ADRESSE_FACTURATION, _sConvertiTexte(sAdresseFacturation))
+      
+      // Enfin, on envoie en email
+      SI EnvoiMessageClient(Client.IDClient,"Confirmation de commande",sEmailConfirmation,Null) = Faux alors
+      	AjouteErreur(<§Rff00075232e96eee¤fr-FR¤Impossible d'envoyer le message de confirmation de commande§>)
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      
+      	// Message non envoyé
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : _sConvertiTexte
+     procedure_id : 2222393697539042504
+     type_code : 15
+     code : |1-
+      // Résumé : Converti un texte en texte HTML
+      // Syntaxe :
+      //[ <Résultat> = ] _sConvertiTexte (<sTexte> est chaîne)
+      //
+      // Paramètres :
+      //	sTexte (chaîne) : Texte brut
+      // Valeur de retour :
+      // 	chaîne: texte HTML
+      //
+      
+      PROCEDURE _sConvertiTexte(sTexte est une chaine)
+      
+      // Variables locales
+      sTexteConverti est une chaine = sTexte
+      
+      <COMPILE SI Configuration="eCommerce">
+      	sTexteConverti = TexteVersHTML(sTexteConverti)
+      <FIN>
+      
+      
+      // On remplace les RC par des <BR>
+      sTexteConverti = Remplace(sTexteConverti,RC,"<br>")
+      
+      RENVOYER sTexteConverti
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : COL_Collection1
+resources :
+ string_res :
+  identifier : 0x14a3f3cc022cdc4d
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Formulaire contact depuis le site Internet
+     index : 0
+   -
+     text :
+      fr-FR : Détail de la commande
+     index : 3
+   -
+     text :
+      fr-FR : Cette commande a été réglée par carte bancaire
+     index : 4
+   -
+     text :
+      fr-FR : "Cette commande est en attente de réception du chèque de règlement à l'adresse suivante : "
+     index : 5
+   -
+     text :
+      fr-FR : Type de paiement non géré dans la confirmation par email
+     index : 6
+   -
+     text :
+      fr-FR : Impossible d'envoyer le message de confirmation de commande
+     index : 7
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

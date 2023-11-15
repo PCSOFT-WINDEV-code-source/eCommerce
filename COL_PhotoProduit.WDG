@@ -1,0 +1,738 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_PhotoProduit
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad30574ea45
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier PhotoProduit
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_PhotoProduit est une structure
+      		IDPhotoProduit 			est un entier
+      		Photo 					est un chaîne
+      		Role 					est un entier
+      		ParDéfaut 				est un booléen
+      		tabDéclinaisonProduit 	est un STCOL_DéclinaisonProduit 
+      		IDProduit				est un entier
+      		Binaire 				est un buffer
+      		NumeroPhoto				est un entier
+      Fin
+       
+       
+     type : 720896
+  procedures :
+   -
+     name : AjouterPhotoProduit
+     internal_properties : CAAAAAgAAAAgT8VyJkZTusR8KydiclUudcxZuMH/Y8koLiXJUR44CqxE5PDEjvX3pM06f2roeUEn4CRStKo99JYHRLbyrE4KLVQhmXLkotKrAMJFNUoj6SSWLRhPZypdOO9duvFDVQyM961gjiLiOX4Te8u0G9Dd4Dpd6ZjGxsVd9I6Zku5a51AWVf7AbJua4WxzqCGu+5ybyLVlaw6dK57Hp2fgemZQIhKtWg==
+     procedure_id : 2216471818069457233
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute une photo de produit
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterPhotoProduit (<nIDProduit> est entier, <bufPhotoProduit> est buffer)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : Identifiant du produit
+      //	bufPhotoProduit (buffer) : Buffer de la photo du produit
+      // Valeur de retour :
+      // 	booléen : Vrai si la photo a été ajoutée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction AjouterPhotoProduit ( nIDProduit est un entier , bufPhotoProduit est un buffer )
+      // Variables locales
+      sListeRole 		est une chaine
+      sRoleEnCours	est une chaine
+      nNuméroPhoto	est un entier
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      // Recherche du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI Htrouve(Produit) = Faux alors
+      	AjouteErreur("Impossible de trouver le produit correspondant")
+      	RENVOYER Faux
+      FIN
+      
+      // Il faut rechercher le plus grand numéro de photo pour ce produit
+      REQ_NUMERO_PHOTO_MAX.pIDProduit = nIDProduit
+      HExécuteRequête(REQ_NUMERO_PHOTO_MAX)
+      HLitPremier(REQ_NUMERO_PHOTO_MAX)
+      SI HEnDehors(REQ_NUMERO_PHOTO_MAX) = Vrai alors
+      	// Première photo
+      	nNuméroPhoto = 1
+      SINON
+      	// On prend la suivante
+      	nNuméroPhoto = REQ_NUMERO_PHOTO_MAX.le_maximum_NumeroPhoto + 1
+      FIN
+      
+      // Initialisation de la liste des rôles
+      sListeRole = ROLE_PHOTO_NORMAL + TAB + ROLE_PHOTO_CARRE_PETIT + TAB + ROLE_PHOTO_CARRE_GRAND
+      
+      // En WebService, on ne crée qu'une seule photo : la photo du rôle par défaut pour stocker le binaire
+      SI EnModeWebservice() = vrai alors
+      	HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[produit.IDProduit,nNuméroPhoto,ROLE_PHOTO_NORMAL])
+      	SI HTrouve(PhotoProduit) = Vrai alors
+      		AjouteErreur("Photo déjà existante")
+      		RENVOYER Faux		
+      	FIN
+      	
+      	// Initialisation de l'enregistrement
+      	HRAZ(PhotoProduit)
+      	
+      	// On stocke le binaire
+      	PhotoProduit.ParDéfaut		= Faux
+      	PhotoProduit.Binaire 		= bufPhotoProduit
+      	PhotoProduit.Role			= ROLE_PHOTO_NORMAL
+      	PhotoProduit.NumeroPhoto	= nNuméroPhoto
+      	PhotoProduit.IDProduit 		= produit.IDProduit		
+      	
+      	// La photo carrée est celle par défaut
+      	SI nNuméroPhoto = 1 _ET_ PhotoProduit.Role = ROLE_PHOTO_NORMAL ALORS
+      		PhotoProduit.ParDéfaut = Vrai
+      	FIN
+      	
+      	// On ajoute en base
+      	SI HAjoute(PhotoProduit) = Faux ALORS
+      		AjouteErreur("Ajout de la miniature impossible")
+      		RENVOYER Faux			
+      	FIN
+      	
+      	// On demande la génération, via l'API REST du site
+      	SI AppelWSRestAdministration(CN_ADMIN_REST_PARAM_IDOPERATION+"="+CN_ADMIN_REST_OPE_GENERATION_PRODUIT+"&"+CN_ADMIN_REST_PARAM_IDPRODUIT+"="+nIDProduit) = Faux ALORS
+      		AjouteErreur("Impossible d'appeler l'API d'administration")	
+      		RENVOYER Faux
+      	FIN
+      	
+      	// En mode WebService, c'est terminé
+      	RENVOYER Vrai
+      FIN
+      
+      // On crée les différentes photos correspondant aux différents rôles définis dans la collection COL_ECOMMERCE
+      Pour toute chaine sRoleEnCours de sListeRole separee par TAB
+      	HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[produit.IDProduit,nNuméroPhoto,Val(sRoleEnCours)])
+      	SI HTrouve(PhotoProduit) = Vrai ALORS
+      		CONTINUER
+      	FIN
+      	
+      	// Initialisation de l'enregistrement
+      	HRAZ(PhotoProduit)
+      		
+      	// Configuration de l'enregistrement 
+      	// On ne stocke le binaire que pour l'image par défaut
+      	SI Val(sRoleEnCours) = ROLE_PHOTO_NORMAL alors
+      		PhotoProduit.Binaire = bufPhotoProduit
+      	FIN
+      	
+      	PhotoProduit.ParDéfaut		= Faux	
+      	PhotoProduit.IDProduit = Produit.IDProduit		
+      	PhotoProduit.Role		= Val(sRoleEnCours)
+      	PhotoProduit.NumeroPhoto	= 	nNuméroPhoto
+      	
+      	// La photo carrée est celle par défaut
+      	SI nNuméroPhoto = 1 _et_ PhotoProduit.Role = ROLE_PHOTO_NORMAL alors
+      		PhotoProduit.ParDéfaut = Vrai
+      	FIN
+      		
+      	// Construction de l'image
+      	PhotoProduit.Photo = _GenereMiniature(bufPhotoProduit,Val(sRoleEnCours),PhotoProduit.IDProduit,nNuméroPhoto)	
+      		
+      	// Ajout en base
+      	SI HAjoute(PhotoProduit) = Faux alors
+      		AjouteErreur("Ajout de la miniature impossible")
+      		RENVOYER Faux			
+      	FIN
+      
+      FIN
+      
+      
+      
+      // Par défaut l'ajout se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : _GenereMiniature
+     internal_properties : CAAAAAgAAABbDD+M7YQY0OnBvKx2CRTplPUBXJVwiHLaqrerOoHuCCbRhhJ7cU/YA3fOVLgWC6xu4m6al1dIxGHpyjv5cehjdhO0B6OYLZG3D7rM9cbh4xzxwzQb6FDiOz5r7GFGJ60KFi6sbmlcyGVMJc2QrkoE/B1SEZpT+lQY8Vo1ShdYnP4uM4hmGNmQ17lewxn5hOndNcbu4mhR5IwAuUEAl1fAUqccf6puPJLHr8r54Ws43WZT0oi8
+     procedure_id : 2216475550402739383
+     type_code : 15
+     code : |1-
+      // Résumé : Génère la miniature d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] _GenereMiniature (<bufPhotoProduit>, <nRole> est entier, <nIDProduit> est entier, <nNuméroPhoto> est entier)
+      //
+      // Paramètres :
+      //	bufPhotoProduit : Buffer contenant l'image source
+      //	nRole (entier) : Rôle de la photo
+      //	nIDProduit (entier) : Identifiant du produit
+      //	nNuméroPhoto (entier) : Numéro de la photo
+      // Valeur de retour :
+      // 	chaîne: Chemin de la photo
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction Privée _GenereMiniature ( bufPhotoProduit , nRole est un entier , nIDProduit est un entier, nNuméroPhoto est un entier )
+      
+      // Variables locales
+      sCheminComplet				est une chaine
+      sCheminWeb					est une chaine
+      Miniature					est une image
+      sCheminCompletGeneration	est une chaine
+      
+      // Cette procédure ne doit pas être exécutée en mode Web Service
+      SI EnModeWebservice() ALORS
+      	AjouteErreur("Ce traitement ne doit pas être exécuté en mode Web Service",dbgInfo(dbgPile))
+      	RENVOYER ""
+      FIN
+      
+      
+      // Chargement de l'image
+      Miniature = bufPhotoProduit
+      Miniature.CouleurRemplissage = iBlanc
+      // Selon le rôle, on redimensionne
+      selon nRole
+      	CAS ROLE_PHOTO_NORMAL	// Photo normale en carrée, 512x512 sans agrandissement
+      		dRedimensionne(Miniature,512,512,drHomothétiqueCentré)
+      
+      		// On redimensionne en carré pour permettre le mode étiré
+      		Miniature.CouleurRemplissage = iBlanc
+      		Miniature..Largeur = 512		
+      		Miniature..Hauteur = 512
+      		
+      	CAS ROLE_PHOTO_CARRE_PETIT	// Photo carrée en petit : 128x128
+      		dRedimensionne(Miniature,128,128,drHomothétiqueCentré)
+      		
+      		// On redimensionne en carré pour permettre le mode étiré
+      		Miniature.CouleurRemplissage = iBlanc
+      		Miniature..Largeur = 128
+      		Miniature..Hauteur = 128		
+      	CAS ROLE_PHOTO_CARRE_GRAND  // Photo carrée en grand : 256x256		
+      		dRedimensionne(Miniature,256,256,drHomothétiqueCentré)
+      		
+      		// On redimensionne en carré pour permettre le mode étiré
+      		Miniature.CouleurRemplissage = iBlanc
+      		Miniature..Largeur = 256
+      		Miniature..Hauteur = 256		
+      
+      	AUTRE CAS
+      		AjouteErreur("Rôle de photo non géré")
+      		RENVOYER ""
+      FIN
+      
+      // Construction du chemin complet du fichier
+      sCheminComplet = ComplèteRep(sRenvoyerRepWebUpload())+"produit_"+nIDProduit+"_"+nNuméroPhoto+"_"+nRole+".jpg"
+      sCheminCompletGeneration = ComplèteRep(sRenvoyerRepGeneration())+"produit_"+nIDProduit+"_"+nNuméroPhoto+"_"+nRole+".jpg"
+      	
+      // Sauvegarde au format JPEG
+      SI dSauveImageJPEG(Miniature,sCheminCompletGeneration) = Faux alors
+      	AjouteErreur("Erreur lors de la sauvegarde de la miniature",ErreurInfo())
+      	RENVOYER ""
+      FIN
+      
+      // On transfert l'image généré dans le répertoire _WEB
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Cette procédure ne doit pas être exécutée en mode Web Service	
+      <SINON>	
+      	// Transfert direct
+      	SI fCopieFichierRépertoireWeb(sCheminCompletGeneration,sCheminComplet) = Faux ALORS
+      		AjouteErreur("Impossible de transférer l'image dans le répertoire _WEb",ErreurInfo())
+      		RENVOYER ""
+      	FIN
+      <FIN>
+      
+      
+      // On supprime le fichier de génération
+      SI fFichierExiste(sCheminCompletGeneration) = vrai alors
+      	SI fSupprime(sCheminCompletGeneration) = Faux alors
+      		AjouteErreur("Impossible de supprimer le fichier temporaire de génération",ErreurInfo())
+      		// Erreur non fatale
+      	FIN
+      FIN
+      
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Cette procédure ne doit pas être exécutée en mode Web Service	
+      <SINON>	
+      	// On construit le chemin de l'image par rapport à fRepWeb
+      	sCheminWeb = Remplace(sCheminComplet,fRepWeb()+"\FR","")
+      <FIN>
+      
+      
+      sCheminWeb = Remplace(sCheminWeb,"\","/")
+      Si Gauche(sCheminWeb,1)~="/" alors sCheminWeb = Droite(sCheminWeb,Taille(sCheminWeb)-1)
+      
+      // On renvoie le chemin Web
+      RENVOYER sCheminWeb
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : ModifierPhotoProduitDefaut
+     internal_properties : CAAAAAgAAADMNG3oipnkhfgbBgSJ/PUmNWhr8ur5Wc2ouDzM57PeA3qKrt51cujoG8JF2nLPCyhCZffqzb2VPJeqlrwsQvKYW69ITZTZ5R3IBylhP3uvGySvlGISRRa1TWJNjaorj+4My+xIudykX6cqBabvKR6LMhCWewUsTPcMwRByyXQIfcwmWPy5FhsG7IHDaaTIeRoq2rC1mADyGMUs4gRPXtSlqxU66jqn
+     procedure_id : 2216781962094556336
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la photo par défaut d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierPhotoProduitDefaut (<nIDProduit> est entier, <nIDNouvellePhoto> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : Identifiant du produit
+      //	nIDNouvellePhoto (entier) : Identifiant de la nouvelle photo
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération s'est correctement déroulée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ModifierPhotoProduitDefaut ( nIDProduit est un entier , nIDNouvellePhoto est un entier )
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      //Enlève le flag "par défaut" sur la photo par défaut actuelle, dans la base de données
+      HLitRecherchePremier(PhotoProduit,ParDéfautIDProduit,[Vrai,nIDProduit])
+      SI HTrouve(PhotoProduit)=Vrai ALORS
+      	PhotoProduit.ParDéfaut = Faux
+      	SI HModifie(PhotoProduit) = Faux alors
+      		AjouteErreur("Impossible de changer l'image par défaut")
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      // Active le flag "par défaut" sur la nouvelle photo par défaut, dans la base de données
+      HLitRecherchePremier(PhotoProduit,IDPhotoProduit,nIDNouvellePhoto)
+      SI HTrouve(PhotoProduit) ALORS
+      	
+      	PhotoProduit.ParDéfaut = Vrai
+      	SI HModifie(PhotoProduit) = Faux alors
+      		AjouteErreur("Impossible de définir l'image par défaut")
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+      	
+     type : 458752
+   -
+     name : LirePhotoProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217204376585327989
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie une photo de produit spécifique
+      // Syntaxe :
+      //[ <Résultat> = ] LirePhotoProduit (<nIDPhoto> est entier)
+      //
+      // Paramètres :
+      //	nIDPhoto (entier) : Identifiant de la photo
+      // Valeur de retour :
+      // 	chaîne ANSI : Chemin de la photo
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePhotoProduit(nIDPhoto est un entier) : chaine
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      // Recherche de la photo en base
+      HLitRecherchePremier(PhotoProduit,IDPhotoProduit,nIDPhoto)
+      SI Htrouve(PhotoProduit) = vrai alors
+      	SI EnModeAWP() = Vrai ALORS
+      		RENVOYER PhotoProduit.Photo	
+      	SINON
+      		RENVOYER "FR/"+PhotoProduit.Photo
+      	FIN
+      SINON
+      	AjouteErreur("Pas de photo pour cet identifiant")
+      	RENVOYER ""
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : LireNombrePhotosProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217222368694846004
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le nombre de photos d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] LireNombrePhotosProduit (<nIDProduit> est entier, <nRole> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : Identifiant de produit
+      //	nRole (entier) : Rôle de la photo (voir les constantes correspondantes)
+      // Valeur de retour :
+      // 	entier : Nombre de photos du produit
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LireNombrePhotosProduit(nIDProduit est un entier, nRole est un entier) : entier
+      
+       // Variables locales
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER 0
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Impossible de trouver le produit correspondant")
+      	RENVOYER 0
+      FIN
+      
+      // Il faut rechercher le plus grand numéro de photo pour ce produit
+      REQ_NOMBRES_PHOTOS_PRODUIT.pIDProduit = nIDProduit
+      REQ_NOMBRES_PHOTOS_PRODUIT.pRole = nRole
+      HExécuteRequête(REQ_NOMBRES_PHOTOS_PRODUIT)
+      HLitPremier(REQ_NOMBRES_PHOTOS_PRODUIT)
+      SI HEnDehors(REQ_NOMBRES_PHOTOS_PRODUIT) = Vrai ALORS
+      	// pas de photo
+      	RENVOYER 0
+      SINON
+      	// On renvoie le nombre
+      	RENVOYER REQ_NOMBRES_PHOTOS_PRODUIT.Comptage_Photos
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER 0
+     type : 458752
+   -
+     name : GenerePhotosProduit
+     internal_properties : CAAAAAgAAAAntBPA3VrB6RGW5pwK5jVeBKJ6WYtiQuu5G0ylbWCvm4Jm9zKWUye11+gCE6oF8bfk6ZZZKywkORj0RQ6B4KVYY+ihwZGEpp8Rp7UgLsj+GevQ4Ohw9YNhpOsc3yY+sNn7Rngn6Y9HnM2+dMbjzPOChxlMyFsB2h03Jrq16o3DXk08h+VHlohSucX7UuKxr83pT9sfp9m/q19guT79HQNqxuDfZOLFwiCGxG7/VRmNCdJ9ir0=
+     procedure_id : 2217228111068244523
+     type_code : 15
+     code : |1-
+      // Résumé : Génère les différentes photos d'une produit
+      // Syntaxe :
+      //[ <Résultat> = ] GenerePhotosProduit (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : Identifiant du produit
+      // Valeur de retour :
+      // 	Booléen : Vrai si la génération s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE GenerePhotosProduit(nIDProduit est un entier) : booleen
+      
+      // Variables locales
+      sListeRole 		est une chaine
+      tabListePhoto	est un tableau d'entier
+      nNuméroPhoto	est un entier
+      nIDPhoto		est un entier
+      bufPhotoProduit	est un buffer
+      sNomPhotoPrecedent	est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Cette procédure ne doit pas être exécutée en mode Web Service
+      SI EnModeWebservice() ALORS
+      	AjouteErreur("Ce traitement ne doit pas être exécuté en mode Web Service",dbgInfo(dbgPile))
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI Htrouve(Produit) = Faux alors
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération de la liste des photos de ce produit : on recherche la plus grande pour avoir son buffer
+      tabListePhoto = LireListePhotos(nIDProduit)
+      
+      // Initialisation de la liste des rôles
+      sListeRole = ROLE_PHOTO_NORMAL + TAB + ROLE_PHOTO_CARRE_PETIT + TAB + ROLE_PHOTO_CARRE_GRAND
+      
+      // On parcours toutes les photos
+      Pour tout element nIDPhoto de tabListePhoto
+      	// Lecture de la photo : on doit avoir un buffer binaire
+      	HlitRecherchePremier(PhotoProduit,IDPhotoProduit,nIDPhoto)
+      	SI Htrouve(PhotoProduit) = Faux alors
+      		AjouteErreur("Une photo n'a pas été trouvée")
+      		CONTINUER
+      	FIN
+      	
+      	// On charge le buffer de la photo
+      	bufPhotoProduit = PhotoProduit.Binaire
+      	SI bufPhotoProduit = "" alors
+      		AjouteErreur("Une photo n'a pas de binaire associée")
+      		CONTINUER
+      	FIN
+      	
+      	// On récupère non numéro et son identifiant
+      	nNuméroPhoto = PhotoProduit.NumeroPhoto
+      		
+      	// On crée les différentes photos correspondant aux différents rôles définis dans la collection COL_ECOMMERCE
+      	POUR TOUTE CHAÎNE sRoleEnCours DE sListeRole SEPAREE PAR TAB
+      		HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[nIDProduit,nNuméroPhoto,Val(sRoleEnCours)])
+      		SI HTrouve(PhotoProduit) = Vrai ALORS
+      			// Mise à jour du produit existant
+      			SI Val(sRoleEnCours) = ROLE_PHOTO_NORMAL alors
+      				PhotoProduit.Binaire = bufPhotoProduit
+      			SINON
+      				PhotoProduit.Binaire = ""
+      			FIn
+      			
+      			// Construction de l'image
+      			sNomPhotoPrecedent = PhotoProduit.Photo
+      			PhotoProduit.Photo = _GenereMiniature(bufPhotoProduit,val(sRoleEnCours),PhotoProduit.IDProduit,nNuméroPhoto)
+      			
+      			// Modification en base
+      			SI Val(sRoleEnCours) = ROLE_PHOTO_NORMAL _ou_ PhotoProduit.Photo <> sNomPhotoPrecedent _ou_ PhotoProduit.Binaire <> bufPhotoProduit alors
+      				SI HMOdifie(PhotoProduit) = Faux ALORS
+      					AjouteErreur("Modification de la miniature impossible")
+      					RENVOYER Faux			
+      				FIN
+      			FIN
+      		SINON
+      			// Initialisation de l'enregistrement
+      			HRAZ(PhotoProduit)
+      			
+      			// Configuration de l'enregistrement
+      			SI Val(sRoleEnCours) = ROLE_PHOTO_NORMAL 
+      				PhotoProduit.Binaire = bufPhotoProduit
+      			FIN
+      			
+      			PhotoProduit.IDProduit = nIDProduit	
+      			PhotoProduit.Role		= Val(sRoleEnCours)
+      			PhotoProduit.NumeroPhoto	= 	nNuméroPhoto
+      			
+      			// La photo carrée est celle par défaut
+      			SI PhotoProduit.Role = ROLE_PHOTO_NORMAL ALORS
+      				PhotoProduit.ParDéfaut = Vrai
+      			FIN
+      			
+      			// Construction de l'image
+      			PhotoProduit.Photo = _GenereMiniature(bufPhotoProduit,Val(sRoleEnCours),PhotoProduit.IDProduit,nNuméroPhoto)	
+      			
+      			// Ajout en base
+      			SI HAjoute(PhotoProduit) = Faux ALORS
+      				AjouteErreur("Ajout de la miniature impossible")
+      				RENVOYER Faux			
+      			FIN
+      		FIN
+      		
+      	FIN
+      FIN
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : GenerePhotosProduitSelonIndex
+     internal_properties : CAAAAAgAAACs91BklxzGtVrzkSAlcI9q2uzpneX2uXWFg96myBJlYZm39XAe9pIB4s3Z7MhLaGu8/RG753EzvzNbWIWW/vyvFqCmRjlmI/X+nZO+jBjTYHMIUGMKlHhBzvA2I+ORY4ERHGAsiRFjO0sD1RRnC8yZnQhMmcY69K2Yqk4yhxXFO7a8
+     procedure_id : 2220172881775653105
+     type_code : 15
+     code : |1+
+      // Résumé : Génère les différentes photos d'une produit selon son indice dans le tableau
+      // Syntaxe :
+      //[ <Résultat> = ] GenerePhotosProduitSelonIndex (<nIndexProduit> est entier)
+      //
+      // Paramètres :
+      //	nIndexProduit (entier) : Identifiant du produit
+      // Valeur de retour :
+      // 	booléen : Vrai si la génération s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE GenerePhotosProduitSelonIndex(nIndexProduit est un entier) : booléen
+      
+      // Variables locales
+      nIDProduit		est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On vérifie la position
+      SI nIndexProduit<=0 _ou_ nIndexProduit>COL_Produit.gtabProduits..Occurrence alors
+      	AjouteErreur("Demande de génération d'un indice non autorisé")
+      	RENVOYER Faux
+      FIN
+      
+      // On récupère l'identifiant du produit
+      nIDProduit = COL_Produit.gtabProduits[nIndexProduit].IDProduit
+      
+      RENVOYER GenerePhotosProduit(nIDProduit)
+     type : 458752
+   -
+     name : SupprimerPhotoProduit
+     internal_properties : CAAAAAgAAAD4cyQCGDS3oRZWOxU6uvs+49CETNJvSd7RnHw1TWTWoqBHocxpdqQF3OR2SFbCFeoI8JQlFmJh48RwIf4cCKxRg/SKgmR+czLK4h7mUPlq0fLv1fGp8ock4M0IwkeAMluXfh3v8DXZEgQ3EnkA5CWMGW97fkQnS+QJzn2RrnUrGhLsrjZzYmE8IHVH5fiYwdiWwlUo+5A=
+     procedure_id : 2239507806482673365
+     type_code : 15
+     code : |1-
+      // Résumé : Supprime une photo de produit
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerPhotoProduit (<nIDPhoto> est entier)
+      //
+      // Paramètres :
+      //	nIDPhoto (entier) : Identifiant de la photo
+      // Valeur de retour :
+      // 	booléen : Vrai si la photo a été supprimée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerPhotoProduit( nIDPhoto est un entier)
+      
+      // Variables locales
+      bPhotoDéfaut 	est un booléen
+      nIDProduit		est un entier
+      nNuméroPhoto	est un entier
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      //Suppression de l'image du produit
+      HLitRecherchePremier(PhotoProduit,IDPhotoProduit,nIDPhoto)
+      SI HTrouve(PhotoProduit) = Faux alors
+      	AjouteErreur("Photo de produit non trouvée : "+nIDPhoto)
+      	RENVOYER Faux
+      FIN
+      
+      // Est-ce une photo par défaut ?
+      bPhotoDéfaut = PhotoProduit.ParDéfaut
+      
+      // Mémorisation du produit
+      nIDProduit	= PhotoProduit.IDProduit
+      
+      // Mémorisation du numéro de la photo
+      nNuméroPhoto = PhotoProduit.NumeroPhoto
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Le produit n'a pas été trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // Suppression de la photo : il faut supprimer la photo dans tous les rôles
+      HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[nIDProduit,nNuméroPhoto,ROLE_PHOTO_CARRE_GRAND])
+      SI HTrouve(PhotoProduit) alors
+      	SI HSupprime(PhotoProduit) = Faux ALORS
+      		AjouteErreur("La photo n'a pas été supprimée dans le rôle CARRE_GRAND")
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[nIDProduit,nNuméroPhoto,ROLE_PHOTO_CARRE_PETIT])
+      SI HTrouve(PhotoProduit) ALORS
+      	SI HSupprime(PhotoProduit) = Faux ALORS
+      		AjouteErreur("La photo n'a pas été supprimée dans le rôle CARRE_PETIT")
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[nIDProduit,nNuméroPhoto,ROLE_PHOTO_NORMAL])
+      SI HTrouve(PhotoProduit) ALORS
+      	SI HSupprime(PhotoProduit) = Faux ALORS
+      		AjouteErreur("La photo n'a pas été supprimée dans le rôle NORMAL")
+      		RENVOYER Faux
+      	FIN	
+      FIN
+      
+      
+      //Si la photo qui vient d'être supprimée était la photo par défaut pour le produit, on en prend une autre.. 
+      //Ce sera la 1ère de la liste..
+      SI bPhotoDéfaut = Vrai ALORS
+      	HLitRecherchePremier(PhotoProduit,IDProduit,nIDProduit)
+      	SI Htrouve(PhotoProduit) = Vrai alors
+      		PhotoProduit.ParDéfaut = Vrai
+      		SI HModifie(PhotoProduit) = Faux alors
+      			AjouteErreur("La nouvelle photo par défaut n'a pas pu être sélectionnée")
+      			RENVOYER Faux
+      		FIN
+      		
+      	FIN	
+      FIN
+      
+      
+      // Par défaut la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f4a8617
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

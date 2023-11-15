@@ -1,0 +1,166 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : admin_rest
+ major_version : 28
+ minor_version : 0
+ type : 65538
+ description : ""
+ subtype : 8192
+page :
+ name : admin_rest
+ identifier : 0x2f1fe006c00be4e4
+ internal_properties : CAAAAAgAAADeKZgy/crSTGBGRGdgqQDUWyIM9NcUymY0ZgAaB7ottevj4peXSedG3/6Z3h6s4DGsMuLrpVtC/Rh6AeLiSq9QFi4BmHxJg5E8xnXllE4K9OMFEFWfuqYdufg0fdFN/v32CFo+nyj/wYT/CbXJhceUuruQNWzKlFyWeExFo/tKLC/0BetW++uoxibCofMIbkC270D25dnWoMScKK4Auwgpeyd8LM4jhebvWJimxIFN/ryGMiBf5jbrAW292HSOhfrkmFvPr7Xcou5nV0knfupn1cx0OmgVU9ntdZEnEwCPN0KOKxNv4X8arU3v+4Zveq+vvGwlJ6+YxP0HhVeMiChR+KlQMrjUiJpJLe2LZn1Mq92s0cMMHzXMRzfeX4NQ6NZEc0fI9AxzbYGCdy9m1KswvT18jM0O7o9FGRK9pa5WcVvoSaCvfDWiG6XyPyh9xobOTk4d3DwycYQ/5HFozy/xa5aDV+9mT4W/Y6bceF57FZWQvnt0Bgp/+c+IntB3i5EaCmx7K/tDgPRapcHO1pnPEmxr6N6Bh+UOBlTj+nLqS/O1X9CHVUSaho/nbYZf0aqPDvzRLKFLG6LF9zaiObch8J4Fb08CWeEkZbS/dnAQMBdgC3tITAnP5bVLlMF0+wN6gVOMV4EkTvu53Vf4XE/0GIe3DwyRj2sYSFIajGhjTNaJodB6ReiSXiF/w0WvHRDo/VGO3KrXMujPNqs3PynUGBN40yWx5/vZPtERLp+JzV2fOMVcr28W0d5xQxLFJXV5AvlYpI6Sb7Tp6ar7WmRp1/JMTkJLDnGrHj11eTkZ5V5xflE8rKiKFWI2PLKTC+obg2+LItGbTY65E0baJiYYUQNNaynT5BgynBXgGLm6cxr4bEHgxX9ZnfL/TLwcf8CzIHg5UcUmAioyAezyVRfGOuotYgtryxMqveN0YEvqkZftJzFUr7yDCt+W7bHygCUN8KNLvRXZ3DhgQafdJT3hxorKnW4A8an6KpaH6hvanBA97cZuC/ibg3bRo4P4vgnQCJJSnS0fhY0hN7UkbVd3RscsXU6VShnXnHqDwKu+X3uZRVmtpsJtkZxln2Hq2BOezI9c1lreJ3KTW1RC8/Gq6+21I0GVyMWe21AtTjEvuzcs3O0cw8k0UCDSfd/Jq4OGhILx5ojCRJUTwZ73pMa3owWCsoErhATCr7P1YWjF85VMaRwLN98Jvyem3bQ7qUtVD2qYKrTazIHGYAYkSwA+Y7fQ94D1bwTTIWo9LqPtvheooAKpuVL6JtnOD65vtVPEYa2iGX+5sZoFAZXSHRn4A3lhjKm9n9n7OvHWxR2AIcpbf8VIJx4b6Dk/xkC+YFMU+VzjrsL5dMIVAgZTzFV6tnkipW4/vKsoIQIpJTJ0RQ1ZlaSx0yl+S41Mq5lzptjls+Bh618UN3G2XB/pOXhQvUjl0wrSw5ud1NokkKL8ZiGsXclQHzAVlEw9XLWAYsfYNr7O+Veam/ZORSDp7KZz7EAHz+tYBAesixKH3RsLe4RaTHv5Vj9Rov9fjKJh8Hd17Cyv4+orUQ0brRD/zvrbuzzf5XOFnj0Yvxvc/0z1cNGhJC14Uclm5CkQUbf1Vrh+80r8SIigZmKjwVMcVw/4t0bbanykqRH9uuRxAeAysmn3eudWD7Uoi0mYL6SjN1/kdorjCIqyy9RkH9MWWYLfbXUMRnxqzF2pohQ0IwZFaW16N94TUw9Q/tOWmm5MkP3pC4f0L2uOq0a53jbnl/QIt4KElsDBUbtBKwPI90lF88UGKkn7Uavgl70CeCkNGRYdkdGMT/QvuOFG1RjtHT1SEqgN9mOC4Hm2NGgmyJd2xF+ZYHxWwkZe1ErCQDT3+KMb6VDerL3msExUSiF1SN2oo93qRIYWvE3sM89L+PjwZ/Q8pR1SZf4tI6k+BEcGdRk/cYps+Kp7bfhhDHsY5TAm1viL4gnXqY+IRuuYtdZxAyBULw8NPNusaK9N2k4klH3LBdxpfJVgQSw96ptiPlaNfh/T0CqIlR5DC8mcBL7l0vxO5poCA5Uc51ARq+HEmPLmUdtOoShmSfl1As2b4RqNP4/hFYiVZdCHTIQqbqvgh6iASl8kQ0S52rndXxJbldcWWlvWL+F+ojZP+DwzMeMq17v3nht7MSNfP/LGIVZRB5mOGJVSGtFlM1p4ie1E5kLJd4qyOpn6U55u73xVubRD8GcYz2hOWpQPTQPfxiUy+HRJfw80A1rT3xsCaQMKgAIuQSe7WlCz1fEkv9fPZrU/I8md+SE7NfH5UTjdJV4B1qhTApPYNu7hoMPwA5o9khZwbih0pKQ8C0Gt3e8d2M9rKgE35dZSj0tVJ6nGxhCinhaZ0E83YyV9ZqaEZe9TNrasjy5T8iJLjBWgZMOOMShlyA098nkdDwJ9Jv3BsruPRho4BHRU5c/x3QwJZOuNBHc8OjgWq8uORoZd4wlxlY0VzFD2mD2c5G/MJMI99YiRy/eSabDmSdv2ilzuD4HlJ8pLjaYtZkiEZYIO8ZlIq+T3TjnLTFAxv6TrQf49WUSCgqYHmBAFiETu1V8awTvhucrMsb9oEc6kL86kTYL8TDrmq52FXXdPcT62k4sd83J7RrQn7IhhrY2vIjugG16nO+UetlNlHuT0mQrDwK80Gp8ULoweQaz9SO+iEpyzn2XdIZ2V61GR0Xo3PD0VjlU8s1hKM1+tFkjPQlHil4PI99VTwoJM55UGd+0YwJo0cSrQ8si3v4vN5pCEQtU0eyho6ZteCpHEhYaDsIiVQLbAVETZwsstzd0rBt2bzhTeKPj6jOHeKGJN65Dl0wPUZvXdBEOuiL0nFmFozNvx5zHh9Fwlga+MgGrV90XZiYfcoFmMHTQk1zesiPiU6cbBMWJVXNNKsARDBUPtj2bF5RZPU1H4dhpqqZmop4Mb6auAVCavwFDbJdmHRR2cHk+KV2TCLL8lYpPIsF6KNuXXRWEQP1U2rpXaD5yoZ3XEiCGkD3UeqmHq5difhcPmNQZIyyz7Ac8ZpGmzQBZe2AegTDRZ3Lbytn15FbcBfUtkuYybexefvIHLgLInDefkz9UMbFiq1642uRcvTJlethKzXU7jSCwUSUaGNskBHfaICNVssXC1O7aLSf9YXdnmwFxGmdZP80000Q3MNQsqHD34CcCOdiOQRwUFtZrpkMZbIcKSa37g12U/DR2d8bc9HV5mVET5UTTWBZGBj7qE9G+m/lYODiwFak2DhfU8teKurCsHHzRpeYVHjZkv1QeEXJ9k5h4HY4Xbz7G3Ub9YzeEcd0LjqfmpfunII9P8f4GRdjTsToFBzgsmDL0BDDKNNxbj11soGVX4pouUbdQx2Hdj97g2dT+KL3zHxL83ZGH4bvxlZBdh6TEgkx6VJKAxjpprtzgNuiJvJp75kOpCSIsbdwRJuzfXXaXgWkHjfX/CqW5qba6yCzupVgTks0iwY7Q5CcSDzqeQ9qvJV9KwYZd34wExQty5P/v6j2fKwkuSrlVed4s2AeoLbm3AniEC7p4864TykLJYzsXNtYf+rJ1dz7zdSHuWOxjd/1De6/Fm9V+gvA6DhDlmAs+fpE/WFcFOXe+8nxa4FtQF5WxPo5f6RLS0Omnb5i/JI0NYchI94QKixK9EK2IXgr+3kBlzUMWptMcBKdQG4B+e9sufB4TQFVEeihevW500QaKAK0y7vhtgmA5kvViEQONbFjMXbEdMTbNms4AZS0JfrgJxCwGT1bk4wuzvf7hlYbac728SFibGyVK3WcpnQ29e8dgTOfDWZEGhM4Zyd2C3LqVqMuUJZo9IKqbxreIO3tgr7nionb2tO4JuttVv44DWiY7Wz8GXfCU45e8M1qbgsix2Y+MJHvFGFEB/q+dz42QtDoFrnqyM9L3GwA7+ovArZ2T6MxO5YiC6G8aJxrAJzafAekB+PZy4zUH2sxNV1ba3dC0KNSgYfpv2uXrG2cYOtbzMqR1TUtREAU8Q/bfnHKVfYNp0ZR1/PSxDuX0IGldaUgWKNSxds/nSlzMMyvT642p63hDWrSbAsf1GereLG477jCiiixaNivqS/s91aVJ/JDadirVmkt064/2fhJUyh6d19L+UpU4i+eiQfW9kUrx7Zt+PZhU/qo2MuIMtPXDXM7tC99VKLOH5moXxrPWhmDeF1ITGe37mh3/E31ZDVGKS6lN5EKnJoP9KhDtbDzYos0w77lPwBgLO3OHfWoNd4tnpkjiFLmu+d7VIOqjeiMm8n18HYzsqa+J4rWZ6k84CAmoViERARH0EiEEd6YTQLN+1b9i4W7wuaxGqBfXa+Y6uKvATgRtoa7v2k/xtGFkJ+nqK7pcHJQUmWWkv69eAsjEv1fN7D2C/+HE8Z8kWyXyXT1QbRY2RPSr+q6hBfARRCI3CNqf05QBrOEoK9ZXbcGbcjsf0vsDFL+ce5IbGbh5iOwthwj2mHRGKWawe5QaGTfRjjpp8g0OPePrgpVYj8qk+WrscKwKJ7sgJBIRslzXJVLBT6xjsz2geKIT7Wi+arvACkZ94tN3e+c5CKfNS4ZxCP6SrJirX8FVfEEd9AVYcY5R+X1SCIwZamBQzvxPlezKLau/voM4VQZwnsjSxyfZgSVbEjqjz3Gzke+1IdCYzj0JM/X862c4r4+I57cTC+RzSKTmpJ2RKkaf3dk4Tg3wWCsiuiyoUrRM9Y/Lei0jnKEZQqaBoii9aMQoKjGoTgbzrImFI8vGFPMXrNUxii8cVcgAMP83VOVI9NXnd7SvRUnYCw22WPts+hKwI1lCkQYJxCywof2WI4kEVKK8TaSBEeN5LKZS1OSf+9i/GSGhtDGqL+HmSJQRD6+h44ka7VbQEPxO+Nm+8N0X1S4tuKenFlifd3LzIEfXhH2u0o9+8x7k9ORoQk9Pg/sztNfE=
+ properties : {}
+ controls :
+  -
+    name : LIB_Cette_page_est_une
+    identifier : 0x2f1fe018c00d29ef
+    internal_properties : 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
+    properties :
+     x : 107
+     y : 227
+     width : 766
+     height : 146
+    type : 3
+    code_elements :
+     type_code : 2
+     alias : A1
+     p_codes : []
+ type : 1
+ languages :
+  - fr-FR
+ code_elements :
+  type_code : 38
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAAANK99aT578pqrY5vHKk6We4QlF1n4phI60i5kiJ2ajIXqY8ANw+K+Ev0qF5XyF7/X5nkR47wx/A9HQAdXUtV09qS9IbkPPF7nTWSaUTtcQidvXNTL45w==
+     code : |1-
+      _AjoutHistoriqueSite(CN_HISTORIQUE_TYPEOPE_APPEL_WS,"Appel de la page REST 'admin_rest'")
+      
+      LOCAL 
+      	nIDProduit		est un entier
+      	nIDPromotion	est un entier
+      	nIDFamille		est un entier
+      
+      // Est-ce que l'on a un numéro d'opération ?
+      SELON PageParamètre(CN_ADMIN_REST_PARAM_IDOPERATION)
+      	CAS ~=CN_ADMIN_REST_OPE_GENERATION_PRODUIT
+      		NotifierInformation("Génération d'une image de produit : "+PageParamètre(CN_ADMIN_REST_PARAM_IDPRODUIT))
+      		
+      		// Demande de génération d'une photo de produit
+      		nIDProduit = Val(PageParamètre(CN_ADMIN_REST_PARAM_IDPRODUIT))
+      		
+      		// Vérification du produit
+      		SI nIDProduit <=0 alors
+      			AjouteErreur("Produit non reconnu",PageParamètre(CN_ADMIN_REST_PARAM_IDPRODUIT))
+      			ChaîneAffiche("ERR")				
+      		FIN
+      		
+      		// On lance la génération
+      		SI GenerePhotosProduit(nIDProduit) = Faux alors
+      			ChaîneAffiche("ERR")
+      		FIN
+      
+      	CAS ~= CN_ADMIN_REST_OPE_GENERATION_FAMILLE
+      		NotifierInformation("Génération d'une image de famille de produit : "+PageParamètre(CN_ADMIN_REST_PARAM_IDFAMILLE))
+      		
+      		// Demande de génération d'une photo de famille
+      		nIDFamille = Val(PageParamètre(CN_ADMIN_REST_PARAM_IDFAMILLE))
+      		
+      		// Vérification de la famille
+      		SI nIDFamille <=0 ALORS
+      			AjouteErreur("Produit non reconnu",PageParamètre(CN_ADMIN_REST_PARAM_IDFAMILLE))
+      			ChaîneAffiche("ERR")				
+      		FIN
+      		
+      		// On lance la génération		
+      		SI GenerePhotoFamille(nIDFamille) = Faux ALORS
+      			ChaîneAffiche("ERR")
+      		FIN	
+      	
+      	CAS ~= CN_ADMIN_REST_OPE_GENERATION_PROMOTION
+      		NotifierInformation("Génération d'une image de promotion : "+PageParamètre(CN_ADMIN_REST_PARAM_IDPROMOTION))
+      		
+      		// Demande de génération d'une photo de promotion
+      		nIDPromotion = Val(PageParamètre(CN_ADMIN_REST_PARAM_IDPROMOTION))
+      		
+      		// Vérification de la promotion
+      		SI nIDPromotion <=0 ALORS
+      			AjouteErreur("Promotion non reconnu",PageParamètre(CN_ADMIN_REST_PARAM_IDPROMOTION))
+      			ChaîneAffiche("ERR")				
+      		FIN
+      		
+      		// On lance la génération
+      		SI GenerePhotosPromotions(nIDPromotion) = Faux ALORS
+      			ChaîneAffiche("ERR")
+      		FIN	
+      	
+      	AUTRE CAS
+      		AjouteErreur("Opération non reconnue",PageParamètre(CN_ADMIN_REST_PARAM_IDOPERATION))
+      		ChaîneAffiche("ERR")	
+      FIN
+      
+      // Par défaut, tout se déroule correctement
+      ChaineAffiche("")
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception non gérée",ExceptionInfo())
+      	ChaineAffiche("ERR")
+     type : 851968
+   -
+     type : 852017
+     enabled : false
+   -
+     type : 852119
+     enabled : false
+   -
+     type : 852298
+     role : N
+   -
+     type : 851999
+     role : N
+   -
+     type : 852000
+     role : N
+   -
+     type : 852232
+     enabled : false
+   -
+     type : 852167
+     enabled : false
+   -
+     type : 852169
+     role : N
+     enabled : false
+   -
+     type : 852225
+     role : N
+     enabled : false
+   -
+     type : 852227
+     enabled : false
+   -
+     type : 1310979
+     enabled : false
+   -
+     type : 852228
+     role : N
+     enabled : false
+   -
+     type : 852217
+     role : N
+     enabled : false
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : PAGE_SansNom1
+resources :
+ string_res :
+  identifier : 0x1f1fdff413a69e91
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+webification :
+ internal_properties : CAAAAAgAAACYzxT95H3qP7nIys4LqA==
+custom_note :
+ internal_properties : CAAAAAgAAAC68/W0/adbG0nFCRhrE42B5HRnbDzVHaz86sSQyxlBk7I=
+rad :
+ internal_properties : CAAAAAgAAABoAN7PLpwJW3EiA7WVZdCA5EwrCA1rvutcDHooMWKe

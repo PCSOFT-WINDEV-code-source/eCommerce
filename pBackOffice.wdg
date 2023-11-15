@@ -1,0 +1,270 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : pBackOffice
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb12ec51101d4de
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAADDEI85duz0oxIsoUc13hgkRXV/YUZxkFXe+YxlgBN5ahM7iWJW2n+utzYbrNsirp88lXiyS1+ruPR9zaF9kR+YQrJSz3D+kg958ZFKM0iASn99T/ZHwrPK9yt2afc/1Z9SkZlSt9offIFtKTPLaEMB80rH3c78zacDh6600SSw3wGiE/HMGX3W+rGNXKc8deEDgkXYp68dEDhFjveKwig=
+     code : |1+
+      
+      CONSTANT
+      	cnDroitsNonConnectés		= 0
+      	cnDroitsAdministrateur		= 1
+      	cnDroitsSuperUtilisateur	= 2
+      FIN
+      
+      // Informations pour le dialogue avec la page REST d'administration
+      PRIVE
+      	CONSTANT
+      		CN_ADMIN_REST_OPE_GENERATION_PRODUIT 	= "img_prod_generation"		
+      		CN_ADMIN_REST_OPE_GENERATION_PROMOTION 	= "img_promo_generation"
+      		CN_ADMIN_REST_OPE_GENERATION_FAMILLE 	= "img_famille_generation"
+      		CN_ADMIN_REST_PARAM_IDOPERATION 		= "idope"
+      		CN_ADMIN_REST_PARAM_IDPRODUIT 			= "idprod"
+      		CN_ADMIN_REST_PARAM_IDPROMOTION			= "idpromotion"
+      		CN_ADMIN_REST_PARAM_IDFAMILLE			= "idfamille"
+      		CS_ADMIN_REST_NOMPAGE					= "admin_rest.awp"
+      	FIN	
+     type : 720896
+  procedures :
+   -
+     name : ConnexionBackOffice
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211684540055687309
+     type_code : 15
+     code : |1-
+      // Résumé : Permet de se connecter au backOffice
+      // Syntaxe :
+      //[ <Résultat> = ] ConnexionBackOffice (<sNomUtilisateur> est chaîne, <sMotDePasse> est chaîne)
+      //
+      // Paramètres :
+      //	sNomUtilisateur (chaîne) : Nom d'utilisateur
+      //	sMotDePasse (chaîne) : Mot de passe
+      // Valeur de retour :
+      // 	booléen : Vrai si l'utilisateur est connecté, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE PUBLIC ConnexionBackOffice(sNomUtilisateur est une chaine, sMotDePasse est une chaine)
+      
+      // Par défaut, non connecté
+      pParamètresSite.gsNomUtilisateurEnCours = ""
+      pParamètresSite.gnDroitsUtilisateurs = cnDroitsNonConnectés
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // On note dans l'historique
+      NotifierInformation(ChaîneConstruit("Tentative de connexion avec l'utilisateur : '%1'",sNomUtilisateur))
+      
+      <COMPILE SI Configuration="eCommerce">
+      	// Chargement de la liste des IP autorisées si on est en site
+      	SI EnModeTest() = Faux ALORS
+      		sListeIP est une chaine = RécupèreParamètreSite(csAdmin_Login_ListeIP)
+      		SI sListeIP <> "" ALORS
+      			// Vérification de l'adresse IP courante
+      			SI Position(NavigateurAdresseIP(Faux),sListeIP)<=0 _ET_  Position(NavigateurAdresseIP(Vrai),sListeIP)<=0 ALORS
+      				AjouteErreur("Tentative de connexion avec une adresse IP non autorisée","",Faux)
+      				RENVOYER Faux
+      			FIN
+      		FIN
+      	FIN
+      <FIN>
+      
+      
+      // Administrateur ?
+      SI RécupèreParamètreSite(csAdmin_Login_Administrateur,csAdmin_Login_Defaut) ~= sNomUtilisateur ALORS
+      	SI RécupèreParamètreSite(csAdmin_MDP_Administrateur,csAdmin_Login_Defaut) ~= sMotDePasse ALORS		
+      		// Connecté en Administrateur
+      		pParamètresSite.gsNomUtilisateurEnCours = sNomUtilisateur	
+      		pParamètresSite.gnDroitsUtilisateurs = cnDroitsAdministrateur
+      		
+      		// On note dans l'historique
+      		NotifierInformation(ChaîneConstruit("Connexion établie pour l'utilisateur '%1' en tant qu'administrateur",sNomUtilisateur))
+      		
+      		// Notification en cas de connexion
+      		Si LireNotificationSiConnexionActif() = Vrai alors
+      			EnvoieMessageWebMaster("Nouvelle connexion au BackOffice",...
+      					ChaîneConstruit("Une nouvelle connexion a été établie par %1 le %2 à %3  en tant qu'administrateur"	,...
+      						sNomUtilisateur,DateVersChaîne(DateSys(), maskDateSystème),HeureVersChaîne(HeureSys(),maskHeureSystème)))
+      		FIN
+      		RENVOYER Vrai
+      	FIN
+      FIN
+      
+      // Super-Utilisateur
+      SI RécupèreParamètreSite(csAdmin_Login_Utilisateur,csAdmin_Login_Defaut) ~= sNomUtilisateur ALORS
+      	SI RécupèreParamètreSite(csAdmin_MDP_Utilisateur,csAdmin_Login_Defaut) ~= sMotDePasse ALORS
+      		// Connecté en super-utilisateur
+      		pParamètresSite.gsNomUtilisateurEnCours = sNomUtilisateur	
+      		pParamètresSite.gnDroitsUtilisateurs = cnDroitsSuperUtilisateur
+      		
+      		// On note dans l'historique
+      		NotifierInformation(ChaîneConstruit("Connexion établie pour l'utilisateur '%1' en tant qu'utilisateur",sNomUtilisateur))
+      		
+      		// Notification en cas de connexion
+      		SI LireNotificationSiConnexionActif() = Vrai ALORS
+      			EnvoieMessageWebMaster("Nouvelle connexion au BackOffice",...
+      			ChaîneConstruit("Une nouvelle connexion a été établie par %1 le %2 à %3  en tant qu'utilisateur"	,...
+      			sNomUtilisateur,DateVersChaîne(DateSys(), maskDateSystème),HeureVersChaîne(HeureSys(),maskHeureSystème)))
+      		FIN
+      		
+      		
+      		RENVOYER Vrai
+      	FIN
+      FIN
+      
+      // On note dans l'historique
+      NotifierInformation(ChaîneConstruit("Connexion non établie pour l'utilisateur '%1'",sNomUtilisateur))
+      
+      // Par défaut, l'utilisateur n'est pas connecté
+      RENVOYER Faux
+      
+      CAS EXCEPTION:	
+      	AjouteErreur("Exception détectée dans ConnexionBackOffice",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : bEstConnectéWSBackOffice
+     internal_properties : CAAAAAgAAADsF4ju7Ri0+QKin62CTkNqz/yMZOKL/SZdCDCl1UA2DoST8YQBUnD9YNg6uI4WtY4s3Ly1No41k5gU7a4kJEz9t0i6oiwKr2rGnuoIKvsUR9QpB6+bvIGeagdinJFyzPGBYPd9wjcjXK5pRAMCPq/S61nt5L5pTWaDCNejAC+dkHxWgPSNPGNOOlcp/zJ6A9+BNsG8V3w=
+     procedure_id : 2211684647429959409
+     type_code : 15
+     code : |1-
+      // Résumé : Est-ce que l'utilisateur est connecté au WebService de BackOffice
+      // Syntaxe :
+      //[ <Résultat> = ] bEstConnectéWSBackOffice ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si l'utilisateur est connecté, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE RESTREINT bEstConnectéWSBackOffice()
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // En mode AWP, on peut accéder aux données
+      SI EnModeAWP() = Vrai alors
+      	RENVOYER Vrai
+      FIN
+      
+      // En mode Webservice
+      si EnModeWebservice() ALORS
+      
+      	// Il faut être administrateur
+      	SI pParamètresSite.gnDroitsUtilisateurs DANS (cnDroitsAdministrateur) ALORS
+      		RENVOYER Vrai
+      	SINON
+      		RENVOYER Faux
+      	FIN
+      	
+      SINOn // En mode site dynamique (partie administration)
+      	
+      	// Il faut avoir des droits d'administration ou de super utilisateur
+      	SI pParamètresSite.gnDroitsUtilisateurs DANS (cnDroitsAdministrateur, cnDroitsSuperUtilisateur) ALORS
+      		RENVOYER Vrai
+      	SINON
+      		RENVOYER Faux
+      	FIN
+      	
+      FIN
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée dans bEstConnectéWSBackOffice",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : bEstConnectéEnAdmin
+     procedure_id : 2211697356660643923
+     type_code : 15
+     code : |1-
+      // Résumé : Est-ce que l'utilisateur est identifié en tant qu'administrateur
+      // Syntaxe :
+      //[ <Résultat> = ] bEstConnectéEnAdmin ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si l'utilisateur est identifié en tant qu'administrateur, Faux sinon
+      //
+      
+      PROCEDURE RESTREINT bEstConnectéEnAdmin()
+      
+      // Vérification des droits
+      SI pParamètresSite.gnDroitsUtilisateurs DANS (cnDroitsAdministrateur) ALORS
+      	RENVOYER Vrai
+      SINON
+      	RENVOYER Faux
+      FIN
+     type : 458752
+   -
+     name : bEstConnectéEnSuperUtilisateur
+     procedure_id : 2211697532765812372
+     type_code : 15
+     code : |1-
+      // Résumé : Est-ce que l'utilisateur est identifié en tant que super-utilisateur ?
+      // Syntaxe :
+      //[ <Résultat> = ] bEstConnectéEnSuperUtilisateur ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si l'utilisateur est identifié en tant que super-utilisateur, Faux sinon
+      //
+      
+      PROCEDURE RESTREINT bEstConnectéEnSuperUtilisateur()
+      
+      
+      // Vérification des droits
+      SI pParamètresSite.gnDroitsUtilisateurs DANS (cnDroitsAdministrateur, cnDroitsSuperUtilisateur) ALORS
+      	RENVOYER Vrai
+      SINON
+      	RENVOYER Faux
+      FIN
+     type : 458752
+   -
+     name : sErreurInfoBackOffice
+     procedure_id : 2214623080189676259
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'erreur s'il y en a eu une (chaine vide dans ce cas)
+      // Syntaxe :
+      //[ <Résultat> = ] sErreurInfoBackOffice ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne: Texte de l'erreur
+      //
+      
+      PROCEDURE sErreurInfoBackOffice() : chaine
+      
+      RENVOYER pParamètresSite.sRenvoyerErreur()
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : COL_SansNom1
+resources :
+ string_res :
+  identifier : 0x10225f0710a38954
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

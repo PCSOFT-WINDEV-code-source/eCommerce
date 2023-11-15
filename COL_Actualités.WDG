@@ -1,0 +1,338 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Actualités
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb144c91c9ed57c
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAACPOLdg6xUBf4+oDum8uKJ1t1EmdIfQOn9H+fUwx5H+MI2EegumMXKsye9sSus0khCsXbYUdIZHl5rFp9Hdk6dXqYxgDJOcFS0fQ+BawED0HJ7OlNleNO2JYDl0edZtEskApECmsozGQmXd
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Actualités
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Actualités est une structure
+      		IDActualités est un entier //Identifiant de Actualités
+      		TexteActualité est un chaîne//Texte de l'actualité
+      		DateCréationActu est un date //Date de Création de l'actualité
+      		Titre est un chaîne//Titre
+      Fin
+       
+      PUBLIC
+      	gtabActualités est un tableau de STCOL_Actualités
+       
+     type : 720896
+   -
+     code : |1-
+      
+     type : 720898
+  procedures :
+   -
+     name : ListeActualités
+     procedure_id : 2211626137709744756
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des actualités
+      // Syntaxe :
+      //[ <Résultat> = ] ListeActualités ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Actualités
+      //
+      
+      Fonction ListeActualités ( )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER gtabActualités
+      FIN
+      
+      // Est-ce que les actualités ont été initialisées ?
+      Si gtabActualités..Occurrence = 0 alors
+      	// On initialise le contenu
+      	ActualiserActualités()
+      FIN
+      
+      // On renvoie la liste des actualités
+      renvoyer gtabActualités
+     type : 458752
+   -
+     name : AjouterActualité
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211626197839365759
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute une actualité
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterActualité (<sTexteActualité> est chaîne, <sTitreActualité> est chaîne)
+      //
+      // Paramètres :
+      //	sTexteActualité (chaîne) : Texte de l'actualité
+      //	sTitreActualité (chaîne) : Titre de l'actualité
+      // Valeur de retour :
+      // 	entier : Identifiant de l'actualité, -1 en cas d'erreur
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction AjouterActualité ( sTexteActualité est un chaîne, sTitreActualité est une chaine )
+      
+      // Variables locales
+      nIDActualité		est un entier	= -1
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER nIDActualité
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Ajout d'une actualité","",sTexteActualité)
+      
+      // Initialisation de l'enregistrement
+      HRaz(Actualités)
+      
+      // On remplit les données
+      Actualités.DateCréationActu	= DateSys()
+      Actualités.TexteActualité	= sTexteActualité
+      Actualités.Titre			= sTitreActualité
+      
+      // Ajout en base
+      SI HAjoute(Actualités) = Faux ALORS
+      	AjouteErreur("Ajout de l'enregistrement impossible")
+      	RENVOYER nIDActualité
+      FIN
+      
+      // On mémorise l'actualité créée
+      nIDActualité = Actualités.IDActualités
+      
+      // Mise à jour 
+      ActualiserActualités()
+      
+      // On renvoie l'identifiant de l'actualité
+      RENVOYER nIDActualité
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER nIDActualité
+     type : 458752
+   -
+     name : SupprimerActualité
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211626313803575368
+     type_code : 15
+     code : |1-
+      // Résumé : Supprimer l'actualité spécifiée
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerActualité (<nIDActualitéRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDActualitéRecherchée (entier) : Identifiant de l'actualité à supprimer
+      // Valeur de retour :
+      // 	booléen : Vrai si la suppression est effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerActualité( nIDActualitéRecherchée est un entier )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de l'actualité en base
+      HLitRecherchePremier(Actualités,IDActualités,nIDActualitéRecherchée)
+      SI Htrouve(Actualités) = Faux alors
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Suppression d'une actualité",Actualités.Titre)
+      
+      // Suppression en base
+      Si HSupprime(Actualités) = Faux alors
+      	AjouteErreur("Suppression de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Mise à jour 
+      ActualiserActualités()
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ActualiserActualités
+     procedure_id : 2211629354640539139
+     type_code : 15
+     code : |1+
+      // Résumé : Actualise la liste des actualités
+      // Syntaxe :
+      //ActualiserActualités ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      Procédure ActualiserActualités ( )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RETOUR
+      FIN
+      
+      // On remet à jour le contenu
+      FichierVersTableau(gtabActualités,Actualités,DateCréationActu)
+     type : 458752
+   -
+     name : ModifierActualité
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211630754800007396
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie une actualité
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierActualité (<nIDActualitéRecherchée> est entier, <sTexteModifiée> est chaîne, <sTitreModifié> est chaîne)
+      //
+      // Paramètres :
+      //	nIDActualitéRecherchée (entier) : Identifiant de l'actualité
+      //	sTexteModifiée (chaîne) : Nouveau texte de l'actualité
+      //	sTitreModifié (chaîne) : Nouveau titre de l'actualité
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ModifierActualité( nIDActualitéRecherchée est un entier , sTexteModifiée est un chaîne, sTitreModifié est une chaine )
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de l'actualité en base
+      HLitRecherchePremier(Actualités,IDActualités,nIDActualitéRecherchée)
+      SI HTrouve(Actualités) = Faux ALORS
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification d'une actualité",actualites.Titre,sTitreModifié)
+      
+      // Modification en base
+      Actualités.TexteActualité 	= sTexteModifiée
+      actualites.Titre			= sTitreModifié
+      SI HModifie(Actualités) = Faux ALORS
+      	AjouteErreur("Modification de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Mise à jour
+      ActualiserActualités()
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : LireActualité
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211637815094677220
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'actualité demandée
+      // Syntaxe :
+      //[ <Résultat> = ] LireActualité (<nIDActualitéRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDActualitéRecherchée (entier) : Identifiant de l'actualité
+      // Valeur de retour :
+      // 	STCOL_Actualités : Contenu de l'actualité
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction LireActualité ( nIDActualitéRecherchée est un entier )
+      // Variables locales
+      nIndiceTableau		est un entier
+      stActualitéErr		est un STCOL_Actualités
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Initialisation de l'actualité "erreur"
+      stActualitéErr.IDActualités = -1
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER stActualitéErr
+      FIN
+      
+      // Recherche de l'actualité
+      nIndiceTableau = TableauCherche(gtabActualités,tcLinéaire,"IDActualités",nIDActualitéRecherchée)
+      SI nIndiceTableau <=0 alors
+      	AjouteErreur("Enregistrement non trouvé")
+      	renvoyer stActualitéErr
+      FIN
+      
+      // On renvoie l'actualité
+      renvoyer gtabActualités[nIndiceTableau]
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER stActualitéErr
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f2485aa
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

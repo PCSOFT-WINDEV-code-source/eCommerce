@@ -1,0 +1,323 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Nouveauté
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad20570e92d
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Nouveauté
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Nouveauté est une structure
+      		IDNouveauté 	est un entier 		
+      		Description 	est un chaîne	
+      		Date 			est un date		
+      		IDProduit 		est un entier 
+      		LibelléProduit	est une chaine
+      		LibelléFamille	est une chaine
+      Fin
+       
+       gtabNouveautés est un tableau de STCOL_Nouveauté
+       
+     type : 720896
+  procedures :
+   -
+     name : ListeNouveautés
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2240589021568132617
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie la liste des nouveautés
+      // Syntaxe :
+      //[ <Résultat> = ] ListeNouveautés ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Nouveauté
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ListeNouveautés()
+      
+      
+      // Variables locales
+      stErr est un STCOL_Nouveauté
+      
+      // On supprime le contenu du tableau précédent
+      TableauSupprimeTout(gtabNouveautés)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER gtabNouveautés
+      FIN
+      
+      // Exécution de la requête
+      SI HExécuteRequête(REQ_Nouveautés) = Faux ALORS	
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_Nouveautés")		
+      	RENVOYER gtabNouveautés
+      FIN
+      
+      // Parcours de la requête pour construire le tableau avec tous les sous-éléments
+      POUR TOUT REQ_Nouveautés 
+      	stNouveauté est un STCOL_Nouveauté	
+      	FichierVersMémoire(stNouveauté,REQ_Nouveautés)	
+      	
+      	// On met en forme les données sur la famille
+      	stNouveauté.LibelléProduit = REQ_Nouveautés.LibelléProduit
+      	stNouveauté.LibelléFamille = REQ_Nouveautés.Libellé_Famille	
+      	
+      	// Ajout au tableau des nouveautés
+      	TableauAjoute(gtabNouveautés,stNouveauté)
+      FIN
+      
+      // On renvoie la liste des nouveautés
+      RENVOYER gtabNouveautés
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	TableauAjoute(gtabNouveautés,stErr)
+      
+     type : 458752
+   -
+     name : AjouteNouveauté
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2240591151874504902
+     type_code : 15
+     code : |1+
+      // Résumé : Ajoute une nouveauté
+      // Syntaxe :
+      //[ <Résultat> = ] AjouteNouveauté (<nIDProduit> est entier, <sDescription> est chaîne, <sDate> est chaîne)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : Identifiant du produit
+      //	sDescription (chaîne ANSI) : Description de la nouveauté
+      //	sDate (chaîne ANSI) : Date de la nouveauté (par défaut, la date du jour)
+      // Valeur de retour :
+      // 	entier : Identifiant de la nouveauté ajoutée
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AjouteNouveauté(nIDProduit est un entier, sDescription est une chaine, sDate est une chaine) : entier
+      
+      // Variables locales
+      
+      // On supprime le contenu du tableau précédent
+      TableauSupprimeTout(gtabNouveautés)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER -1
+      FIN
+      
+      // Vérification du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI Htrouve(Produit) = Faux alors
+      	AjouteErreur(CST_MESSAGE_ERREUR_PRODUIT)
+      	RENVOYER -1
+      FIN
+      
+      // Initialise l'enregistrement
+      HRaz(Nouveauté)
+      
+      // On remplit l'enregistrement
+      Nouveauté.Date 			= sDate
+      Nouveauté.Description	= sDescription
+      Nouveauté.IDProduit		= nIDProduit
+      
+      // Ajout en base
+      SI HAjoute(Nouveauté) = Faux alors
+      	AjouteErreur(<§Rff000152334d6f4c¤fr-FR¤Impossible d'ajouter la nouveauté§>)
+      	RENVOYER -1
+      FIN
+      
+      // On renvoie l'identifiant de la nouveauté
+      RENVOYER Nouveauté.IDNouveauté
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER -1
+      
+     type : 458752
+   -
+     name : ModifieNouveauté
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2240594098253426571
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie une nouveauté
+      // Syntaxe :
+      //[ <Résultat> = ] ModifieNouveauté (<nIDNouveauté> est entier, <nIDProduit> est entier, <sDescription> est chaîne, <sDate> est chaîne)
+      //
+      // Paramètres :
+      //	nIDNouveauté (entier) :Identifiant de la nouveauté à modifier
+      //	nIDProduit (entier) :Identifiant du produit
+      //	sDescription (chaîne ANSI) :Description de la nouveauté
+      //	sDate (chaîne ANSI) :Date de la nouveauté (par défaut, la date du jour)
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification est effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifieNouveauté(nIDNouveauté est un entier,nIDProduit est un entier, sDescription est une chaine, sDate est une chaine)
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Vérification du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI Htrouve(Produit) = Faux alors
+      	AjouteErreur(CST_MESSAGE_ERREUR_PRODUIT)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la nouveauté
+      HLitRecherchePremier(Nouveauté,IDNouveauté,nIDNouveauté)
+      SI HTrouve(Nouveauté) = Faux ALORS
+      	AjouteErreur(<§Rff000252334f6f4c¤fr-FR¤Nouveauté non trouvée en base§>)
+      	RENVOYER Faux
+      FIN
+       
+      // On remplit l'enregistrement
+      Nouveauté.Date 			= sDate
+      Nouveauté.Description	= sDescription
+      Nouveauté.IDProduit		= nIDProduit
+      
+      // Modification en base
+      SI HModifie(Nouveauté) = Faux alors	
+      	AjouteErreur(<§Rff00035233516f4c¤fr-FR¤Impossible de modifier la nouveauté§>)
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la modification est effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Vrai
+      
+     type : 458752
+   -
+     name : SupprimeNouveauté
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2242057835910662987
+     type_code : 15
+     code : |1+
+      // Résumé : Supprime une nouveauté
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimeNouveauté (<nIDNouveauté> est entier)
+      //
+      // Paramètres :
+      //	nIDNouveauté (entier) : Identifiant de la nouveauté à supprimer
+      // Valeur de retour :
+      // 	booléen : Vrai si la suppression est effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE SupprimeNouveauté(nIDNouveauté est un entier)
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la nouveauté
+      HLitRecherchePremier(Nouveauté,IDNouveauté,nIDNouveauté)
+      SI HTrouve(Nouveauté) = Faux ALORS
+      	AjouteErreur("Nouveauté non trouvée en base")
+      	RENVOYER Faux
+      FIN
+       
+      // Suppression en base
+      SI HSupprime(Nouveauté) = Faux alors		
+      	AjouteErreur(<§Rff00045233536f4c¤fr-FR¤Impossible de supprimer la nouveauté§>)
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la suppression est effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Vrai
+      
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x1eb15ad20571e92d
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Impossible de trouver le produit spécifié
+     index : 0
+   -
+     text :
+      fr-FR : Impossible d'ajouter la nouveauté
+     index : 1
+   -
+     text :
+      fr-FR : Nouveauté non trouvée en base
+     index : 2
+   -
+     text :
+      fr-FR : Impossible de modifier la nouveauté
+     index : 3
+   -
+     text :
+      fr-FR : Impossible de supprimer la nouveauté
+     index : 4
+   -
+     text :
+      fr-FR : Nouveauté non trouvée en base
+     index : 5
+   -
+     text :
+      fr-FR : Impossible de trouver le produit spécifié
+     index : 6
+   -
+     text :
+      fr-FR : Impossible de trouver le produit spécifié
+     index : 7
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

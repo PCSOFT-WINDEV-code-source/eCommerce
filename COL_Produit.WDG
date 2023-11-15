@@ -1,0 +1,1966 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Produit
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad30579eb5e
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Produit
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Produit est une structure
+      		IDProduit 				est un entier 
+      		Référence 				est un chaîne
+      		LibelléProduit 			est un chaîne
+      		Description 			est un chaîne
+      		PrixUnitaireHT 			est un monétaire 
+      		tabDéclinaisonProduit 	est un tableau de STCOL_DéclinaisonProduit 
+      		nIDNouveauté			est un entier
+      		tabPromotion 			est un tableau de STCOL_Promotion 
+      		tabPhotoProduit 		est un tableau de STCOL_PhotoProduit 
+      		tabAvis 				est un tableau de STCOL_Avis 
+      		IDFamille 				est un entier //Identifiant de Famille
+      		IDTauxTaxe 				est un entier		
+      		LibelléFamille			est une chaine
+      Fin
+       
+       
+      PUBLIC
+      gtabProduits		est un tableau de STCOL_Produit
+       
+     type : 720896
+  procedures :
+   -
+     name : ListeProduits
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2212436048291795633
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des produits
+      // Syntaxe :
+      //[ <Résultat> = ] ListeProduits (<nIDFamille> est entier, <moMPrixMin> est monétaire, <moMPrixMax> est monétaire, <sReference> est chaîne, <sRecherche> est chaîne, <nRole> est entier)
+      //
+      // Paramètres :
+      //	nIDFamille (entier) :Identifiant de la famille de produits (0 pour tous)
+      //	moMPrixMin (monétaire) :Prix minimum
+      //	moMPrixMax (monétaire) :Prix maximum
+      //	sReference (chaîne ANSI) :Référence
+      //	sRecherche (chaîne ANSI) :Recherche
+      //	nRole (entier) :Rôle des photos de produit parmi : 	ROLE_PHOTO_NORMAL = 0, 	ROLE_PHOTO_CARRE_PETIT = 1, ROLE_PHOTO_CARRE_GRAND = 2
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Produit
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeProduits ( LOCAL  nIDFamille est un entier , LOCAL  moMPrixMin est un monétaire , LOCAL  moMPrixMax est un monétaire , LOCAL  sReference est un chaîne, LOCAL  sRecherche est un chaîne, LOCAL nRole est un entier)
+      
+      // Variables locales
+      stErr est un STCOL_Produit
+      sListeIDFamille	est une chaine
+      
+      // On supprime le contenu du tableau précédent
+      TableauSupprimeTout(gtabProduits)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // Initialement, tous les paramètres sont ignorés
+      REQ_RechercheProduits.pIDFamille	= NULL
+      REQ_RechercheProduits.pPrixDébut	= Null
+      REQ_RechercheProduits.pPrixFin		= Null
+      REQ_RechercheProduits.pRecherche	= Null
+      REQ_RechercheProduits.pReference	= Null
+      
+      // On recherche les sous-familles de la famille (pour avoir tous les produits)
+      SI nIDFamille <>-1 alors
+      	sListeIDFamille = COL_Famille.ListeIDSousFamilles(nIDFamille)
+      SINON
+      	sListeIDFamille = nIDFamille
+      FIN
+      
+      // On paramètre la requête
+      SI nIDFamille>0 alors REQ_RechercheProduits.pIDFamille		= sListeIDFamille
+      Si moMPrixMin<>0 alors REQ_RechercheProduits.pPrixDébut		= moMPrixMin
+      SI moMPrixMax<>0 ALORS REQ_RechercheProduits.pPrixFin		= moMPrixMax
+      SI pas sRecherche~="" ALORS REQ_RechercheProduits.pRecherche	= sRecherche
+      SI pas sReference~="" ALORS REQ_RechercheProduits.pReference	= sReference
+      
+      // Exécution de la requête
+      Si HExécuteRequête(REQ_RechercheProduits) = Faux alors	
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_RechercheProduits")	
+      	TableauAjoute(gtabProduits,stErr)
+      FIN
+      
+      // Parcours de la requête pour construire le tableau avec tous les sous-éléments
+      Pour TOUT REQ_RechercheProduits 
+      	stProduit est un STCOL_Produit	
+      	
+      	// Lecture du produit
+      	stProduit = LireProduit(REQ_RechercheProduits.IDProduit, nRole)
+      		 
+      	// Ajout au tableau des produits
+      	TableauAjoute(gtabProduits,stProduit)
+      FIN
+      
+      // On renvoie la liste des produits
+      renvoyer gtabProduits
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	TableauAjoute(gtabProduits,stErr)
+      	
+     type : 458752
+   -
+     name : SupprimerProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2213503480566983233
+     type_code : 15
+     code : |1+
+      // Résumé : Supprimer le produit spécifié
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerProduit (<nIDProduitRecherché> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRecherché (entier) : <indiquez ici le rôle de nIDProduitRecherché>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerProduit ( nIDProduitRecherché est un entier )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Recherche du produit en base
+      HLitRecherchePremier(Produit,IDProduit,nIDProduitRecherché)
+      SI Htrouve(produit) = Faux alors
+      	AjouteErreur("Enregistrement non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Est-ce que ce produit est proposé par d'autres produits ?
+      HLitRecherchePremier(LiaisonProduit,IDProduitLié,produit.IDProduit)
+      Tantque htrouve(LiaisonProduit)
+      	Hsupprime(LiaisonProduit)
+      	HLitSuivant(LiaisonProduit,IDProduitLié)
+      FIN
+      
+      // Suppression en base
+      Si HSupprime(produit) = Faux alors
+      	AjouteErreur("Suppression de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LireListePhotos
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217224288545543219
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des identifiants de photos d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] LireListePhotos (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	tableau (entier) : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LireListePhotos(nIDProduit est un entier)
+      
+      // Variables locales
+      tabListePhoto est un tableau d'entiers
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER tabListePhoto
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI HTrouve(Produit) = Faux alors
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER tabListePhoto
+      FIN
+      
+      // On parcourt les photos du produit
+      Pour TOUT PhotoProduit AVEC IDProduit = Produit.IDProduit
+      	// On ne prend que le rôle par défaut
+      	SI PhotoProduit.Role = ROLE_PHOTO_NORMAL alors
+      		TableauAjoute(tabListePhoto,PhotoProduit.IDPhotoProduit)
+      	FIN
+      FIN
+      
+      // On renvoie le tableau
+      renvoyer tabListePhoto
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER tabListePhoto
+     type : 458752
+   -
+     name : LirePhotoProduitSelonNuméro
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217262050082110542
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le chemin d'une photo donnée
+      // Syntaxe :
+      //[ <Résultat> = ] LirePhotoProduitSelonNuméro (<nIDProduit> est entier, <nNumPhoto> est entier, <nRolePhoto> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	nNumPhoto (entier) : <indiquez ici le rôle de nNumPhoto>
+      //	nRolePhoto (entier) : <indiquez ici le rôle de nRolePhoto>
+      // Valeur de retour :
+      // 	chaîne ANSI : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePhotoProduitSelonNuméro(nIDProduit est un entier, nNumPhoto est un entier, nRolePhoto est un entier ) : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      // Recherche de la photo
+      HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[nIDProduit,nNumPhoto,nRolePhoto])
+      SI HTrouve(PhotoProduit) = Faux ALORS
+      	AjouteErreur("Photo demandée non trouvée")
+      	RENVOYER ""
+      SINON
+      	SI EnModeAWP() = Vrai ALORS
+      		RENVOYER PhotoProduit.Photo	
+      	SINON
+      		RENVOYER "FR/"+PhotoProduit.Photo
+      	FIN	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : AjouterProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218677464241451182
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute un produit à la base
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterProduit (<nIDFamille> est entier, <sReference> est chaîne, <sLibellé> est chaîne, <sDescription> est chaîne, <moPrixUnitaireHT> est monétaire, <nIDTauxTaxe> est entier, <bAffichagePrioritaire> est booléen)
+      //
+      // Paramètres :
+      //	nIDFamille (entier) : <indiquez ici le rôle de nIDFamille>
+      //	sReference (chaîne ANSI) : <indiquez ici le rôle de sReference>
+      //	sLibellé (chaîne ANSI) : <indiquez ici le rôle de sLibellé>
+      //	sDescription (chaîne ANSI) : <indiquez ici le rôle de sDescription>
+      //	moPrixUnitaireHT (monétaire) : <indiquez ici le rôle de moPrixUnitaireHT>
+      //	nIDTauxTaxe (entier) : <indiquez ici le rôle de nIDTauxTaxe>
+      //	bAffichagePrioritaire (booléen) : <indiquez ici le rôle de bAffichagePrioritaire>
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AjouterProduit(nIDFamille est un entier, sReference est une chaine, sLibellé est une chaine, sDescription est une chaine, moPrixUnitaireHT est un monétaire, nIDTauxTaxe est un entier, bAffichagePrioritaire est un booléen)
+      
+      // Variables locales
+      nIDProduit		est un entier	= -1
+      nOrdreAffichage	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER nIDProduit
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Ajout d'un produit","",sReference)
+      
+      // Vérification de la famille
+      HLitRecherchePremier(Famille,IDFamille,nIDFamille)
+      SI HTrouve(Famille) = Faux alors
+      	AjouteErreur("Famille non trouvée")
+      	RENVOYER -1
+      FIN
+      
+      // Vérification du taux de taxe
+      HLitRecherchePremier(TauxTaxe,IDTauxTaxe,nIDTauxTaxe)
+      SI HTrouve(TauxTaxe) = Faux alors
+      	AjouteErreur("Taux de taxe non trouvé")
+      	RENVOYER -1
+      FIN
+      
+      // On vérifie que cette référence n'existe pas déjà
+      HLitRecherchePremier(Produit,Référence,sReference)
+      SI Htrouve(Produit) = Vrai ALORS
+      	 AjouteErreur("Un produit existe déjà pour cette référence")
+      	 RENVOYER -1
+      FIN
+      
+      // Gestion de l'ordre d'affichage
+      Si bAffichagePrioritaire = Faux alors
+      	// Recherche de l'ordre d'affichage max (ajout)
+      	REQ_MAXORDRE_AFFICHAGE_PRODUIT.pIDFamille = nIDFamille
+      	SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_PRODUIT) = Faux ALORS
+      		AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_MAXORDRE_AFFICHAGE_PRODUIT")			
+      	SINON
+      		HLitPremier(REQ_MAXORDRE_AFFICHAGE_PRODUIT)
+      		SI HEnDehors(REQ_MAXORDRE_AFFICHAGE_PRODUIT) alors
+      			nOrdreAffichage = Produit.OrdreAffichage..ValeurParDéfaut
+      		SINON
+      			nOrdreAffichage = REQ_MAXORDRE_AFFICHAGE_PRODUIT.le_maximum_OrdreAffichage			
+      		FIN
+      	FIN
+      
+      SINON
+      	// Affichage prioritaire
+      	nOrdreAffichage = 0
+      FIN	
+      
+      // Initialisation de l'enregistrement
+      HRAZ(produit)
+      
+      // On remplit les paramètres du produit
+      produit.IDFamille 		= Famille.IDFamille
+      produit.Description		= sDescription
+      produit.Référence		= sReference
+      produit.LibelléProduit	= sLibellé
+      produit.PrixUnitaireHT	= moPrixUnitaireHT
+      produit.IDTauxTaxe		= TauxTaxe.IDTauxTaxe
+      produit.OrdreAffichage	= nOrdreAffichage
+      
+      // Ajout en base
+      SI HAjoute(Produit) = faux alors
+      	AjouteErreur("Impossible d'ajouter le produit")
+      	RENVOYER -1
+      FIN
+      
+      // On mémorise l'identifiant
+      nIDProduit = Produit.IDProduit
+      
+      // On renvoie l'identifiant de produit
+      RENvOYER nIDProduit
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER -1
+     type : 458752
+   -
+     name : ModifierProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218680986115519675
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie un produit de la base
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierProduit (<nIDProduitAModifier> est entier, <nIDFamille> est entier, <sReference> est chaîne, <sLibellé> est chaîne, <sDescription> est chaîne, <moPrixUnitaireHT> est monétaire, <nIDTauxTaxe> est entier, <bAffichagePrioritaire> est booléen)
+      //
+      // Paramètres :
+      //	nIDProduitAModifier (entier) : <indiquez ici le rôle de nIDProduitAModifier>
+      //	nIDFamille (entier) : <indiquez ici le rôle de nIDFamille>
+      //	sReference (chaîne ANSI) : <indiquez ici le rôle de sReference>
+      //	sLibellé (chaîne ANSI) : <indiquez ici le rôle de sLibellé>
+      //	sDescription (chaîne ANSI) : <indiquez ici le rôle de sDescription>
+      //	moPrixUnitaireHT (monétaire) : <indiquez ici le rôle de moPrixUnitaireHT>
+      //	nIDTauxTaxe (entier) : <indiquez ici le rôle de nIDTauxTaxe>
+      //	bAffichagePrioritaire (booléen) : <indiquez ici le rôle de bAffichagePrioritaire>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierProduit(nIDProduitAModifier est un entier, nIDFamille est un entier, sReference est une chaine, sLibellé est une chaine, sDescription est une chaine, moPrixUnitaireHT est un monétaire, nIDTauxTaxe est un entier, bAffichagePrioritaire est un booléen)
+      
+      // Variables locales
+      nOrdreAffichage		est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification d'un produit",sReference,"")
+      
+      // Vérification de la famille
+      HLitRecherchePremier(Famille,IDFamille,nIDFamille)
+      SI HTrouve(Famille) = Faux alors
+      	AjouteErreur("Famille non trouvée")
+      	RENVOYER Faux
+      FIN
+      
+      // Vérification du taux de taxe
+      HLitRecherchePremier(TauxTaxe,IDTauxTaxe,nIDTauxTaxe)
+      SI HTrouve(TauxTaxe) = Faux alors
+      	AjouteErreur("Taux de taxe non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On vérifie que cette référence n'existe pas déjà
+      HLitRecherchePremier(Produit,Référence,sReference)
+      SI Htrouve(Produit) = Vrai et  produit.IDProduit <> nIDProduitAModifier alors
+      	 AjouteErreur("Un autre produit existe déjà pour cette référence")
+      	 RENVOYER Faux
+      FIN
+      
+      // Chargement du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduitAModifier)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_PRODUIT)
+      	RENVOYER Faux
+      FIN
+      
+      // Gestion de l'ordre d'affichage
+      SI bAffichagePrioritaire = Faux ALORS
+      	// Recherche de l'ordre d'affichage max (ajout)
+      	REQ_MAXORDRE_AFFICHAGE_PRODUIT.pIDFamille = nIDFamille
+      	SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_PRODUIT) = Faux ALORS
+      		AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_MAXORDRE_AFFICHAGE_PRODUIT")			
+      	SINON
+      		HLitPremier(REQ_MAXORDRE_AFFICHAGE_PRODUIT)
+      		SI HEnDehors(REQ_MAXORDRE_AFFICHAGE_PRODUIT) ALORS
+      			nOrdreAffichage = produit.OrdreAffichage..ValeurParDéfaut
+      		SINON
+      			nOrdreAffichage = REQ_MAXORDRE_AFFICHAGE_PRODUIT.le_maximum_OrdreAffichage			
+      		FIN
+      	FIN
+      	
+      SINON
+      	// Affichage prioritaire
+      	nOrdreAffichage = 0
+      FIN	
+      
+      // On remplit les paramètres du produit
+      produit.IDFamille 		= Famille.IDFamille
+      produit.Référence		= sReference
+      produit.LibelléProduit	= sLibellé
+      produit.Description 	= sDescription
+      produit.PrixUnitaireHT	= moPrixUnitaireHT
+      produit.IDTauxTaxe		= TauxTaxe.IDTauxTaxe
+      produit.OrdreAffichage	= nOrdreAffichage
+      
+      // Modification en base
+      SI HModifie(Produit) = faux alors
+      	AjouteErreur("Impossible de modifier le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // On renvoie l'identifiant de produit
+      RENvOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER faux
+     type : 458752
+   -
+     name : LireProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2239478643526767159
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie les informations sur un produit
+      // Syntaxe :
+      //[ <Résultat> = ] LireProduit (<nIDProduit> est entier, <nRole> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	nRole (entier) : <indiquez ici le rôle de nRole>
+      // Valeur de retour :
+      // 	STCOL_Produit : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction LireProduit( LOCAL  nIDProduit est un entier, LOCAL nRole est un entier)
+      
+      // Variables locales
+      stErr 			est un STCOL_Produit
+      stDétailProduit	est un STCOL_Produit
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER stErr
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(Produit,IDProduit,nIDProduit)
+      SI Htrouve(Produit) = Faux alors
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER stErr
+      FIN
+      
+      // On récupère les informations	
+      FichierVersMémoire(stDétailProduit,produit)	
+      	
+      // On recherche la famille
+      HLitRecherchePremier(Famille,IDFamille,Produit.IDFamille) 
+      SI HTrouve(Famille) = Faux alors
+      	AjouteErreur("Famille du produit non trouvée en base")
+      	RENVOYER stErr	
+      FIN
+      	
+      // On met en forme les données sur la famille
+      stDétailProduit.LibelléFamille = Famille.Libellé
+      
+      // On ajoute les photos du produits 
+      NouvellePhoto est un STCOL_PhotoProduit 		
+      		
+      // On recherche les photos de ce produit
+      HLitRecherchePremier(PhotoProduit,IDProduitRole,[stDétailProduit.IDProduit,nRole])
+      Tantque Htrouve(PhotoProduit) = Vrai 
+      	// Transfert en mémoire
+      	FichierVersMémoire(NouvellePhoto,PhotoProduit)
+      		
+      	// Est-ce que cette photo est déjà dans le tableau ?
+      	SI TableauCherche(stDétailProduit.tabPhotoProduit,tcLinéaire,"IDPhotoProduit",NouvellePhoto.IDPhotoProduit) <= 0 alors
+      		// On ajoute la photo
+      							
+      		// Mais on ne veut pas certaines informations.
+      		NouvellePhoto.Binaire = ""			
+      		
+      		// Si c'est un rôle autre, il faut regarder si l'image avec le rôle normale est celle par défaut
+      		SI nRole <> ROLE_PHOTO_NORMAL ALORS
+      			HLitRecherchePremier(PhotoProduit,IDProduitNumeroPhotoRole,[stDétailProduit.IDProduit,PhotoProduit.NumeroPhoto,ROLE_PHOTO_NORMAL])
+      			SI HTrouve(PhotoProduit) _et_ PhotoProduit.ParDéfaut = Vrai alors
+      				// C'est la photo par défaut
+      				NouvellePhoto.ParDéfaut = Vrai
+      			FIN
+      		FIN
+      				
+      		TableauAjoute(stDétailProduit.tabPhotoProduit,NouvellePhoto)
+      	FIN
+      		
+      	HLitSuivant(PhotoProduit,IDProduitRole)
+      FIN
+      
+      // On renvoie le produit
+      renvoyer stDétailProduit
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYeR stErr
+      	
+     type : 458752
+   -
+     name : ListeProduitsLiés
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222380291647358349
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des produits liés à un produit donné
+      // Syntaxe :
+      //[ <Résultat> = ] ListeProduitsLiés (<nIDProduitRéférence> est entier, <nRole> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRéférence (entier) :Identifiant du produit de produits
+      //	nRole (entier) :Rôle des photos de produit parmi : 	ROLE_PHOTO_NORMAL = 0, 	ROLE_PHOTO_CARRE_PETIT = 1, ROLE_PHOTO_CARRE_GRAND = 2
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Produit
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeProduitsLiés( LOCAL  nIDProduitRéférence est un entier, LOCAL nRole est un entier)
+      
+      // Variables locales
+      stErr est un STCOL_Produit
+      
+      // On supprime le contenu du tableau précédent
+      TableauSupprimeTout(gtabProduits)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      // Initialement, tous les paramètres sont ignorés
+      REQ_RechercheProduitsLiés.pIDProduitRéférence	= NULL
+      
+      // On vérifie que l'identifiant de produit est valide
+      SI nIDProduitRéférence <=0 alors
+      	SI HExécuteRequête(REQ_RechercheProduitsLiés) = Faux ALORS	
+      		AjouteErreur("Le produit spécifié n'est pas valide")	
+      		TableauAjoute(gtabProduits,stErr)
+      		
+      		// On renvoie la liste des produits
+      		RENVOYER gtabProduits
+      	FIn
+      FIN
+      
+      // On paramètre la requête
+      REQ_RechercheProduitsLiés.pIDProduitRéférence		= nIDProduitRéférence
+      
+      // Exécution de la requête
+      Si HExécuteRequête(REQ_RechercheProduitsLiés) = Faux alors	
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_RechercheProduitsLiés")	
+      	TableauAjoute(gtabProduits,stErr)
+      FIN
+      
+      // Parcours de la requête pour construire le tableau avec tous les sous-éléments
+      Pour TOUT REQ_RechercheProduitsLiés 
+      	stProduit est un STCOL_Produit	
+      	
+      	// Lecture du produit
+      	stProduit = LireProduit(REQ_RechercheProduitsLiés.IDProduit, nRole)
+      		 
+      	// Ajout au tableau des produits
+      	TableauAjoute(gtabProduits,stProduit)
+      FIN
+      
+      // On renvoie la liste des produits
+      renvoyer gtabProduits
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	TableauAjoute(gtabProduits,stErr)
+      	
+     type : 458752
+   -
+     name : AjouterProduitLié
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222388327534087897
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute un produit lié à la base
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterProduitLié (<nIDProduitRéférence> est entier, <nIDProduitLié> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRéférence (entier) : <indiquez ici le rôle de nIDProduitRéférence>
+      //	nIDProduitLié (entier) : <indiquez ici le rôle de nIDProduitLié>
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AjouterProduitLié(nIDProduitRéférence est un entier, nIDProduitLié est un entier)
+      
+      // Variables locales
+      nIDProduit		est un entier	= -1
+      nOrdreAffichage	est un entier 	= 0
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER nIDProduit
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Ajout d'un produit lié","",""+nIDProduitLié)
+      
+      // Vérification du produit référence
+      HLitRecherchePremier(Produit,IDProduit,nIDProduitRéférence)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit de référence non trouvé")
+      	RENVOYER -1
+      FIN
+      
+      // Vérification du produit lié
+      HLitRecherchePremier(produit,IDProduit,nIDProduitLié)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit à lier  non trouvé")
+      	RENVOYER -1
+      FIN
+      
+      // Recherche de l'ordre d'affichage max (ajout)
+      REQ_MAXORDRE_AFFICHAGE_PRODUITLIE.pIDProduit = nIDProduitRéférence
+      SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_PRODUITLIE) = Faux alors
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_MAXORDRE_AFFICHAGE_PRODUITLIE")			
+      SINON
+      	HLitPremier(REQ_MAXORDRE_AFFICHAGE_PRODUITLIE)
+      	nOrdreAffichage = REQ_MAXORDRE_AFFICHAGE_PRODUITLIE.le_maximum_OrdreAffichage
+      FIN
+      
+      
+      // Initialisation de l'enregistrement
+      HRAZ(LiaisonProduit)
+      
+      // On remplit les paramètres du produit
+      LiaisonProduit.IDProduit 		= nIDProduitRéférence
+      LiaisonProduit.IDProduitLié		= nIDProduitLié
+      LiaisonProduit.OrdreAffichage	= nOrdreAffichage
+      
+      // Ajout en base
+      SI HAjoute(LiaisonProduit) = faux alors
+      	AjouteErreur("Impossible d'ajouter le produit lié")
+      	RENVOYER -1
+      FIN
+      
+      // On mémorise l'identifiant
+      nIDProduit = LiaisonProduit.IDProduit
+      
+      // On renvoie l'identifiant de produit mis à jour
+      RENvOYER nIDProduit
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER -1
+     type : 458752
+   -
+     name : RemonteOrdreProduitLié
+     internal_properties : CAAAAAgAAABC7a6IlA4Uuej4p0l2JHsOMQYW+n4RZab7Vqh1ncpyzoLRO5IJDEAhcjqGkB7IOZ7yAu6jzlgNg9o2lTbEhrz5qVJYpNiwv4YQSNJ/BzwDcJEeDpCgtXqJF7z3P5pPt5a2bQ6uR2hUj5NGcfqDY24TjOpgwR8OKkVQTayePRiQ/f3XD11eaYh1YwhKuv+DZkByPN+ecRo=
+     procedure_id : 1222398781810602858
+     type_code : 15
+     code : |1-
+      // Résumé : Remonte un produit lié à un autre produit dans la base
+      // Syntaxe :
+      //[ <Résultat> = ] RemonteOrdreProduitLié (<nIDProduitRéférence> est entier, <nIDProduitLié> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRéférence (entier) : <indiquez ici le rôle de nIDProduitRéférence>
+      //	nIDProduitLié (entier) : <indiquez ici le rôle de nIDProduitLié>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE RemonteOrdreProduitLié(nIDProduitRéférence est un entier, nIDProduitLié est un entier)
+      
+      // Variables locales
+      nIDProduit				est un entier	= -1
+      nOrdreAffichage			est un entier 	= 0
+      nIDProduitLiéPrécédent	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'ordre d'affichage d'un produit lié","",""+nIDProduitRéférence)
+      
+      // Vérification du produit référence
+      HLitRecherchePremier(Produit,IDProduit,nIDProduitRéférence)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit de référence non trouvé")
+      	RENVOYER faux
+      FIN
+      
+      // Vérification du produit lié
+      HLitRecherchePremier(produit,IDProduit,nIDProduitLié)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit à lier  non trouvé")
+      	RENVOYER faux
+      FIN
+      
+      // On recherche les produits liés, triés
+      REQ_RechercheProduitsLiés.pIDProduitRéférence = nIDProduitRéférence
+      SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_PRODUITLIE) = Faux ALORS
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_RechercheProduitsLiés")			
+      	RENVOYER Faux
+      FIN
+      
+      // On parcours les produits liés jusqu'à trouver celui à remonter
+      Pour TOUT REQ_RechercheProduitsLiés 
+      	// Est-ce le produit recherché ?
+      	SI REQ_RechercheProduitsLiés.IDProduitLié = nIDProduitLié alors
+      		// Est-ce que l'on peut le monter par rapport au précédent ?
+      		SI nIDProduitLiéPrécédent <> 0 alors
+      			// Oui, on modifie
+      			HLitRecherchePremier(LiaisonProduit,IDLiaisonProduit,[nIDProduitRéférence,REQ_RechercheProduitsLiés.IDProduitLié])
+      			
+      			// Si l'ordre d'affichage est le même, il faut forcer la différence
+      			SI LiaisonProduit.OrdreAffichage = nOrdreAffichage alors
+      				LiaisonProduit.OrdreAffichage = LiaisonProduit.OrdreAffichage - 1
+      			SINON
+      				// On prend l'ordre d'affichage du précédent
+      				LiaisonProduit.OrdreAffichage = nOrdreAffichage				
+      			FIN
+      			SI HModifie(LiaisonProduit) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage du produit lié")
+      				RENVOYER Faux
+      			FIN
+      			
+      			// Et on descend le précédent
+      			HLitRecherchePremier(LiaisonProduit,IDLiaisonProduit,[nIDProduitRéférence,nIDProduitLiéPrécédent])
+      			LiaisonProduit.OrdreAffichage = REQ_RechercheProduitsLiés.OrdreAffichage
+      			SI HModifie(LiaisonProduit) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage du produit lié précédent")
+      				RENVOYER Faux				
+      			FIN
+      			
+      			RENVOYER Vrai
+      		FIN
+      	FIN
+      	
+      	// On mémorise l'ordre d'affichage en cours ainsi que la liaison en cours
+      	nIDProduitLiéPrécédent 	= REQ_RechercheProduitsLiés.IDProduitLié
+      	nOrdreAffichage		= REQ_RechercheProduitsLiés.OrdreAffichage
+      	
+      FIN
+      
+      // Par défaut, on n'a pas pu remonter le produit
+      RENvOYER Faux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER faux
+     type : 458752
+   -
+     name : BaisseOrdreProduitLié
+     internal_properties : CAAAAAgAAABC7a6IlA4Uuej4p0l2JHsOMQYW+n4RZab7Vqh1ncpyzoLRO5IJDEAhcjqGkB7IOZ7yAu6jzlgNg9o2lTbEhrz5qVJYpNiwv4YQSNJ/BzwDcJEeDpCgtXqJF7z3P5pPt5a2bQ6uR2hUj5NGcfqDY24TjOpgwR8OKkVQTayePRiQ/f3XD11eaYh1YwhKuv+DZkByPN+ecRo=
+     procedure_id : 1222409867127051654
+     type_code : 15
+     code : |1-
+      // Résumé : baisse un produit lié à un autre produit dans la base
+      // Syntaxe :
+      //[ <Résultat> = ] BaisseOrdreProduitLié (<nIDProduitRéférence> est entier, <nIDProduitLié> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRéférence (entier) : <indiquez ici le rôle de nIDProduitRéférence>
+      //	nIDProduitLié (entier) : <indiquez ici le rôle de nIDProduitLié>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE BaisseOrdreProduitLié(nIDProduitRéférence est un entier, nIDProduitLié est un entier)
+      
+      // Variables locales
+      nIDProduit				est un entier	= -1
+      nOrdreAffichage			est un entier 	= 0
+      nIDProduitLiéPrécédent	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'ordre d'affichage d'un produit lié","",""+nIDProduitRéférence)
+      
+      // Vérification du produit référence
+      HLitRecherchePremier(Produit,IDProduit,nIDProduitRéférence)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit de référence non trouvé")
+      	RENVOYER faux
+      FIN
+      
+      // Vérification du produit lié
+      HLitRecherchePremier(produit,IDProduit,nIDProduitLié)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit à lier  non trouvé")
+      	RENVOYER faux
+      FIN
+      
+      // On recherche les produits liés, triés
+      REQ_RechercheProduitsLiés.pIDProduitRéférence = nIDProduitRéférence
+      SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_PRODUITLIE) = Faux ALORS
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_RechercheProduitsLiés")			
+      	RENVOYER Faux
+      FIN
+      
+      // On parcours les produits liés jusqu'à trouver celui à remonter
+      Pour TOUT REQ_RechercheProduitsLiés DepuisFin
+      	// Est-ce le produit recherché ?
+      	SI REQ_RechercheProduitsLiés.IDProduitLié = nIDProduitLié alors
+      		// Est-ce que l'on peut le monter par rapport au précédent ?
+      		SI nIDProduitLiéPrécédent <> 0 alors
+      			// Oui, on modifie
+      			HLitRecherchePremier(LiaisonProduit,IDLiaisonProduit,[nIDProduitRéférence,REQ_RechercheProduitsLiés.IDProduitLié])
+      			
+      			// Si l'ordre d'affichage est le même, il faut forcer la différence
+      			SI LiaisonProduit.OrdreAffichage = nOrdreAffichage alors
+      				LiaisonProduit.OrdreAffichage = LiaisonProduit.OrdreAffichage + 1
+      			SINON
+      				// On prend l'ordre d'affichage du précédent
+      				LiaisonProduit.OrdreAffichage = nOrdreAffichage				
+      			FIN
+      			SI HModifie(LiaisonProduit) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage du produit lié")
+      				RENVOYER Faux
+      			FIN
+      			
+      			// Et on remonte le précédent
+      			HLitRecherchePremier(LiaisonProduit,IDLiaisonProduit,[nIDProduitRéférence,nIDProduitLiéPrécédent])
+      			LiaisonProduit.OrdreAffichage = REQ_RechercheProduitsLiés.OrdreAffichage
+      			SI HModifie(LiaisonProduit) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage du produit lié suivant")
+      				RENVOYER Faux				
+      			FIN
+      			
+      			RENVOYER Vrai
+      		FIN
+      	FIN
+      	
+      	// On mémorise l'ordre d'affichage en cours ainsi que la liaison en cours
+      	nIDProduitLiéPrécédent 	= REQ_RechercheProduitsLiés.IDProduitLié
+      	nOrdreAffichage		= REQ_RechercheProduitsLiés.OrdreAffichage
+      	
+      FIN
+      
+      // Par défaut, on n'a pas pu remonter le produit
+      RENvOYER Faux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER faux
+     type : 458752
+   -
+     name : SupprimerProduitLié
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222410966638738836
+     type_code : 15
+     code : |1+
+      // Résumé : Supprimer un produit lié
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerProduitLié (<nIDProduitRéférenceRecherché> est entier, <nIDProduitLiéRecherché> est entier)
+      //
+      // Paramètres :
+      //	nIDProduitRéférenceRecherché (entier) : <indiquez ici le rôle de nIDProduitRéférenceRecherché>
+      //	nIDProduitLiéRecherché (entier) : <indiquez ici le rôle de nIDProduitLiéRecherché>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerProduitLié( nIDProduitRéférenceRecherché est un entier, nIDProduitLiéRecherché est un entier )
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Recherche de la liaison en base
+      HLitRecherchePremier(LiaisonProduit,IDLiaisonProduit,[nIDProduitRéférenceRecherché,nIDProduitLiéRecherché])
+      SI HTrouve(LiaisonProduit) = Faux ALORS
+      	AjouteErreur("Enregistrement non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Suppression en base
+      Si HSupprime(LiaisonProduit) = Faux alors
+      	AjouteErreur("Suppression de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : bGereStocks
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222748748170611679
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si les stocks sont limités sur ce produit
+      // Syntaxe :
+      //[ <Résultat> = ] bGereStocks (<nIDProduit> est entier, <bAlerteStock> est booléen)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	bAlerteStock (booléen) : <indiquez ici le rôle de bAlerteStock>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bGereStocks(LOCAL  nIDProduit est un entier, bAlerteStock est un booléen)
+      
+      // Variables locales
+      bAuMoinsUnStock	est un booléen
+      bAuMoinsUneDéclinaison est un booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, pas d'alerte de stocks
+      bAlerteStock = Faux
+      bAuMoinsUnStock = Faux
+      bAuMoinsUneDéclinaison = Faux
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Parcours des déclinaisons
+      Pour TOUT DéclinaisonProduit avec IDProduit = nIDProduit
+      	bAuMoinsUneDéclinaison = Vrai
+      	// Est-ce que le stock est limité ?
+      	SI produit.QuantitéLimitée = Vrai alors
+      		bAuMoinsUnStock = Vrai
+      		
+      		// Est-ce que le seuil d'alerte est atteint ?
+      		SI DéclinaisonProduit.Quantité <= DéclinaisonProduit.SeuilAlerteStock ALORS
+      			bAlerteStock = Vrai
+      		FIN
+      	FIN	
+      	
+      FIN
+      
+      SI bAuMoinsUneDéclinaison = Faux alors
+      	// Est-ce que le produit gère des stocks ?
+      	Si produit.QuantitéLimitée = Vrai alors
+      		bAuMoinsUnStock = Vrai
+      		// Est-ce que le seuil d'alerte est atteint ?
+      		SI produit.Quantité <= produit.SeuilAlerteStock alors
+      			bAlerteStock = vrai
+      		FIN	
+      	FIN
+      FIN
+      
+      RENVOYER bAuMoinsUnStock
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : bADesDeclinaisons
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222773160766212094
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si le produit spécifié à des déclinaisons
+      // Syntaxe :
+      //[ <Résultat> = ] bADesDeclinaisons (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bADesDeclinaisons(LOCAL  nIDProduit est un entier)
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // On recherche une déclinaison
+      HLitRecherchePremier(DéclinaisonProduit,IDProduit,nIDProduit)
+      SI Htrouve(DéclinaisonProduit) = Vrai ALORS
+      	renvoyer vrai
+      FIN
+      
+      // Par défaut, un produit n'a pas de déclinaisons
+      RENVOYER Faux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : bProduitEstEnStock
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222785642682328593
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si le produit demandé est disponible en stock (ou pas de gestion de stock pour ce produit)
+      // Syntaxe :
+      //[ <Résultat> = ] bProduitEstEnStock (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bProduitEstEnStock(LOCAL  nIDProduit est un entier)
+      
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit, IDProduit, nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      Si produit.QuantitéLimitée = Vrai alors
+      	
+      	// La quantité en stock est-elle positive ?
+      	renvoyer (produit.Quantité > 0)
+      
+      SINON // Pas de quantité limitée : le produit est donc toujours disponible
+      	
+      	renvoyer vrai
+      	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : bDéclinaisonEstEnStock
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222786463026581880
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si la déclinaison demandée est disponible en stock (ou pas de gestion de stock pour cette déclinaison)
+      // Syntaxe :
+      //[ <Résultat> = ] bDéclinaisonEstEnStock (<nIDDéclinaisonProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaisonProduit (entier) : <indiquez ici le rôle de nIDDéclinaisonProduit>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bDéclinaisonEstEnStock(LOCAL nIDDéclinaisonProduit est un entier)
+      
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      
+      // Recherche de la déclinaison
+      HLitRecherchePremier(DéclinaisonProduit, IDDéclinaisonProduit, nIDDéclinaisonProduit)
+      SI HTrouve(DéclinaisonProduit) = Faux ALORS
+      	AjouteErreur("Déclinaison non trouvée en base")
+      	RENVOYER Faux
+      FIN
+      // Recherche le produit
+      hlitrecherchepremier(produit, idproduit, DéclinaisonProduit.idproduit)
+      si htrouve(produit) = faux ALORS
+      	AjouteErreur("Produit de la déclinaison non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      SI produit.QuantitéLimitée = faux ALORS renvoyer vrai
+      
+      // La quantité en stock est-elle positive ?
+      renvoyer (DéclinaisonProduit.Quantité > 0)
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : bProduitOuDéclinaisonEstEnStock
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222787867482852957
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si le produit, ou au moins une déclinaison, est disponible en stock (ou pas de gestion de stock pour ce produit)
+      // Syntaxe :
+      //[ <Résultat> = ] bProduitOuDéclinaisonEstEnStock (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bProduitOuDéclinaisonEstEnStock(LOCAL nIDProduit est un entier)
+      
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit, IDProduit, nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      Si produit.QuantitéLimitée = Vrai alors
+      	
+      	// Si le produit possède des déclinaisons
+      	si bADesDeclinaisons(nIDProduit) ALORS
+      		
+      		// Parcours chaque déclinaison pour vérifier son stock
+      		pour tout DéclinaisonProduit avec idproduit = nIDProduit
+      			// Si la déclinaison est en stock, le produit (au sens large) est considéré comme disponible
+      			si bDéclinaisonEstEnStock(declinaisonproduit.IDDéclinaisonProduit) ALORS
+      				renvoyer vrai
+      			FIN
+      		FIN
+      		
+      		// Si aucune déclinaison n'est disponible en stock, le produit (au sens large) est non disponible
+      		renvoyer faux
+      		
+      		
+      	SINON
+      		
+      		// La quantité en stock est-elle positive ?
+      		RENVOYER (produit.Quantité > 0)	
+      		
+      	FIN
+      
+      SINON // Pas de quantité limitée : le produit est donc toujours disponible
+      	
+      	renvoyer vrai
+      	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : ModifierStockProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1222791800888115543
+     type_code : 15
+     code : |1-
+      // Résumé : Mets à jour le stock d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierStockProduit (<nIDProduit> est entier, <bActiverGestionStock> est booléen, <nQuantité> est entier, <nSeuilAlerte> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	bActiverGestionStock (booléen) : <indiquez ici le rôle de bActiverGestionStock>
+      //	nQuantité (entier) : <indiquez ici le rôle de nQuantité>
+      //	nSeuilAlerte (entier) : <indiquez ici le rôle de nSeuilAlerte>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierStockProduit(LOCAL nIDProduit est un entier, LOCAL bActiverGestionStock est un booléen, LOCAL nQuantité est un entier, LOCAL nSeuilAlerte est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération des informations
+      produit.QuantitéLimitée = bActiverGestionStock
+      produit.Quantité = nQuantité
+      produit.SeuilAlerteStock = nSeuilAlerte
+      
+      // Mise à jour en base
+      SI HModifie(Produit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : nNbProduitEnStock
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223037631768786349
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie le nombre de produit en stock
+      // Syntaxe :
+      //[ <Résultat> = ] nNbProduitEnStock (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE nNbProduitEnStock(LOCAL nIDProduit est un entier) : entier
+      
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER 0
+      FIN
+      
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit, IDProduit, nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER 0
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      Si produit.QuantitéLimitée = Vrai alors
+      	
+      	// Renvoie la quantité en stock
+      	renvoyer produit.Quantité
+      
+      SINON // Pas de quantité limitée
+      	
+      	renvoyer -1
+      	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER 0
+      
+     type : 458752
+   -
+     name : nNbDéclinaisonEnStock
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223038147164981522
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie le nombre de déclinaisons en stock
+      // Syntaxe :
+      //[ <Résultat> = ] nNbDéclinaisonEnStock (<nIDDéclinaisonProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaisonProduit (entier) : <indiquez ici le rôle de nIDDéclinaisonProduit>
+      // Valeur de retour :
+      // 	entier : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE nNbDéclinaisonEnStock(LOCAL nIDDéclinaisonProduit est un entier) : entier
+      
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER 0
+      FIN
+      
+      // Recherche de la déclinaison
+      HLitRecherchePremier(DéclinaisonProduit, IDDéclinaisonProduit, nIDDéclinaisonProduit)
+      SI HTrouve(DéclinaisonProduit) = Faux ALORS
+      	AjouteErreur("Déclinaison non trouvée en base")
+      	RENVOYER 0
+      FIN
+      // Recherche le produit
+      hlitrecherchepremier(produit, idproduit, DéclinaisonProduit.idproduit)
+      si htrouve(produit) = faux ALORS
+      	AjouteErreur("Produit de la déclinaison non trouvé en base")
+      	RENVOYER 0
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      SI produit.QuantitéLimitée = faux ALORS renvoyer -1
+      
+      // Renvoie la quantité en stock
+      renvoyer DéclinaisonProduit.Quantité
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER 0
+      
+     type : 458752
+   -
+     name : ModifierStockProduitDéclinaison
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223043700610248559
+     type_code : 15
+     code : |1-
+      // Résumé : Mets à jour le stock d'une déclinaison de produit
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierStockProduitDéclinaison (<nIDProduit> est entier, <nIDDéclinaison> est entier, <nQuantité> est entier, <nSeuilAlerte> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	nIDDéclinaison (entier) : <indiquez ici le rôle de nIDDéclinaison>
+      //	nQuantité (entier) : <indiquez ici le rôle de nQuantité>
+      //	nSeuilAlerte (entier) : <indiquez ici le rôle de nSeuilAlerte>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierStockProduitDéclinaison(LOCAL nIDProduit est un entier, LOCAL nIDDéclinaison est un entier, LOCAL nQuantité est un entier, LOCAL nSeuilAlerte est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la déclinaison
+      HLitRecherchePremier(DéclinaisonProduit,IDDéclinaisonProduit, nIDDéclinaison)
+      SI HTrouve(DéclinaisonProduit) = Faux ALORS
+      	AjouteErreur("Déclinaison non trouvée en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Vérification de l'association
+      SI DéclinaisonProduit.IDProduit <> Produit.IDProduit ALORS
+      	AjouteErreur("La déclinaison ne correspond pas au produit demandé")
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération des informations
+      DéclinaisonProduit.Quantité = nQuantité
+      DéclinaisonProduit.SeuilAlerteStock = nSeuilAlerte
+      
+      // Mise à jour en base
+      SI HModifie(DéclinaisonProduit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour la déclinaison de produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : bProduitEstEnQuantitéLimitée
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223060614494363025
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie Vrai si le produit demandé est disponible en stock (ou pas de gestion de stock pour ce produit)
+      // Syntaxe :
+      //[ <Résultat> = ] bProduitEstEnQuantitéLimitée (<nIDProduit> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE bProduitEstEnQuantitéLimitée(LOCAL nIDProduit est un entier) : booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit, IDProduit, nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Le produit est-il en quantité limité ( = gestion de stock) ?
+      renvoyer produit.QuantitéLimitée
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : DiminuerStockProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223144312379177043
+     type_code : 15
+     code : |1-
+      // Résumé : Diminue le stock d'un produit (suite commande)
+      // Syntaxe :
+      //[ <Résultat> = ] DiminuerStockProduit (<nIDProduit> est entier, <nQuantitéAEnlever> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	nQuantitéAEnlever (entier) : <indiquez ici le rôle de nQuantitéAEnlever>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE DiminuerStockProduit(LOCAL nIDProduit est un entier, LOCAL nQuantitéAEnlever est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Modifie la quantité
+      produit.Quantité -= nQuantitéAEnlever
+      
+      // Mise à jour en base
+      SI HModifie(Produit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : DiminuerStockDéclinaison
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1223144707516259863
+     type_code : 15
+     code : |1-
+      // Résumé : Diminue le stock d'une déclinaison de produit (suite commande)
+      // Syntaxe :
+      //[ <Résultat> = ] DiminuerStockDéclinaison (<nIDDéclinaisonProduit> est entier, <nQuantitéAEnlever> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaisonProduit (entier) : <indiquez ici le rôle de nIDDéclinaisonProduit>
+      //	nQuantitéAEnlever (entier) : <indiquez ici le rôle de nQuantitéAEnlever>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE DiminuerStockDéclinaison(LOCAL nIDDéclinaisonProduit est un entier, LOCAL nQuantitéAEnlever est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la déclinaison produit
+      HLitRecherchePremier(DéclinaisonProduit, iddeclinaisonproduit, nIDDéclinaisonProduit)
+      SI HTrouve(DéclinaisonProduit) = Faux ALORS
+      	AjouteErreur("Déclinaison produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Modifie la quantité
+      DéclinaisonProduit.Quantité -= nQuantitéAEnlever
+      
+      // Mise à jour en base
+      SI HModifie(DéclinaisonProduit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : AugmenterStockDéclinaison
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1224210407112060429
+     type_code : 15
+     code : |1-
+      // Résumé : Augmente le stock d'une déclinaison de produit (suite annulation commande)
+      // Syntaxe :
+      //[ <Résultat> = ] AugmenterStockDéclinaison (<nIDDéclinaisonProduit> est entier, <nQuantitéAAjouter> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaisonProduit (entier) : <indiquez ici le rôle de nIDDéclinaisonProduit>
+      //	nQuantitéAAjouter (entier) : <indiquez ici le rôle de nQuantitéAAjouter>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AugmenterStockDéclinaison(LOCAL nIDDéclinaisonProduit est un entier, LOCAL nQuantitéAAjouter est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche de la déclinaison produit
+      HLitRecherchePremier(DéclinaisonProduit, iddeclinaisonproduit, nIDDéclinaisonProduit)
+      SI HTrouve(DéclinaisonProduit) = Faux ALORS
+      	AjouteErreur("Déclinaison produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Modifie la quantité
+      DéclinaisonProduit.Quantité += nQuantitéAAjouter
+      
+      // Mise à jour en base
+      SI HModifie(DéclinaisonProduit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : AugmenterStockProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1224210411407093604
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute le stock d'un produit (suite annulation commande)
+      // Syntaxe :
+      //[ <Résultat> = ] AugmenterStockProduit (<nIDProduit> est entier, <nQuantitéAAjouter> est entier)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	nQuantitéAAjouter (entier) : <indiquez ici le rôle de nQuantitéAAjouter>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AugmenterStockProduit(LOCAL nIDProduit est un entier, LOCAL nQuantitéAAjouter est un entier)
+      	
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Modifie la quantité
+      produit.Quantité += nQuantitéAAjouter
+      
+      // Mise à jour en base
+      SI HModifie(Produit) = faux alors
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ActiverGestionStockProduit
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1224538194512885428
+     type_code : 15
+     code : |1+
+      // Résumé : Activer ou désactiver la gestion de stock d'un produit
+      // Syntaxe :
+      //[ <Résultat> = ] ActiverGestionStockProduit (<nIDProduit> est entier, <bActiverGestionStock> est booléen)
+      //
+      // Paramètres :
+      //	nIDProduit (entier) : <indiquez ici le rôle de nIDProduit>
+      //	bActiverGestionStock (booléen) : <indiquez ici le rôle de bActiverGestionStock>
+      // Valeur de retour :
+      // 	booléen : <indiquez ici le rôle de la valeur de retour>
+      //
+      // Exemple :
+      // Indiquez ici un exemple d'utilisation.
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ActiverGestionStockProduit(LOCAL nIDProduit est un entier, LOCAL bActiverGestionStock est un booléen)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(produit,IDProduit,nIDProduit)
+      SI HTrouve(produit) = Faux ALORS
+      	AjouteErreur("Produit non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération des informations
+      produit.QuantitéLimitée = bActiverGestionStock
+      
+      // Mise à jour en base
+      SI HModifie(produit) = Faux ALORS
+      	AjouteErreur("Impossible de mettre à jour le produit")
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : LirePhotoProduitSelonNuméroEtDéclinaison
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 1172679990976449547
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le chemin d'une photo donnée
+      // Syntaxe :
+      //[ <Résultat> = ] LirePhotoProduitSelonNuméroEtDéclinaison (<nIDDéclinaison> est entier, <nNumPhoto> est entier, <nRolePhoto> est entier)
+      //
+      // Paramètres :
+      //	nIDDéclinaison (entier) : IDDéclinaison
+      //	nNumPhoto (entier) : Numéro de la photo
+      //	nRolePhoto (entier) : Rôle de la photo
+      // Valeur de retour :
+      // 	chaîne ANSI : Chemin de la photo
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePhotoProduitSelonNuméroEtDéclinaison(nIDDéclinaison est un entier, nNumPhoto est un entier, nRolePhoto est un entier  ) : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(<§Rff00005233376f1d¤fr-FR¤CST_MESSAGE_ERREUR_DROITS§>)
+      	RENVOYER ""
+      FIN
+      
+      // Recherche de la photo
+      HLitRecherchePremier(PhotoProduit,IDDéclinaisonProduitRoleNumeroPhoto,[nIDDéclinaison,nRolePhoto,nNumPhoto])
+      SI HTrouve(PhotoProduit) = Faux ALORS
+      	AjouteErreur("Photo demandée non trouvée")
+      	RENVOYER ""
+      SINON
+      	SI EnModeAWP() = Vrai ALORS
+      		RENVOYER PhotoProduit.Photo	
+      	SINON
+      		RENVOYER "FR/"+PhotoProduit.Photo
+      	FIN	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f0710c78973
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : CST_MESSAGE_ERREUR_DROITS
+     index : 0
+   -
+     text :
+      fr-FR : Impossible de trouver le produit spécifié
+     index : 1
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

@@ -1,0 +1,1042 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Famille
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad20567e640
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Famille
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Famille est une structure
+      		IDFamille 		est un entier
+      		Libellé 		est un chaîne
+      		IDFamilleParent est un entier
+      		Photo			est une chaine
+      		tabSousFamilles	est un tableau de STCOL_Famille
+      Fin
+       
+      public
+      	gtabFamilles est un tableau de STCOL_Famille
+     type : 720896
+  procedures :
+   -
+     name : ActualiserFamilles
+     procedure_id : 2211650407966690410
+     type_code : 15
+     code : |1-
+      // Résumé : Actualise la liste des familles de produits
+      // Syntaxe :
+      //ActualiserFamilles ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	Aucune
+      //
+      
+      Procédure ActualiserFamilles ( )
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RETOUR
+      FIN
+      
+      // On remet à jour le contenu
+      FichierVersTableau(gtabFamilles,Famille,IDFamilleParent)
+      
+      // On met à jour les chemins
+     type : 458752
+   -
+     name : AjouterFamille
+     internal_properties : CAAAAAgAAADki4m3upJbui6ei0WADOf4R6LPus2bi+Xa8PEPbwgiRMr+glRkfjVn1s+i7bCmkyvFAkIeTPKd0HwdPNjQgqQoI17LORb4utq1woI/Mxh5P1Y0nrWKrGsc6yaGt/BEWCElGBpJ1ZtXpCUm7EBrFE9OzR+6Cn9fW2CIpzsivcsNJBG/htv72Rwl3AMQIWSr+j0yt2j0pEXgpFfEJvpR8Qtr3lZpHg==
+     procedure_id : 2211650407966755977
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute une famille de produit
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterFamille (<sLibelléFamille> est chaîne, <bufImage> est buffer, <nIDFamilleParent> est entier)
+      //
+      // Paramètres :
+      //	sLibelléFamille (chaîne) : Libellé de la famille
+      //	bufImage (buffer) : buffer contenant l'image de la famille
+      //	nIDFamilleParent (entier) : Identifiant de la famille de produit parent
+      // Valeur de retour :
+      // 	entier : Identifiant de la famille, -1 en cas d'erreur
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction AjouterFamille ( sLibelléFamille est un chaîne, bufImage est un buffer , nIDFamilleParent est un entier )
+      
+      // Variables locales
+      nIDFamille		est un entier	= -1
+      nOrdreAffichage	est un entier	= 0
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER nIDFamille
+      FIN
+      
+      // Si le parent n'est pas trouvé, on le met à la racine
+      SI nIDFamilleParent <>0 alors
+      	HLitRecherchePremier(Famille,IDFamille,nIDFamilleParent)
+      	SI HTrouve(Famille) = Faux alors
+      		AjouteErreur("Famille parent non trouvée, on positionne à la racine")
+      		nIDFamilleParent = 0
+      	FIN
+      FIN
+      
+      // Recherche de l'ordre d'affichage max (ajout)
+      REQ_MAXORDRE_AFFICHAGE_FAMILLE.pIDFamilleParent = nIDFamilleParent
+      SI HExécuteRequête(REQ_MAXORDRE_AFFICHAGE_FAMILLE) = Faux ALORS
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_MAXORDRE_AFFICHAGE_FAMILLE")			
+      SINON
+      	HLitPremier(REQ_MAXORDRE_AFFICHAGE_FAMILLE)
+      	nOrdreAffichage = REQ_MAXORDRE_AFFICHAGE_FAMILLE.le_maximum_OrdreAffichage
+      FIN
+      
+      // Initialisation de l'enregistrement
+      HRaz(Famille)
+      
+      // On remplit les données
+      Famille.IDFamilleParent = nIDFamilleParent
+      Famille.Libellé 		= sLibelléFamille
+      Famille.Binaire			= bufImage
+      Famille.OrdreAffichage	= nOrdreAffichage
+      
+      // Est-ce qu'une image est définie ?
+      SI bufImage = "" alors
+      	// On prend l'image par défaut
+      	bufImage = RécupèreParamètreSite(csAdmin_Image_Defaut_Famille,"images/Puce_Menu.png")
+      FIN
+      
+      // Ajout en base
+      SI HAjoute(Famille) = Faux ALORS
+      	AjouteErreur("Ajout de l'enregistrement impossible")
+      	RENVOYER nIDFamille
+      FIN
+      
+      // On mémorise l'actualité créée
+      nIDFamille = Famille.IDFamille
+      
+      SI EnModeWebservice() = vrai alors
+      	// Génération de la miniature
+      	GenerePhotoFamille(nIDFamille)
+      	
+      SINON
+      	// Génération de la miniature
+      	Famille.Photo = _GenereMiniatureFamille(bufImage,nIDFamille)
+      	
+      	// Mémorisation en base
+      	SI Hmodifie(Famille) = faux alors
+      		AjouteErreur("Modification de l'enregistrement impossible")
+      		RENVOYER nIDFamille
+      	FIN
+      FIN
+      
+      
+      // Mise à jour 
+      ActualiserFamilles()
+      
+      // On renvoie l'identifiant de la famille
+      RENVOYER nIDFamille
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER nIDFamille
+     type : 458752
+   -
+     name : LireFamilles
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211650407966821544
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la famille demandée
+      // Syntaxe :
+      //[ <Résultat> = ] LireFamilles (<nIDFamilleRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille
+      // Valeur de retour :
+      // 	STCOL_Famille : Contenu de la famille
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction LireFamilles ( nIDFamilleRecherchée est un entier )
+      // Variables locales
+      nIndiceTableau		est un entier
+      stFamilleErr		est un STCOL_Famille
+      
+      // Initialisation de la famille "erreur"
+      stFamilleErr.IDFamille = -1 
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER stFamilleErr
+      FIN
+      
+      // Recherche de l'actualité
+      nIndiceTableau = TableauCherche(gtabFamilles,tcLinéaire,"IDFamille",nIDFamilleRecherchée)
+      SI nIndiceTableau <=0 alors
+      	AjouteErreur("Enregistrement non trouvé")
+      	renvoyer stFamilleErr
+      FIN
+      
+      // On renvoie la famille
+      renvoyer gtabFamilles[nIndiceTableau]
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER stFamilleErr
+     type : 458752
+   -
+     name : ModifierFamille
+     internal_properties : CAAAAAgAAABhwyN63EZUaJkjWR7rhsvYRwrI4tvGvHmeNgrLYXb+FA0RcbhnVnmORclySAwIxWQogKz4HwyFi9z2Y5920d2eCcwiOBIUDVzce1ig/7BBobdqz3CyaZOxXIy+F9uqn5+QhcQHQqcCzSCElprKCpJeAjoYwqqHEp2LmeEG1GWu/mzxc9H8ji9XOH/xWkXl3C77MT5uk3TzO4GxyC0HXhO+FXVxLsGROQ0lcL6p6JPKG+k+0g==
+     procedure_id : 2211650407966952741
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie une famille de produits
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierFamille (<nIDFamilleRecherchée> est entier, <bufImage> est buffer, <sLibelléFamille> est chaîne)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille à modifier
+      //	bufImage (buffer) : Nouvelle image de la famille
+      //	sLibelléFamille (chaîne) : Nouveau libellé de la famille
+      // Valeur de retour :
+      // 	booléen : Vrai si la famille a été mise à jour, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ModifierFamille ( LOCAL nIDFamilleRecherchée est un entier , LOCAL bufImage est un buffer , LOCAL sLibelléFamille est un chaîne)
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche en base
+      HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)
+      SI HTrouve(Famille) = Faux ALORS
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On remplit les données
+      Famille.Libellé 		= sLibelléFamille
+      
+      // En mode Web Service,  on ne modifie pas directement la base
+      SI EnModeWebservice() = vrai alors
+      	// Génération de la miniature
+      	SI bufImage<>"" ALORS		
+      		
+      		// On stocke le buffer
+      		Famille.Binaire	= bufImage	
+      		
+      		// Modification en base
+      		SI HModifie(Famille) = Faux ALORS
+      			AjouteErreur("Modification de l'enregistrement impossible")
+      			RENVOYER Faux
+      		FIN
+      	FIN	
+       	
+      	// On appelle l'API REST
+      	GenerePhotoFamille(nIDFamilleRecherchée)
+       	
+      SINON
+      	// Génération de la miniature
+      	SI bufImage<>"" ALORS
+      		Famille.Binaire	= bufImage	
+      		Famille.Photo = _GenereMiniatureFamille(bufImage,nIDFamilleRecherchée)
+      	FIN
+      	
+      	// Modification en base
+      	SI HModifie(Famille) = Faux ALORS
+      		AjouteErreur("Modification de l'enregistrement impossible")
+      		RENVOYER Faux
+      	FIN
+      	
+      	// Mise à jour
+      	ActualiserFamilles()
+      	
+      FIN
+      
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : SupprimerFamille
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211650407967018308
+     type_code : 15
+     code : |1-
+      // Résumé : Supprimer la famille de produits spécifiée
+      // Syntaxe :
+      //[ <Résultat> = ] SupprimerFamille (<nIDFamilleRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille à supprimer
+      // Valeur de retour :
+      // 	booléen : Vrai si la suppression est effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction SupprimerFamille ( nIDFamilleRecherchée est un entier )
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche en base
+      HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)
+      SI Htrouve(Famille) = Faux alors
+      	AjouteErreur(<§Rff00005233666f5c¤fr-FR¤Enregistrement non trouvé§>)
+      	RENVOYER Faux
+      FIN
+      
+      // Suppression en base
+      Si HSupprime(Famille) = Faux alors
+      	AjouteErreur(<§Rff00015233686f5c¤fr-FR¤Suppression de l'enregistrement impossible§>)
+      	RENVOYER Faux
+      FIN
+      
+      // Mise à jour 
+      ActualiserFamilles()
+      
+      // Par défaut, la suppression se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ListeFamilles
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2211652624170658128
+     type_code : 15
+     code : |1-
+      // Résumé : Liste les familles d'une famille parent
+      // Syntaxe :
+      //[ <Résultat> = ] ListeFamilles (<nIdentifiantFamilleParent> est entier)
+      //
+      // Paramètres :
+      //	nIdentifiantFamilleParent (entier) : Identifiant de la famille parent
+      // Valeur de retour :
+      // 	tableau : tableau de STCOL_Famille
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeFamilles ( nIdentifiantFamilleParent est un entier )
+      
+      // Variables locales
+      tabFamilles 	est un tableau de STCOL_Famille
+      stFamilleErr	est un STCOL_Famille
+      
+      // Configuration en cas d'erreur
+      stFamilleErr.IDFamille = -1
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	// On l'ajoute la famille en erreur au tableau des familles
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	TableauAjoute(tabFamilles,stFamilleErr)	
+      	RENVOYER tabFamilles
+      FIN
+      
+      // Pour toutes les familles qui ont comme parent nIdentifiantParent, 
+      REQ_LISTE_FAMILLES_SELON_PARENT.pIDParent = nIdentifiantFamilleParent
+      
+      // Exécution de la requête
+      SI HExécuteRequête(REQ_LISTE_FAMILLES_SELON_PARENT) = Faux alors
+      	AjouteErreur("Impossible d'exécuter la requête de parcours des familles")
+      	TableauAjoute(tabFamilles,stFamilleErr)	
+      	RENVOYER tabFamilles
+      FIN
+      
+      POUR TOUT REQ_LISTE_FAMILLES_SELON_PARENT
+      	// On crée la structure
+      	stFamille	est un STCOL_Famille
+      	FichierVersMémoire(stFamille,REQ_LISTE_FAMILLES_SELON_PARENT)
+      	
+      	// On l'ajoute au tableau des familles
+      	TableauAjoute(tabFamilles,stFamille)	
+      FIN
+      
+      // On renvoie le tableau
+      renvoyer tabFamilles
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	TableauAjoute(tabFamilles,stFamilleErr)	
+      	RENVOYER tabFamilles
+     type : 458752
+   -
+     name : ChargeFamilles
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2216051933675060814
+     type_code : 15
+     code : |1-
+      // Résumé : Charge la liste des familles
+      // Syntaxe :
+      //[ <Résultat> = ] ChargeFamilles (<bViderContenu> est booléen, <nFamilleBase> est entier)
+      //
+      // Paramètres :
+      //	bViderContenu (booléen) :Vrai pour vider le tableau des familles avant le chargement
+      //	nFamilleBase (entier) :Identifiant de la famille "racine" pour le chargement
+      // Valeur de retour :
+      // 	booléen : Vrai si le chargement est effectué, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ChargeFamilles ( bViderContenu est un booléen  , nFamilleBase est un entier )
+      // Variables locales
+      tabNouvellesFamilles est un tableau de STCOL_Famille
+      stFamille		est un STCOL_Famille
+      
+      SI bViderContenu = vrai alors
+      	// Suppression du contenu précédent
+      	TableauSupprimeTout(gtabFamilles)
+      FIN
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération des familles depuis la racine
+      tabNouvellesFamilles = ListeFamilles(nFamilleBase)
+      Pour tout element stFamille de tabNouvellesFamilles
+      	// On ajoute à la famille
+      	TableauAjoute(gtabFamilles,stFamille)
+      	// Est-ce que cette famille à des fils ?
+      	ChargeFamilles(Faux,stFamille.IDFamille)
+      FIN
+      
+      RENVOYER VRai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : _GenereMiniatureFamille
+     internal_properties : CAAAAAgAAABUginvBHAUP/mu5xQsxnSsAfCimgIgdYweo4cMFyrFI/7Xg6bEhUBsW3A8Jv0eVP5E+JocyWX61ZCx3DJU/NsmL2STaG9PB+R0JzkZfy4Ncs+4byWKxzyuDEHPHMnu7txrL+8BMsN3M5hSbZWNgFGHgVTxVILJtaEVe6r3NTnBwyQCTy7braUibSyfuj2kAgpbhU+YU+LeBdFV6zDi9pY9/re4XKUlRhl7Nhssk1oCRepc4yrQ7fNzpkzams7ZIw==
+     procedure_id : 2218705209632572799
+     type_code : 15
+     code : |1-
+      // Résumé : Génère la miniature d'une famille
+      // Syntaxe :
+      //[ <Résultat> = ] _GenereMiniatureFamille (<bufPhoto> est buffer, <nIDFamille> est entier)
+      //
+      // Paramètres :
+      //	bufPhoto (buffer) : Buffer contenant l'image source
+      //	nIDFamille (entier) : identifiant de la famille
+      // Valeur de retour :
+      // 	chaîne ANSI : Chemin de la photo
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction Privée _GenereMiniatureFamille( LOCAL bufPhoto est un buffer , nIDFamille est un entier)
+      
+      // Variables locales
+      sCheminCompletRepertoireDonnees	est une chaine
+      sCheminCompletRepertoireWeb		est une chaine
+      sCheminWeb						est une chaine
+      Miniature						est une image
+      
+      // Cette procédure ne doit pas être exécutée en mode Web Service
+      SI EnModeWebservice() alors
+      	AjouteErreur("Ce traitement ne doit pas être exécuté en mode Web Service",dbgInfo(dbgPile))
+      	RENVOYER ""
+      FIN
+      
+      // Chargement de l'image
+      SI bufPhoto <> "" alors
+      	Miniature = bufPhoto
+      FIN
+      
+      // On redimensionne en 50x50
+      dRedimensionne(Miniature,50,50,drHomothétiqueCentré)
+      Miniature..Largeur = 50
+      Miniature..Hauteur = 50
+      
+      // Construction des noms complets
+       sCheminCompletRepertoireDonnees	= ComplèteRep(sRenvoyerRepGeneration())+"famille_"+nIDFamille+".jpg"
+      sCheminCompletRepertoireWeb 		= ComplèteRep(sRenvoyerRepWebUpload())+"famille_"+nIDFamille+".jpg"
+      
+      
+      // Sauvegarde de l'image
+      SI Miniature..AvecAlpha = Faux alors
+      
+      	// Sauvegarde au format JPEG
+      	SI dSauveImageJPEG(Miniature,sCheminCompletRepertoireDonnees) = Faux alors
+      		AjouteErreur("Erreur lors de la sauvegarde de la miniature",ErreurInfo())
+      		RENVOYER ""
+      	FIN
+      SINON
+      	
+      	// Sauvegarde en PNG pour conserver la couche alpha
+      	SI dSauveImagePNG(Miniature,sCheminCompletRepertoireDonnees) = Faux alors
+      		AjouteErreur("Erreur lors de la sauvegarde de la miniature",ErreurInfo())
+      		RENVOYER ""			
+      	FIN
+      FIN
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Cette procédure ne doit pas être exécutée en mode Web Service	
+      <SINON>	
+      	// On copie l'image dans le répertoire _WEB
+      	SI fCopieFichierRépertoireWeb(sCheminCompletRepertoireDonnees,sCheminCompletRepertoireWeb) = Faux ALORS
+      		AjouteErreur("Erreur lors lors du transfert de la miniature dans le répertoire _WEB",ErreurInfo())
+      		RENVOYER ""
+      	FIN
+      <FIN>
+      
+      
+                                                                    
+      // On peut supprimer l'image de génération
+      SI fFichierExiste(sCheminCompletRepertoireDonnees) = Vrai alors
+      	SI fSupprime(sCheminCompletRepertoireDonnees) = Faux alors
+      		AjouteErreur("Impossible de supprimer l'image temporaire de génération",ErreurInfo())
+      		// erreur non fatale, on continue
+      	FIN
+      FIN
+      
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Cette procédure ne doit pas être exécutée en mode Web Service	
+      <SINON>	
+      	// On construit le chemin de l'image par rapport à fRepWeb
+      	sCheminWeb = Remplace(sCheminCompletRepertoireWeb,fRepWeb()+"\FR","")
+      <FIN>
+      
+      
+      
+      // On construit le chemin de l'image
+      sCheminWeb = Remplace(sCheminWeb,"\","/")
+      SI Gauche(sCheminWeb,1)~="/" ALORS sCheminWeb = Droite(sCheminWeb,Taille(sCheminWeb)-1)
+      
+      
+      
+      // On renvoie le chemin Web
+      RENVOYER sCheminWeb
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : LirePhotoFamille
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218706876095147638
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie une photo d'une famille
+      // Syntaxe :
+      //[ <Résultat> = ] LirePhotoFamille (<nIDFamille> est entier)
+      //
+      // Paramètres :
+      //	nIDFamille (entier) : Identifiant de la famille
+      // Valeur de retour :
+      // 	chaîne ANSI : Chemin de la photo
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LirePhotoFamille(nIDFamille est un entier) : chaine
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      // Initialisation du mécanisme de gestion des erreurs
+      InitialiseErreur()
+      
+      // Recherche de la photo en base
+      HLitRecherchePremier(Famille,IDFamille,nIDFamille)
+      SI Htrouve(Famille) = vrai alors
+      	SI EnModeAWP() = Vrai ALORS
+      		RENVOYER Famille.Photo	
+      	SINON
+      		RENVOYER "FR/"+Famille.Photo
+      	FIN
+      SINON
+      	AjouteErreur("Pas de photo pour cet identifiant")
+      	RENVOYER ""
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : ListeFamillesEtSousFamilles
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2239517457336727776
+     type_code : 15
+     code : |1-
+      // Résumé : Liste les familles et les sous-familles d'une famille parent
+      // Syntaxe :
+      //[ <Résultat> = ] ListeFamillesEtSousFamilles (<nIdentifiantFamilleParent> est entier, <bInitialiserListe> est booléen)
+      //
+      // Paramètres :
+      //	nIdentifiantFamilleParent (entier) :Identifiant de la famille parent
+      //	bInitialiserListe (booléen) :Vrai pour initialiser la liste, faux pour compléter une liste existante
+      // Valeur de retour :
+      // 	tableau : tableau de STCOL_Famille
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeFamillesEtSousFamilles( nIdentifiantFamilleParent est un entier, bInitialiserListe est un booléen)
+      
+      // ATTENTION, traitement RECURSIF
+      
+      // Variables locales
+      tabFamillesErr 	est un tableau de STCOL_Famille
+      stFamilleErr	est un STCOL_Famille
+      nIndice			est un entier
+      sListeSousFamille	est une chaine
+      sIDFamille		est une chaine
+      
+      // Configuration en cas d'erreur
+      stFamilleErr.IDFamille = -1
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	// On l'ajoute la famille en erreur au tableau des familles
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	TableauAjoute(tabFamillesErr,stFamilleErr)	
+      	RENVOYER tabFamillesErr
+      FIN
+      
+      // Est-ce qu'il faut initialiser la liste des familles en cours
+      SI bInitialiserListe =  Vrai alors
+      	TableauSupprimeTout(gtabFamilles)
+      FIN
+      
+      // Pour toutes les familles qui ont comme parent nIdentifiantParent, 
+      POUR TOUT Famille AVEC IDFamilleParent = nIdentifiantFamilleParent
+      	// On crée la structure
+      	stFamille	est un STCOL_Famille
+      	FichierVersMémoire(stFamille,Famille)
+      	
+      	// Est-ce que l'on a déjà cette famille comme parent ?
+      	nIndice = TableauCherche(gtabFamilles,tcLinéaire,"IDFamille",stFamille.IDFamilleParent)
+      	SI nIndice>0 ALORS
+      		TableauAjoute(gtabFamilles[nIndice].tabSousFamilles,stFamille)	
+      	SINON
+      		TableauAjoute(gtabFamilles,stFamille)	
+      	FIN	
+      	
+      	// Une nouvelle famille a été ajoutée, il faudra traiter ses sous-familles
+      	sListeSousFamille = sListeSousFamille + [RC] + stFamille.IDFamille
+      	
+      FIN
+      
+      // On traite les sous-familles (déplacé de la boucle principal pour simplifier la mise au point)
+      Pour toute chaine sIDFamille de sListeSousFamille separee par RC
+      	// On recherche les sous familles
+      	ListeFamillesEtSousFamilles(Val(sIDFamille),Faux)	
+      FIN
+      
+      // On renvoie le tableau
+      renvoyer gtabFamilles
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	TableauAjoute(tabFamillesErr,stFamilleErr)	
+      	RENVOYER tabFamillesErr
+     type : 458752
+   -
+     name : ListeIDSousFamilles
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2240612068456679361
+     type_code : 15
+     code : |1-
+      // Résumé : Liste les identifiants des familles et les sous-familles d'une famille parent
+      // Syntaxe :
+      //[ <Résultat> = ] ListeIDSousFamilles (<nIdentifiantFamilleParent> est entier)
+      //
+      // Paramètres :
+      //	nIdentifiantFamilleParent (entier) : Identifiant de la famille parent
+      // Valeur de retour :
+      // 	chaîne ANSI : liste des identifiants de famille, séparée par des RC
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeIDSousFamilles( nIdentifiantFamilleParent est un entier)
+      
+      // ATTENTION, traitement RECURSIF
+      
+      // Variables locales
+      sListeSousFamille	est une chaine = nIdentifiantFamilleParent
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // Pour toutes les familles qui ont comme parent nIdentifiantParent, 
+      POUR TOUT Famille AVEC IDFamilleParent = nIdentifiantFamilleParent
+      	
+      	// Une nouvelle famille a été ajoutée, il faudra traiter ses sous-familles
+      	sListeSousFamille = sListeSousFamille + [RC] + ListeIDSousFamilles(Famille.IDFamille)	
+      FIN
+      
+      // On renvoie la liste sous-famille
+      renvoyer sListeSousFamille
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	RENVOYER ""
+     type : 458752
+   -
+     name : GenerePhotoFamille
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2242838597979220234
+     type_code : 15
+     code : |1+
+      // Résumé : Génère l'image d'une famille de produits
+      // Syntaxe :
+      //[ <Résultat> = ] GenerePhotoFamille (<nIDFamilleRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille à modifier
+      // Valeur de retour :
+      // 	booléen : Vrai si la famille a été mise à jour, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction GenerePhotoFamille( LOCAL nIDFamilleRecherchée est un entier)
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche en base
+      HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)
+      SI HTrouve(Famille) = Faux ALORS
+      	AjouteErreur("Enregistrement non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // En mode Web Service,  on ne modifie pas directement la base
+      SI EnModeWebservice() = vrai alors
+      	// Génération de la miniature
+      	SI Famille.Binaire<>"" ALORS		
+      		
+      		// On appelle l'API REST
+      		SI AppelWSRestAdministration(CN_ADMIN_REST_PARAM_IDOPERATION+"="+CN_ADMIN_REST_OPE_GENERATION_FAMILLE+"&"+CN_ADMIN_REST_PARAM_IDFAMILLE+"="+nIDFamilleRecherchée) = Faux ALORS
+      			AjouteErreur("Erreur lors de l'appel à l'API REST")
+      			RENVOYER Faux
+      		FIN
+      	FIN	
+      
+      SINON
+      	// Génération de la miniature
+      	SI Famille.Binaire<>"" ALORS		
+      		Famille.Photo = _GenereMiniatureFamille(Famille.Binaire,nIDFamilleRecherchée)
+      	FIN
+      	
+      	// Modification en base
+      	SI HModifie(Famille) = Faux ALORS
+      		AjouteErreur("Modification de l'enregistrement impossible")
+      		RENVOYER Faux
+      	FIN
+      	
+      	// Mise à jour
+      	ActualiserFamilles()
+      	
+      FIN
+      
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+      
+     type : 458752
+   -
+     name : RemonteOrdreFamille
+     internal_properties : CAAAAAgAAADoQzQSDLS7oRZWOxU6uvs+49CETNJvSd7RnHw1TWTWoqBHocxpdqQF3OR2SFbCFeoI8JQlFmJh48RwIf4cCKxRg/SKgmR+czLK4h5m0HnqUXJvVXEpcgekYE2IQscAstsX/p1vcLVZkoS3kvmAZKUMme/7/sSny2SJTv0RLvWrmpJsLrbz4uG8oPXHZXgYQVSS0mUYC4A=
+     procedure_id : 1222656788430165240
+     type_code : 15
+     code : |1-
+      // Résumé : Remonte une famille dans la base
+      // Syntaxe :
+      //[ <Résultat> = ] RemonteOrdreFamille (<nIDFamilleRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille
+      // Valeur de retour :
+      // 	booléen : Vrai si le produit a été remonté, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE RemonteOrdreFamille(nIDFamilleRecherchée est un entier)
+      
+      // Variables locales
+      nIDProduit				est un entier	= -1
+      nOrdreAffichage			est un entier 	= 0
+      nIDFamillePrécédente	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'ordre d'affichage d'une famille","",""+nIDFamilleRecherchée)
+      
+      // Vérification de la famille
+      SI nIDFamilleRecherchée <=0 alors renvoyer faux
+      HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)
+      SI HTrouve(Famille) = Faux ALORS
+      	AjouteErreur("Famille non trouvée")
+      	RENVOYER faux
+      FIN
+      
+      // On recherche les produits liés, triés
+      REQ_LISTE_FAMILLES_SELON_PARENT.pIDParent = Famille.IDFamilleParent
+      SI HExécuteRequête(REQ_LISTE_FAMILLES_SELON_PARENT) = Faux ALORS
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_LISTE_FAMILLES_SELON_PARENT")			
+      	RENVOYER Faux
+      FIN
+      
+      // On parcours les familles du parent jusqu'à trouver celle à remonter
+      Pour TOUT REQ_LISTE_FAMILLES_SELON_PARENT 
+      	// Est-ce le produit recherché ?
+      	SI REQ_LISTE_FAMILLES_SELON_PARENT.IDFamille = nIDFamilleRecherchée alors
+      		// Est-ce que l'on peut le monter par rapport au précédent ?
+      		SI nIDFamillePrécédente <> 0 alors
+      			// Oui, on modifie
+      			HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)			
+      			
+      			// Si l'ordre d'affichage est le même, il faut forcer la différence
+      			SI Famille.OrdreAffichage = nOrdreAffichage alors
+      				Famille.OrdreAffichage = Famille.OrdreAffichage - 1
+      			SINON
+      				// On prend l'ordre d'affichage de la précédente
+      				Famille.OrdreAffichage = nOrdreAffichage				
+      			FIN
+      			SI HModifie(Famille) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage de la famille")
+      				RENVOYER Faux
+      			FIN
+      			
+      			// Et on descend la précédente
+      			HLitRecherchePremier(Famille,IDFamille,nIDFamillePrécédente)
+      			Famille.OrdreAffichage = REQ_LISTE_FAMILLES_SELON_PARENT.OrdreAffichage
+      			SI HModifie(Famille) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage de la famille précédent")
+      				RENVOYER Faux				
+      			FIN
+      			
+      			RENVOYER Vrai
+      		FIN
+      	FIN
+      	
+      	// On mémorise l'ordre d'affichage en cours ainsi que la liaison en cours
+      	nIDFamillePrécédente 	= REQ_LISTE_FAMILLES_SELON_PARENT.IDFamille
+      	nOrdreAffichage		= REQ_LISTE_FAMILLES_SELON_PARENT.OrdreAffichage
+      	
+      FIN
+      
+      // Par défaut, on n'a pas pu remonter la famille
+      RENvOYER Faux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER faux
+     type : 458752
+   -
+     name : BaisseOrdreFamille
+     internal_properties : CAAAAAgAAADoQzQSDLS7oRZWOxU6uvs+49CETNJvSd7RnHw1TWTWoqBHocxpdqQF3OR2SFbCFeoI8JQlFmJh48RwIf4cCKxRg/SKgmR+czLK4h5m0HnqUXJvVXEpcgekYE2IQscAstsX/p1vcLVZkoS3kvmAZKUMme/7/sSny2SJTv0RLvWrmpJsLrbz4uG8oPXHZXgYQVSS0mUYC4A=
+     procedure_id : 1222658334618424872
+     type_code : 15
+     code : |1-
+      // Résumé : Baisse une famille dans la base
+      // Syntaxe :
+      //[ <Résultat> = ] BaisseOrdreFamille (<nIDFamilleRecherchée> est entier)
+      //
+      // Paramètres :
+      //	nIDFamilleRecherchée (entier) : Identifiant de la famille
+      // Valeur de retour :
+      // 	booléen : Vrai si le produit a été remonté, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE BaisseOrdreFamille(nIDFamilleRecherchée est un entier)
+      
+      // Variables locales
+      nIDProduit				est un entier	= -1
+      nOrdreAffichage			est un entier 	= 0
+      nIDFamillePrécédente	est un entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'ordre d'affichage d'une famille","",""+nIDFamilleRecherchée)
+      
+      // Vérification de la famille
+      SI nIDFamilleRecherchée <=0 ALORS RENVOYER Faux
+      HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)
+      SI HTrouve(Famille) = Faux ALORS
+      	AjouteErreur("Famille non trouvée")
+      	RENVOYER faux
+      FIN
+      
+      // On recherche les produits liés, triés
+      REQ_LISTE_FAMILLES_SELON_PARENT.pIDParent = Famille.IDFamilleParent
+      SI HExécuteRequête(REQ_LISTE_FAMILLES_SELON_PARENT) = Faux ALORS
+      	AjouteErreur("Une erreur est survenue pendant l'exécution de la requête REQ_LISTE_FAMILLES_SELON_PARENT")			
+      	RENVOYER Faux
+      FIN
+      
+      // On parcours les familles du parent jusqu'à trouver celle à baisser
+      Pour TOUT REQ_LISTE_FAMILLES_SELON_PARENT DEPUISFIN
+      	// Est-ce le produit recherché ?
+      	SI REQ_LISTE_FAMILLES_SELON_PARENT.IDFamille = nIDFamilleRecherchée alors
+      		// Est-ce que l'on peut le monter par rapport au précédent ?
+      		SI nIDFamillePrécédente <> 0 alors
+      			// Oui, on modifie
+      			HLitRecherchePremier(Famille,IDFamille,nIDFamilleRecherchée)			
+      			
+      			// Si l'ordre d'affichage est le même, il faut forcer la différence
+      			SI Famille.OrdreAffichage = nOrdreAffichage alors
+      				Famille.OrdreAffichage = Famille.OrdreAffichage + 1
+      			SINON
+      				// On prend l'ordre d'affichage de la précédente
+      				Famille.OrdreAffichage = nOrdreAffichage				
+      			FIN
+      			SI HModifie(Famille) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage de la famille")
+      				RENVOYER Faux
+      			FIN
+      			
+      			// Et on descend la précédente
+      			HLitRecherchePremier(Famille,IDFamille,nIDFamillePrécédente)
+      			Famille.OrdreAffichage = REQ_LISTE_FAMILLES_SELON_PARENT.OrdreAffichage
+      			SI HModifie(Famille) = Faux alors
+      				AjouteErreur("Impossible de mettre à jour l'ordre d'affichage de la famille précédent")
+      				RENVOYER Faux				
+      			FIN
+      			
+      			RENVOYER Vrai
+      		FIN
+      	FIN
+      	
+      	// On mémorise l'ordre d'affichage en cours ainsi que la liaison en cours
+      	nIDFamillePrécédente 	= REQ_LISTE_FAMILLES_SELON_PARENT.IDFamille
+      	nOrdreAffichage		= REQ_LISTE_FAMILLES_SELON_PARENT.OrdreAffichage
+      	
+      FIN
+      
+      // Par défaut, on n'a pas pu remonter la famille
+      RENvOYER Faux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER faux
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x1eb15ad20568e640
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Enregistrement non trouvé
+     index : 0
+   -
+     text :
+      fr-FR : Suppression de l'enregistrement impossible
+     index : 1
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

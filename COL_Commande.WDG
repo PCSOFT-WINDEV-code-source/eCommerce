@@ -1,0 +1,443 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Commande
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad00554def0
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAAAgtxfUV4X/HCMuT05SvXAKYIhpp99Omhmcs/o48TW0Tz2TvtqJVPV7+q27N+M1uyJysvGVr4dyu2EGVZ5ZvM3tJXu3v3s=
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAADpYAfR4usQ3CaXTIRjRCAQ8TvqB+18DvpXha3BbHK2cAxBLOSt+HNdNPNekAfajrME8xDtb8NJx2WQLySM+08ZCBmqBDnJuYH63okNplgoB4pytPQ0m+UOEL6qM4DciKo4t3lNDR3r5LHuap495zzYuKXqmqLboUl3gx4JciRe
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Commande
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Commande est une structure
+      		IDCommande 				est un entier 
+      		DateCommande 			est un date 
+      		EtatCommande 			est un entier sans signe sur 1 octet 
+      		TotalTTC 				est un monétaire 
+      		TotalHT 				est un monétaire 
+      		TotalTVA 				est un monétaire 
+      		FraisPort 				est un monétaire 
+      		FraisPortHT				est un monétaire
+      		NumCommande 			est un chaîne
+      		NumFacture 				est un chaîne
+      		TypeReglement 			est un entier sur 2 octets
+      		tabLigneCde 			est un tableau de STCOL_LigneCde //dynamique
+      		IDClient 				est un entier 
+      		IDAdresseFacturation	est un entier 
+      		IDAdresseLivraison 		est un entier 
+      		EmailClient				est une chaine
+      		NomCompletClient		est une chaine
+      Fin
+       
+       // Structure utilisée pour renvoyer par WebService, la liste des états de commandes
+      STCOL_ETATCOMMANDE est une structure
+      	EtatCommande		est un entier
+      	LibelleEtatCommande	est une chaine
+      FIN
+       
+       // Tableau des commandes
+       gtabCommandes est un tableau de STCOL_Commande
+       
+       // Tableau des états possibles d'une commande
+       gtabEtatCommande est un tableau de STCOL_ETATCOMMANDE
+       
+      // Etats d'une commande (utilisé dans la rubrique Commande.EtatCommande)
+      CONSTANT
+      	CDE_ATTENTEREGLEMENT = 1		// Commande en attente de règlement
+      	CDE_PREPARATION = 2				// Commande réglée, en cours de préparation
+      	CDE_LIVRAISON = 3				// Commande en cours de livraison
+      	CDE_LIVREE = 4					// Commande livrée
+      	CDE_PAYEE_CB_NONVERIFIE = 5		// Commande payée par CB mais paiement non vérifié
+      	CDE_PAYEE_CB_VERIFIE = 6		// Commande payée par CB et paiement vérifié (manuellement ou par traitement)
+      	CDE_COMMANDE_ANNULEE = 7		// Commande annulée
+      	CDE_PAYEE_CB_SUSPECTE = 8		// Commande payée par CB mais non validée (une vérification n'a pas pu être faite)
+      FIN 
+     type : 720896
+  procedures :
+   -
+     name : AnnulerCommande
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218720323477370315
+     type_code : 15
+     code : |1-
+      // Résumé : Annule une commande
+      // Syntaxe :
+      //[ <Résultat> = ] AnnulerCommande (<nIDCommande> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      // Valeur de retour :
+      // 	booléen : Vrai si la commande a été annulée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AnnulerCommande(nIDCommande est un entier)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Annulation d'une commande",""+nIDCommande,"")
+      
+      // Recherche de la commande dans le fichier des commandes
+      HLitRecherchePremier(Commande,IDCommande,nIDCommande)
+      SI HTrouve(Commande) = Faux ALORS
+      	AjouteErreur("Impossible de trouver la commande")
+      	RENVOYER Faux
+      FIN	
+      
+      // On passe la commande en état annulée
+      Commande.EtatCommande = CDE_COMMANDE_ANNULEE
+      	
+      // Modification de l'état
+      SI HModifie(Commande) = Faux ALORS
+      	AjouteErreur(<§Rff00005233946f8b¤fr-FR¤Modification de l'état de la commande impossible§>)				
+      	RENVOYER Faux
+      FIN
+      
+      // On doit vérifier si la commande contenait des produits avec gestion de stocks
+      Pour TOUT LigneCde avec IDCommande = Commande.IDCommande
+      	// Est-ce que le produit à une gestion de stocks ?
+      	HLitRecherchePremier(Produit,Référence,LigneCde.Référence)
+      	SI Htrouve(Produit) = Faux alors
+      		AjouteErreur(<§Rff00025233966f8b¤fr-FR¤Produit non trouvé§>)
+      		RENVOYER Faux
+      	FIN
+      	
+      	SI Produit.QuantitéLimitée = vrai alors
+      		// Est-ce que le produit à une déclinaison
+      		SI LigneCde.IDDéclinaisonProduit>0 alors
+      			AugmenterStockDéclinaison(LigneCde.IDDéclinaisonProduit,LigneCde.Quantité)
+      		SINON
+      			AugmenterStockProduit(produit.IDProduit,LigneCde.Quantité)
+      		FIN
+      	FIN
+      FIN
+      
+      // Par défaut, la modification se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ListeCommandes
+     internal_properties : CAAAAAgAAAB2wbKEmRKXceiot7H2ZEt+meb+2vaR7bbj7qDFJSLaBkKJS4oJVAD5cirm2G6I6d6aYnZjRrjVc3Je/bZMDsTh+XpInKiIzz6QyMKLMxh3HI1iQuRk2cbVU3C7G7Y724IykaLCi2xQe4+KZSZvrzJfaN5kJWPS9qH8sdB62SSE+fnLc4HyjfRhD3xe5ns/2j/9QNuSjQY=
+     procedure_id : 2242491597638538554
+     type_code : 15
+     code : |1-
+      // Résumé : Liste les commandes
+      // Syntaxe :
+      //[ <Résultat> = ] ListeCommandes (<nIDClient> est entier, <sNomClient> est chaîne, <sEmailClient> est chaîne, <nEtatCommande> est entier, <sDateDébut> est chaîne, <sDateFin> est chaîne)
+      //
+      // Paramètres :
+      //	nIDClient (entier) : Identifiant du client (-1 pour ignorer)
+      //	sNomClient (chaîne ANSI) : Nom du client à rechercher (chaine vide pour ignorer)
+      //	sEmailClient (chaîne ANSI) : Email du client à rechercher (chaine vide pour ignorer)
+      //	nEtatCommande (entier) : état de la commande (-1 pour ignorer)
+      //	sDateDébut (chaîne ANSI) : Date de début de la recherche (chaine vide pour ignorer)
+      //	sDateFin (chaîne ANSI) : Date de fin de la recherche (chaine vide pour ignorer)
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Commande
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ListeCommandes(nIDClient est un entier, sNomClient est une chaine, sEmailClient est une chaine, nEtatCommande est un entier, sDateDébut est une chaine, sDateFin est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER gTabCommandes
+      FIN
+      
+      // Suppression du contenu précédent
+      TableauSupprimeTout(gtabCommandes)
+      
+      // Paramètres de la requête 'REQ_COMMANDES'
+      REQ_Commandes.pNomClient	= sNomClient <> "" ? sNomClient sinon Null
+      REQ_Commandes.pEmailClient	= sEmailClient <> "" ? sNomClient SINON Null
+      REQ_Commandes.pTotalMin 	= Null
+      REQ_Commandes.pTotalMax 	= Null
+      REQ_Commandes.pEtatCommande = nEtatCommande <> -1 ? nEtatCommande SINON Null
+      REQ_Commandes.pDateDébut 	= sDateDébut <> "" ? sDateDébut SINON Null
+      REQ_Commandes.pDateFin 		= sDateFin <> "" ? sDateFin SINON Null
+      REQ_Commandes.pIDClient		= nIDClient <> -1 ? nIDClient SINON Null
+      
+      // Exécution de la requête
+      SI HExécuteRequête(REQ_Commandes) = Faux alors
+      	AjouteErreur("Impossible d'exécuter la requête")
+      	RENVOYER gtabCommandes
+      FIN
+      
+      // Parcours du résultat
+      Pour TOUT REQ_Commandes 
+      	// On transfert en mémoire
+      	stCommande est un STCOL_Commande	
+      	FichierVersMémoire(stCommande,REQ_Commandes)
+      	
+      	// on ajoute les informations complémentaires
+      	stCommande.TotalHT = REQ_Commandes.Total_HT
+      	stCommande.TotalTTC = REQ_Commandes.Total_TTC
+      	stCommande.TotalTVA = REQ_Commandes.Total_TVA
+      	stCommande.EmailClient = REQ_Commandes.Email
+      	stCommande.NomCompletClient = REQ_Commandes.Nom + " " +REQ_Commandes.Prénom
+      	
+      	// On ajoute aux résultats
+      	TableauAjoute(gtabCommandes,stCommande)
+      	
+      FIN
+      
+      // On renvoie la liste des commandes
+      RENVOYER gTabCommandes
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER gTabCommandes
+     type : 458752
+   -
+     name : EnvoiCommandePDF
+     internal_properties : CAAAAAgAAACjBaFtw6AUkk9DSjaMIyvzt0jwRsainFBszk/ZTCFCBDSEahqF8TNAZwdKcMyiF1giig42i+/MzM15dmdt5dS/mnu8Y49AcSnzNz6Y2YKtJ1DJI/AX2NzSR1Z98gvwxcMgLESicGvaQiuS77uCkGAy6gNQL4yt4LZ+50SD5GGW4oQs8QbI0h9SVQdw+VPT4jeRWZ651z2cmzeLePT9UNwZPIkls5WZYLp/d2YFkf/+oeJQF/BE
+     procedure_id : 2242495437558495308
+     type_code : 15
+     code : |1-
+      // Résumé : Envoi un message au client avec sa commande au format PDF
+      // Syntaxe :
+      //[ <Résultat> = ] EnvoiCommandePDF (<nIDCommande> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      // Valeur de retour :
+      // 	booléen : VRAI si l'envoi du message est effectif, FAUX dans le cas contraire
+      //
+      // Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE EnvoiCommandePDF(nIDCommande est un entier)
+      
+      // Variables locales
+      tabPièceJointe est un tableau de 0 chaînes
+      sMessageModele est une chaîne = [
+      %1
+      
+      Veuillez trouver ci joint la facture concernant votre commande N°%2 du %3.
+      
+      A bientôt.
+      %4
+      ]
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Envoi du PDF d'une commande ("+nIDCommande+")",""+nIDCommande,"")
+      
+      HLitRecherchePremier(Commande,IDCommande,nIDCommande)
+      SI Htrouve(Commande) = Faux alors
+      	AjouteErreur("Commande non trouvée en base")	
+      	RENVOYER Faux
+      FIN
+      // Se positionne sur le client
+      HLitRecherchePremier(Client,IDClient,Commande.IDClient)
+      SI HTrouve(Client) = Faux alors
+      	AjouteErreur("Client non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Construit l'entête...
+      sEntete est une chaîne
+      //... avec la civilité...
+      SELON Client.Civilité
+      	CAS 1 // Mr
+      		sEntete = "M. "
+      	CAS 2 // Mme
+      		sEntete = "Mme "
+      	CAS 3 // Melle
+      		sEntete = "Melle "
+      	AUTRES CAS	// Autres cas
+      		sEntete = ""
+      FIN
+      //...suivi du nom et prénom du client
+      sEntete+= Client.Nom+" "+Client.Prénom+","
+      
+      sMessage est une chaîne = ChaîneConstruit(sMessageModele, sEntete, Commande.IDCommande, DateVersChaîne(Commande.DateCommande, maskDateSystème), LireNomSociété())
+      
+      // Récupération de la commande 
+      REQ_DetailsFacture.pIDCommande = nIDCommande
+      SI HExécuteRequête(REQ_DetailsFacture) = Faux alors
+      	AjouteErreur("Impossible d'exécuter la requête")
+      	RENVOYER Faux
+      FIN
+      
+      // On passe en aperçu PDF
+      iDestination(iPDFGénérique)
+      
+      // Impression du fichier PDF
+      iImprimeEtat(ETAT_BonDeCommande)
+      
+      // Ajout du fichier PDF au tableau des pièces jointes
+      TableauAjoute(tabPièceJointe,iDernierFichier())
+      
+      // Envoi de la commande en pdf
+      RENVOYER EnvoiMessageClient(Client.IDClient,"Facture de la commande N°"+nIDCommande,sMessage,tabPièceJointe)
+      	
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : ListeEtatsCommandes
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2243132810932661951
+     type_code : 15
+     code : |1-
+      // Résumé : <indiquez ici ce que fait la procédure>
+      // Syntaxe :
+      //[ <Résultat> = ] ListeEtatsCommandes ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	tableau : Tableau de STCOL_Commande
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ListeEtatsCommandes()
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER gtabEtatCommande
+      FIN
+      
+      // Si le tableau est déjà rempli, on le renvoie
+      SI gtabEtatCommande..Occurrence > 0 alors
+      	RENVOyer gtabEtatCommande
+      FIN
+      
+      // On remplit le tableau
+      Pour i = 1 a 8
+      	stEtat est un STCOL_ETATCOMMANDE
+      	
+      	// Mémorisation de l'état
+      	stEtat.EtatCommande = i
+      	stEtat.LibelleEtatCommande = COL_ECommerce.CommandeEtatVersChaine(stEtat.EtatCommande)
+      	
+      	// On ajoute à la liste des états
+      	TableauAjoute(gtabEtatCommande,stEtat)
+      FIN
+      
+      // On renvoie la liste des états
+      RENVOYER gtabEtatCommande
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER gtabEtatCommande
+     type : 458752
+   -
+     name : LitCommandePDF
+     internal_properties : CAAAAAgAAABrcFcLWfYPBeqmnswS/sMqDLoYpuqrQFlG7ks/xcwO8Q2A/IYmKZ0nC9w4q3oBVZu8QU4LpZZVkVB0vfhlG9ME58wxX7ciGE3JDz9wOkSueReMXLqCL9X7SL9zjo/tEVhiff9O9qpqATabUwXM++DN8jRrB7j22NdzGgY5Xiomw6rpLGKm59lt1JTkgyF6puhyU/vA1vufzakPQYOUel+d7ib5XviZrkQKIOKq1jIYVp5BxvE=
+     procedure_id : 2243204692762201525
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le bon de commande au format PDF
+      // Syntaxe :
+      //[ <Résultat> = ] LitCommandePDF (<nIDCommande> est entier)
+      //
+      // Paramètres :
+      //	nIDCommande (entier) : Identifiant de la commande
+      // Valeur de retour :
+      // 	buffer : Buffer du PDF (chaine vide en cas d'erreur)
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LitCommandePDF(nIDCommande est un entier)
+      
+      // Variables locales
+      sNomFichier	est une chaine
+      bufResultat	est un buffer
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER bufResultat
+      FIN
+      
+      // Récupération de la commande 
+      REQ_DetailsFacture.pIDCommande = nIDCommande
+      SI HExécuteRequête(REQ_DetailsFacture) = Faux alors
+      	AjouteErreur("Impossible d'exécuter la requête")
+      	RENVOYER bufResultat
+      FIN
+      
+      // Construction du nom de fichier
+      sNomFichier = sRenvoyerRepGeneration()+["\"]+ChaîneConstruit("BDC_%1.pdf",nIDCommande)
+      
+      // On passe en aperçu PDF
+      iDestination(iPDFGénérique,sNomFichier)
+      
+      // Impression du fichier PDF
+      iImprimeEtat(ETAT_BonDeCommande)
+      
+      // On renvoie le fichier
+      bufResultat = fChargeBuffer(sNomFichier)
+      RENVOYER bufResultat
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER bufResultat
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x1eb15ad00555def0
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Modification de l'état de la commande impossible
+     index : 0
+   -
+     text :
+      fr-FR : Produit non trouvé
+     index : 2
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

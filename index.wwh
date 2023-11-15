@@ -1,0 +1,159 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : index
+ major_version : 28
+ minor_version : 0
+ type : 65538
+ description : ""
+ subtype : 8192
+page :
+ name : index
+ identifier : 0x2eb13d7210ec0a51
+ internal_properties : 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
+ properties : {}
+ controls :
+  -
+    name : LIB_ChargementEnCours
+    identifier : 0x2eb13ed6b80e791a
+    internal_properties : CAAAAAgAAABuDlvQ2WLz8lJ/Cfj7KcQM0mq3A9OLmXB9/RaQNRHmq8gPgKmfuOAVO0OBrr08wKQGv3RgNCpbftPE1R9k7niAaXlcMA/QLQi3jPuSepyPmWpq2GfdYq8/eikJBvFDBw4kdQfqKhL9IofIfhDt+lidf/hd1SiMqNKhQz7oPgZ3+Tz7yW15tw5J9Fukc7pxs7U9V9ncuvyR9RDMuJ8ksdp+RUILZLjaE8OwjagfhqCZsnr53OapIqmF7C3mgDwQuOcCMpJ0cKsmPuYZ75Qyr0FGYxtxChPPMrcjB6NlLjJVbt75+NO5GBWAWp3aqNC9eLn7p8LMu9fK4GEhSuRhS/eJ4hpBq3LJLJF0mQ6THuinV7aC4xRhCoyVvIdhYjE+1WwZOWK0QCCTI7UqOB5UEamxa0AG3ueVpaWAjfthGOXNeXvEuKE1L10njjhc3PDTyUlL1RMiqSMVP8+5BMIZeo9JrVxx5uscaNntCo8oWVBBa8TqtJxTOyAvD1Mz/k5pUUlnVdXHNKVlQAMGa8+Avi8W5YGOrUy1d3RnEsqd3FoB35Fikg0zcQja1IvKZVwR7Y8Ozir/9qZlhfbUG5acrlLgPzYS8d9GTMguYggXUhlV3EDMuhG07fGmx2CFfdD5/3BDEBtEqH9NLqmn15w6Zs8atDa5qTNuB9chGLfLEtFm2krtuAhhZU3aCv/9NYxfBgSHnSD0wvi9N+zwWEgznIonu+S4qao9DDvXZIclqDOUfBsFSv8vWd4JGF7B+pm5mSxWqNpE/0L8OgQ5ioq9iX+jrMb7dj6MFLxYyk+VyZyerQy+hTH5Yy2Nx+FRRSryG2vZCF944DOMRNIR1jKsxGx3LloKz/woLPLcPC3Bzr37uRgyxHID/qMYGDE40Lw7pJ5y9nYuFdu0gJmqYFyywPEwEyIbAHGEkNaP2zHjnF9GJnhYBhPf1ODtb+uyJ7MF35aX+4X3OV7ImhOtVEsnQCYKAsYRBmAmf4RaSYY+yhrAZb2MhwSO/Dxa01/kalgqg4AWSxS5175B5RoTWI+ZWo3aSSyCn0pwV1Avi5wczY4DSJaRx2QRTGhc+EeB/JRN8QlLvX9p9nlBlnWbEj2jQldv8eHzOx7RqLsOPEYw3z/XW7znacxvN1PUuBbq7Y/NBoHLy9oNI3kZVBfrw7fWF4wZCitq5GLnLqaMw4MlqWWP5L9X7ZeH1tI7gNbgOVzFcG4Z+Qap1umXEEyMolNoNoWAZ1rbwAuNE+9QOvc5K7KbpwfeJ2k3ZPDBsxs5ezHbqRL+GL7piNJyjAZe6oVshIEsDrfHaKyX0BHCheaXPfMw0ZvnenlH2dwwj3XASEV4P4u53f0JxmVSkza2cQ90vIk0g5ce+ZgT9cDWKD0kovzyjIkh1T9em/kONZtLf3vFOA7ztfXy1PwrXe3mxQZjqG0OcKeKVE9g/toQMNna87Xr9UaMvMKQe0nSYhrmwcwkw2aSl6g111Sv+eoen8SDdtsHupFY66ma6svyjfljJnLEUJv3I4U4B+XFIuBbQkQ8sQtINb7HsXZZ347fgVcUMBW09qVorEApNUL3mfM7q85lQo1wR33yyogsxg==
+    properties :
+     x : 370
+     y : 280
+     width : 240
+     height : 41
+    type : 3
+    code_elements :
+     type_code : 2
+     alias : A1
+     p_codes : []
+ type : 1
+ languages :
+  - fr-FR
+ code_elements :
+  type_code : 38
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAAB17MssKjqhN5RdCpNCrereE3v+73dS+xYf4Fq399lIMjnzqyDdBtEk6jyqGk3raRebBOQtku12+y2MkNDvWKy4ajxq3g380QI3+Fbbg6UwJqTJ/KzHjVpx27Co3LF/JhYuwNWCSWvuUyNG9o0tOJrcWQfvYTwxUs5fcHWogkmm2Fcne16/zLEJv642MNCvGtk=
+     code : |1-
+      procedure index()
+      
+      // Variables locales
+      LOCAL
+      	sURLConfig est une chaine
+      
+      // Est-ce que l'on a déjà mémorisé l'URL du site ?
+      sURLConfig = LireURLPageAdminRest()
+      SI LireURLPageAdminRest() = "" _ou_ Gauche(sURLConfig,Taille("http://localhost"))~="http://localhost" ALORS
+      	// On mémorise l'url du site en se basant sur l'url de la page d'index
+      	LOCAL
+      		sURL est une chaine = PageAdresse("",paCOMPLETE)
+      	
+      	// On retire les paramètres
+      	SI Position(sURL,"?") > 0 alors
+      		sURL = sURL[[1 A Position(sURL,"?")-1]]
+      	FIN	
+      		
+      	// On remplace la page index.awp par la page d'administration rest
+      	sURL = Remplace(sURL,"index.awp",CS_ADMIN_REST_NOMPAGE)
+      	
+      	// Mémorisation de l'URL
+      	ModifierURLPageAdminRest(sURL)
+      FIN
+     type : 851968
+   -
+     internal_properties : CAAAAAgAAABxQxSfk0SdVtFqh8hsZwbfsSvubMa3R4sJ8EsmiNVJiZvW2NglwnWhEvlP1oyyS5wBvFjUxhoZ3a10Vwjl66dL4mr7Dm5z+133ybF/gwXJ2eiim7L3dq3Mh19kX2QEtCc24rZsK5F0NDqcTRY=
+     code : |1+
+      // Selon la plate-forme du navigateur, l'Internaute peut être redirigé vers la version mobile du site
+      Si NavigateurPlateforme() dans (NavigateurPlateformeRobot, NavigateurPlateformeStandard) ALORS
+      	
+      	// Existe-t-il une promotion marquée comme promotion principale ?
+      	HLitRecherchePremier(Promotion, EstPrincipale, Vrai)
+      	SI HTrouve(Promotion) ALORS
+      		
+      		// Affiche la page qui affiche en "grand" la promotion principale
+      		pageaffiche(IndexPromotionPrincipale)
+      		
+      	SINON // Aucune promotion principale
+      		
+      		// Affiche la page d'index demandée
+      		PageAffiche(LirePageAccueilSite())
+      		
+      	FIN
+      	
+      SINON // Plate-forme mobile
+      	
+      	// Affiche la page d'accueil mobile
+      	pageaffiche(accueil_mobile)
+      	
+      FIN
+      
+     type : 851996
+   -
+     type : 852017
+     enabled : false
+   -
+     type : 852119
+     enabled : false
+   -
+     type : 852298
+     role : N
+   -
+     code : |1-
+      
+     type : 851999
+     role : N
+   -
+     code : |1-
+      
+     type : 852000
+     role : N
+   -
+     type : 852232
+     enabled : false
+   -
+     type : 852167
+     enabled : false
+   -
+     type : 852169
+     role : N
+     enabled : false
+   -
+     type : 852225
+     role : N
+     enabled : false
+   -
+     type : 852227
+     enabled : false
+   -
+     type : 1310979
+     enabled : false
+   -
+     type : 852228
+     role : N
+     enabled : false
+   -
+     code : |1-
+      
+     type : 851970
+   -
+     code : |1-
+      
+     type : 851979
+   -
+     type : 852217
+     role : N
+     enabled : false
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : PAGE_SansNom1
+resources :
+ string_res :
+  identifier : 0x1eb13d6b1645edcc
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+webification :
+ internal_properties : CAAAAAgAAACYzxT95H3qP7nIys4LqA==
+custom_note :
+ internal_properties : CAAAAAgAAAC68/W0/adbG0nFCRhrE42B5HRnbDzVHaz86sSQyxlBk7I=
+rad :
+ internal_properties : CAAAAAgAAABoAN7PLpwJW3EiA7WVZdCA5EwrCA1rvutcDHooMWKe

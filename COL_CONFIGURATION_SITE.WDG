@@ -1,0 +1,3251 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_CONFIGURATION_SITE
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad0055ae076
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     code : |1+
+      STCOL_CONFIGURATION_SITE est une structure
+      		Nom_Paramètre est un chaîne//Nom du paramètre
+      		TypeParamètre est un chaîne//Type de paramètre
+      		ValeurEntier est un entier //Valeur entière
+      		ValeurChaîne est un chaîne//Valeur Chaîne
+      		ValeurBinaire est un buffer //Valeur binaire
+      		ValeurRéelle est un monétaire //Valeur réelle
+      Fin
+      
+      ST_CONFIGURATION_SMTP est une structure
+      	sAdresseServeur		est une chaine
+      	sLoginUtilisateur	est une chaine
+      	sMDPUtilisateur		est une chaine
+      	nPort				est un entier
+      	bModeSécurisé		est un booléen	
+      FIN
+      
+      ST_CONFIGURATION_PAYXBOX	est une structure
+      	bEstActivé		est un booléen
+      	bEnModeTest		est un booléen
+      	sContratVAD		est une chaine
+      	sRang			est une chaine
+      	sIdentifiant	est une chaine
+      FIN
+      
+      ST_CONFIGURATION_PAYPAL		est une structure
+      	bEstActivé		est un booléen
+      	bEnModeTest		est un booléen
+      	SANDBOX_Identifiant	est une chaine
+      	SANDBOX_MotDePasse	est une chaine
+      	SANDBOX_Signature	est une chaine
+      	Identifiant	est une chaîne
+      	MotDePasse	est une chaîne
+      	Signature	est une chaîne
+      FIN
+      
+      
+      // Liste des pages spéciales
+      CONSTANTE
+      	Page_ACTUALITES 			= 1
+      	Page_NOUVEAUTES 			= 2
+      	PAGE_PROMOTIONS				= 3
+      	PAGE_REFERENCES				= 4
+      	PAGE_SERVICES				= 5
+      	PAGE_INFORMATIONS_LEGALES	= 6
+      	PAGE_CONTACT				= 7
+      	PAGE_PRESENTATION			= 8
+      FIN
+     type : 720896
+  procedures :
+   -
+     name : LireNomSociété
+     procedure_id : 2214250924788497811
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte indiquée en nom de société
+      // Syntaxe :
+      //[ <Résultat> = ] LireNomSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Nom de la société
+      //
+      
+      PROCEDURE LireNomSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_NomSociété,"")
+     type : 458752
+   -
+     name : ModifierNomSociété
+     procedure_id : 2214251014982897841
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le nom indiqué pour la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierNomSociété (<sNomSociété> est chaîne)
+      //
+      // Paramètres :
+      //	sNomSociété (chaîne) : Nouveau nom indiqué pour la société
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierNomSociété(sNomSociété est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du nom de la société", LireNomSociété(), sNomSociété)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_NomSociété,sNomSociété,CN_CHAINE)
+     type : 458752
+   -
+     name : LireAdresseSociété
+     procedure_id : 2214251414415342453
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse indiquée pour la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse de la société
+      //
+      
+      PROCEDURE LireAdresseSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_AdresseSociété,"")
+     type : 458752
+   -
+     name : ModifierAdresseSociété
+     procedure_id : 2214251444480120217
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse indiquée pour la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseSociété (<sAdresseSociété> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseSociété (chaîne) : Nouvelle adresse de la société
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseSociété(sAdresseSociété est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse de la société",LireAdresseSociété(),sAdresseSociété)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_AdresseSociété,sAdresseSociété,CN_CHAINE)
+     type : 458752
+   -
+     name : LireQuiSommesNousSociété
+     procedure_id : 2214251620574541106
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte indiquée comme présentation de la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireQuiSommesNousSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte indiqué comme présentation de la société
+      //
+      
+      PROCEDURE LireQuiSommesNousSociété() :chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(pParamètresSite.csAdmin_Contacts)
+     type : 458752
+   -
+     name : ModifierQuiSommesNousSociété
+     procedure_id : 2214252187512191085
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le texte indiqué comme présentation de la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierQuiSommesNousSociété (<sTexteQuiSommesNous> est chaîne)
+      //
+      // Paramètres :
+      //	sTexteQuiSommesNous (chaîne) : Nouveau texte de présentation de la société
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierQuiSommesNousSociété(sTexteQuiSommesNous est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la page de présentation de la société", LireQuiSommesNousSociété(), sTexteQuiSommesNous)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_Contacts,sTexteQuiSommesNous,CN_CHAINE)
+     type : 458752
+   -
+     name : LireServicesSociété
+     procedure_id : 2214274783225709145
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie les services proposés par la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireServicesSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Les services proposées par la société
+      //
+      
+      PROCEDURE LireServicesSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(pParamètresSite.csAdmin_Services)
+     type : 458752
+   -
+     name : ModifierServicesSociété
+     procedure_id : 2214275139709126313
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la présentation des services proposés par la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierServicesSociété (<sServicesSociété> est chaîne)
+      //
+      // Paramètres :
+      //	sServicesSociété (chaîne) : Nouveau texte de présentation des services proposés
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierServicesSociété(sServicesSociété est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la page des services de la société", LireServicesSociété(), sServicesSociété)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_Services,sServicesSociété,CN_CHAINE) 
+     type : 458752
+   -
+     name : LireConditionsGénéralesVenteSociété
+     procedure_id : 2214276711693278509
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie les conditions générales de vente de la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireConditionsGénéralesVenteSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte des conditions générales de vente
+      //
+      
+      PROCEDURE LireConditionsGénéralesVenteSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_CGV, "")
+     type : 458752
+   -
+     name : ModifierConditionsGénéralesVenteSociété
+     procedure_id : 2214277076766172765
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie la présentation des services proposés par la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierConditionsGénéralesVenteSociété (<sConditionsGénéralesVente> est chaîne)
+      //
+      // Paramètres :
+      //	sConditionsGénéralesVente (chaîne ANSI) : Nouveau texte de présentation des services proposés
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierConditionsGénéralesVenteSociété(sConditionsGénéralesVente est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification des CGV", LireConditionsGénéralesVenteSociété(),sConditionsGénéralesVente)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_CGV, sConditionsGénéralesVente, CN_CHAINE)
+     type : 458752
+   -
+     name : LireAdresseEmailExpéditeurContactSociété
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2214294222391152766
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email d'expédition des contacts
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailExpéditeurContactSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email
+      //
+      
+      PROCEDURE LireAdresseEmailExpéditeurContactSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER  RécupèreParamètreSite(csAdmin_Contact_EmailExpéditeur,"")
+     type : 458752
+   -
+     name : LireAdresseEmailExpéditeurCommandeSociété
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2214294338356017938
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email d'expédition des commandes
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailExpéditeurCommandeSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email
+      //
+      
+      PROCEDURE LireAdresseEmailExpéditeurCommandeSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_EmailExpéditeur,"")
+     type : 458752
+   -
+     name : LireConfigurationSMTP
+     internal_properties : CAAAAAgAAAAUbxBm+XB00TJyT0WiLvMqB+xk1LpbRQbFsBiV/fiOVoSb8YxRKvC1oMgKcF621a6kHPSlbn6tY/DcZR7sfIQlx/AqelwSr5LGnhrsXt8Aa/jVM/tHyJUi/tMe0PXmGHUVzFPpHlNHAAI1gNcGAmtWTzW5sBo1MVq35MOXtJNZhHCi3KAZiNeyrsPV0/aebxNVHjk07+Q=
+     procedure_id : 2214294707723946836
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie la configuration du serveur SMTP 
+      // Syntaxe :
+      //[ <Résultat> = ] LireConfigurationSMTP ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	ST_CONFIGURATION_SMTP : Configuration SMTP 	
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LireConfigurationSMTP()
+      
+      // Variables locales
+      stConfiguration 			est un ST_CONFIGURATION_SMTP
+      sConfigurationSerialisée	est une chaine
+      
+      // Configuration par défaut
+      stConfiguration.nPort = 25
+      stConfiguration.sAdresseServeur = "localhost"
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER stConfiguration
+      FIN
+      
+      // Récupération du contenu stocké
+      sConfigurationSerialisée = RécupèreParamètreSite(csAdmin_CONFIGSMTP, "")
+      
+      // Dé-sérialisation
+      Si sConfigurationSerialisée <> "" alors
+      	Quand exception dans
+      		Désérialise(stConfiguration,sConfigurationSerialisée,psdXML)
+      	FAIRE
+      		AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	FIN
+      sinon
+      	
+      fin
+      
+      // On renvoie la configuration
+      RENVOYER stConfiguration
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo(errComplet))
+      	RENVOYER stConfiguration
+     type : 458752
+   -
+     name : ModifierConfigurationSMTP
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2214298375629230397
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la configuration du serveur SMTP 
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierConfigurationSMTP (<stNouvelleConfiguration> est ST_CONFIGURATION_SMTP)
+      //
+      // Paramètres :
+      //	stNouvelleConfiguration (ST_CONFIGURATION_SMTP) : Nouvelle configuration du serveur SMTP
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierConfigurationSMTP(stNouvelleConfiguration est un ST_CONFIGURATION_SMTP)
+      
+      // Variables locales
+      sConfigurationSerialisée	est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la configuration du serveur SMTP de prise de contact")
+      
+      // Sérialisation
+      QUAND EXCEPTION DANS
+      	sérialise(stNouvelleConfiguration,sConfigurationSerialisée,psdXML)
+      FAIRE
+      	AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	RENVOYER Faux
+      FIN
+      
+      // Sauvegarde en base
+      SI SauvegardeParamètreSite(csAdmin_CONFIGSMTP, sConfigurationSerialisée, CN_CHAINE) = Faux alors	
+      	RENVOYER Faux
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo(errComplet))
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LirePageAccueilSite
+     procedure_id : 2214602115913929585
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la page d'accueil du site
+      // Syntaxe :
+      //[ <Résultat> = ] LirePageAccueilSite ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : nom de la page d'accueil du site
+      //
+      
+      PROCEDURE LirePageAccueilSite() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // On renvoie la page d'accueil
+      RENVOYER RécupèreParamètreSite(csAdmin_PageAccueil, "accueil_nouveautes")
+     type : 458752
+   -
+     name : ModifierPageAccueilSite
+     procedure_id : 2214602498166107397
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'image d'accueil du site
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierPageAccueilSite (<sNomPageAccueil> est chaîne)
+      //
+      // Paramètres :
+      //	sNomPageAccueil (chaîne) : Nouveau nom de la page d'accueil du site
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierPageAccueilSite(sNomPageAccueil est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la page d'accueil du site", LirePageAccueilSite(), sNomPageAccueil)
+      
+      // On renvoie la page d'accueil
+      RENVOYER SauvegardeParamètreSite(csAdmin_PageAccueil, sNomPageAccueil, CN_CHAINE)
+     type : 458752
+   -
+     name : LireBandeauSite
+     internal_properties : CAAAAAgAAADuX8E5rxLsAV4C/1hfWXv+eDHGhQpnGTyVS1qE8IHQ15YTcbFH+4EUGRb7uQhA5tm8e9VQutTV5HMToMrjoi2w1YPH8LQaw2YDTPI9f1K70FcEn6JZHOuw8pyp6hdKq2rPnDb9nhMiWZ5iytE1
+     procedure_id : 2214636961696423520
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le bandeau du site
+      // Syntaxe :
+      //[ <Résultat> = ] LireBandeauSite ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	buffer : Buffer vide si aucune image de bandeau à appliquer
+      //
+      
+      PROCEDURE LireBandeauSite() : buffer
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      // On renvoie le bandeau (en localisant correctement selon l'appel)
+      SI EnModeAWP() = Vrai _OU_ EnModeWebservice() = Vrai ALORS
+      	RENVOYER RécupèreParamètreSite(csAdmin_Bandeau)
+      SINON
+      	RENVOYER "FR/"+RécupèreParamètreSite(csAdmin_Bandeau)
+      FIN
+     type : 458752
+   -
+     name : BandeauSiteEstPersonnalisé
+     internal_properties : CAAAAAgAAADcJ9j7RrINAVREO9FmuBNaPcL2gl6VaXbm+AiZ8TYKn9A1mwJJoAQhzpbSyPZUAeom3t771uQ5k1ayGZYUAgSlBQ5wPOCkG2akzM4RuVZVBqsQ8K6il4QT4c4ZwRzZudxIj6B0yTrmEQUIA6xdtcgpDgSKJ5HqzeKFSukdcrqiW9cZwWMA0xqHfVJkxPmFkGtpuxHsJ6w=
+     procedure_id : 2214639229440535122
+     type_code : 15
+     code : |1+
+      // Résumé : Indique si le bandeau du site est personnalisé
+      // Syntaxe :
+      //[ <Résultat> = ] BandeauSiteEstPersonnalisé ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si le bandeau est personnalisé, Faux sinon
+      //
+      
+      PROCEDURE BandeauSiteEstPersonnalisé()
+      
+      // Variables locales
+      bufBandeau est un buffer
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Récupération du bandeau
+      bufBandeau = RécupèreParamètreSite(csAdmin_Bandeau)
+      
+      // Si le buffer est vide, c'est que le bandeau n'est pas personnalisé
+      Si bufBandeau = "" alors
+      	// Le bandeau est celui par défaut
+      	RENVOYER Faux
+      SINON
+      	// Le bandeau est personnalisé
+      	RENVOYER Vrai
+      FIN
+     type : 458752
+   -
+     name : ModifierBandeauSite
+     internal_properties : CAAAAAgAAACwxQku7hzQz/TlR6HymlSx1VSNIp3nFfBASTJa6w3r12zrpXUQYBZ9ueyY6E042/8snF9n6RdOjvXQj9MzANxJK7rHJf1du5BafkV7lJSOhzjLrtH/Wirbi3ZHrnXlZsbjBkyCab7dQcae75b9CUhzoogu1XfdtcwCekV6PEpxe3F8BvnmMpXZe5Qy8IpgwAi63G1wRHTDZimWGeDtMG0T7Zl6YmX4I0eVwue3+VUWzCOe0xvX9cDcogCRmeunH6ObmG1y4QAh7xj9BncWRpXUy6BPw5xzQVdywqTIDP+HvaLtN9dPwdeLy6aaaA9b3G7Lq/sGjMzJQgVYPf7I/yTazebG7c9SyNf3SV1FMg+LvTCTflgU3lzk9DIz2PRou/2bi32Arw4PE6sXieCC2AUi8DTXqe50vi8dw7IL1HPqetPRw7tCQtbhgNgjRK8IW62s
+     procedure_id : 2214653875279607208
+     type_code : 15
+     code : |1-
+      // Résumé : Modification du bandeau du site
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierBandeauSite (<sCheminFichier> est chaîne)
+      //
+      // Paramètres :
+      //	sCheminFichier (chaîne) : Chemin du fichier du nouveau bandeau
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierBandeauSite(sCheminFichier est une chaine)
+      
+      // Variables locales
+      ImageBandeau est une image
+      sCheminBandeau				est une chaine
+      sCheminBandeauGénération	est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du bandeau du site")
+      
+      // Vérification de l'existence du fichier
+      Si fFichierExiste(sCheminFichier) = Faux alors
+      	AjouteErreur("Le fichier pour le nouveau bandeau n'est pas accessible")
+      	RENVOYER Faux
+      FIN
+      
+      // Est-ce que l'image n'est pas trop grande ?
+      ImageBandeau = sCheminFichier
+      SI ImageBandeau..Hauteur > 132 _ou_ ImageBandeau..Largeur > 980  alors
+      	// Redimensionnement de l'image
+      	SI dRedimensionne(ImageBandeau,980,132,drHomothétiqueCentré) = Faux alors
+      		AjouteErreur("L'image de bandeau fournie n'a pas pu être redimensionnée",ErreurInfo())
+      		RENVOYER Faux
+      	FIN
+      	
+      	// Sauvegarde de l'image
+      	SI ImageBandeau..AvecAlpha = Vrai ALORS
+      		sCheminBandeauGénération = ComplèteRep(sRenvoyerRepGeneration())+"bandeau.png"
+      		SI dSauveImagePNG(ImageBandeau,sCheminBandeauGénération) = Faux ALORS
+      			AjouteErreur("Une erreur est survenue pendant la sauvegarde du bandeau",ErreurInfo())
+      			RENVOYER Faux
+      		FIN
+      	SINON
+      		sCheminBandeauGénération = ComplèteRep(sRenvoyerRepGeneration())+"bandeau.jpg"
+      		SI dSauveImageJPEG(ImageBandeau,sCheminBandeauGénération) = Faux ALORS
+      			AjouteErreur("Une erreur est survenue pendant la sauvegarde du bandeau",ErreurInfo())
+      			RENVOYER Faux
+      		FIN
+      	FIN
+      	
+      FIN
+      
+      // Si la taille n'est pas exactement celle du bandeau, on complète avec la couleur de palette
+      SI ImageBandeau..Hauteur <> 132 _OU_ ImageBandeau..Largeur <> 980  ALORS
+      	// On redimensionne avec du blanc ou du transparent 
+      	SI ImageBandeau..AvecAlpha = Vrai ALORS
+      		ImageBandeau.CouleurRemplissage.Couleur = iTransparent
+      SINON
+      	
+      	<COMPILE SI TypeConfiguration=Webservice>
+      		// On prend du blanc comme couleur de fond
+      		ImageBandeau.CouleurRemplissage.Couleur = iBlanc
+      	<sinon>
+      		// On prend la couleur de la palette du site comme couleur de fond
+      		ImageBandeau.CouleurRemplissage.Couleur = CouleurPalette(couleurFondGénéral)
+      	<FIN>		
+      		
+      	FIN
+      	
+      	ImageBandeau..Hauteur = 132
+      	ImageBandeau..Largeur = 980
+      	
+      	// Sauvegarde de l'image
+      	SI ImageBandeau..AvecAlpha = Vrai ALORS
+      		sCheminBandeauGénération = ComplèteRep(sRenvoyerRepGeneration())+"bandeau.png"
+      		SI dSauveImagePNG(ImageBandeau,sCheminBandeauGénération) = Faux ALORS
+      			AjouteErreur("Une erreur est survenue pendant la sauvegarde du bandeau",ErreurInfo())
+      			RENVOYER Faux
+      		FIN
+      	SINON
+      		sCheminBandeauGénération = ComplèteRep(sRenvoyerRepGeneration())+"bandeau.jpg"
+      		SI dSauveImageJPEG(ImageBandeau,sCheminBandeauGénération) = Faux ALORS
+      			AjouteErreur("Une erreur est survenue pendant la sauvegarde du bandeau",ErreurInfo())
+      			RENVOYER Faux
+      		FIN
+      	FIN
+      SINON
+      	// Il suffit de copier le fichier, si ce n'est pas déjà fait
+      	SI sCheminBandeauGénération = "" alors
+      		sCheminBandeauGénération = ComplèteRep(sRenvoyerRepGeneration())+"bandeau"+fExtraitChemin(sCheminFichier,fExtension)
+      		SI fCopieFichier(sCheminFichier,sCheminBandeauGénération) = Faux alors
+      			AjouteErreur("Une erreur est survenue pendant la sauvegarde du bandeau",ErreurInfo())
+      			RENVOYER Faux
+      		FIN
+      	Fin
+      FIN
+      
+      // On copie le bandeau dans le répertoire _WEB autorisé
+      SI fExtraitChemin(sCheminBandeauGénération,fExtension)~=".png" ALORS
+      	sCheminBandeau = ComplèteRep(sRenvoyerRepWebUpload())+"bandeau.png"	
+      SINON
+      	sCheminBandeau = ComplèteRep(sRenvoyerRepWebUpload())+"bandeau.jpg"	
+      FIN
+      
+      // Transfert de l'image
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Non disponible 
+      	AjouteErreur("Cette fonctionnalité n'est pas disponible en mode Web Service")
+      	RENVOYER Faux
+      <sinon>
+      	// Copie dans le répertoire _WEB
+      	SI fCopieFichierRépertoireWeb(sCheminBandeauGénération,sCheminBandeau) = Faux ALORS
+      		AjouteErreur("Une erreur est survenue pendant le déploiement du bandeau",ErreurInfo())
+      		RENVOYER Faux
+      	FIN
+      <FIN>
+      
+      
+      // Suppression du fichier de génération
+      SI fSupprime(sCheminBandeauGénération) = Faux alors
+      	AjouteErreur("Impossible de supprimer le fichier de génération du bandeau",ErreurInfo())
+      	// Erreur non fatale, on continue
+      FIN
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// On construit le chemin de l'image
+      	sCheminBandeau = Remplace(sCheminBandeau,fRepExe()+"\FR","")	
+      <sinon>
+      	// On construit le chemin de l'image par rapport à fRepWeb
+      	sCheminBandeau = Remplace(sCheminBandeau,fRepWeb()+"\FR","")
+      <FIN>
+      
+      
+      sCheminBandeau = Remplace(sCheminBandeau,"\","/")
+      SI Gauche(sCheminBandeau,1)~="/" ALORS sCheminBandeau = Droite(sCheminBandeau,Taille(sCheminBandeau)-1)
+      
+      
+      // On sauvegarde le bandeau en base
+      SI SauvegardeParamètreSite(csAdmin_Bandeau,sCheminBandeau,CN_CHAINE) = Faux alors
+      	RENVOYER Faux
+      FIN
+      
+      // On supprime le fichier temporaire
+      SI fSupprime(sCheminFichier) = Faux alors
+      	AjouteErreur("Le fichier temporaire du bandeau n'a pas pu être supprimé",ErreurInfo())
+      	// Ceci n'est pas une erreur fatale
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Une exception a été détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LireConfigurationSSL
+     procedure_id : 2214657341324920235
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la configuration SSL du site
+      // Syntaxe :
+      //[ <Résultat> = ] LireConfigurationSSL ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la configuration SSL est activée, Faux sinon
+      //
+      
+      PROCEDURE LireConfigurationSSL() : booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_SSL)
+     type : 458752
+   -
+     name : ModifierConfigurationSSL
+     procedure_id : 2214657379979700156
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie la configuration SSL du site
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierConfigurationSSL (<bActiverSSL> est booléen)
+      //
+      // Paramètres :
+      //	bActiverSSL (booléen) : Vrai pour activer la connexion SSL, Faux sinon
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierConfigurationSSL(bActiverSSL est un booléen)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la configuration SSL", ""+LireConfigurationSSL(),""+bActiverSSL)
+      
+      SI bActiverSSL = vrai alors
+      	RENVOYER SauvegardeParamètreSite(csAdmin_SSL,1,CN_ENTIER)	
+      SINon
+      	RENVOYER SauvegardeParamètreSite(csAdmin_SSL,0,CN_ENTIER)
+      FIN
+     type : 458752
+   -
+     name : LireDisponibilitéPageSpéciale
+     procedure_id : 2216013918664781973
+     type_code : 15
+     code : |1+
+      // Résumé : Renvoie la disponibilité d'une page spéciale
+      // Syntaxe :
+      //[ <Résultat> = ] LireDisponibilitéPageSpéciale (<nNuméroPageSpéciale> est entier)
+      //
+      // Paramètres :
+      //	nNuméroPageSpéciale (entier) : Numéro de la page (constantes PAGE_XXX de la collection)
+      // Valeur de retour :
+      // 	booléen : Vrai si la page est disponible, Faux sinon
+      //
+      
+      PROCEDURE LireDisponibilitéPageSpéciale(nNuméroPageSpéciale est un entier)
+      
+      bPageEstDisponible est un booleen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // Lecture de la configuration
+      SELON nNuméroPageSpéciale
+      	CAS Page_ACTUALITES 		
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_Actualités,Vrai)	
+      	CAS Page_NOUVEAUTES 			
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_Nouveautés,Vrai)
+      	CAS PAGE_PROMOTIONS				
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_Promotions,Vrai)
+      	CAS PAGE_REFERENCES				
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_Références,Vrai)
+      	CAS PAGE_SERVICES				
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_Services,Vrai)
+      	CAS PAGE_INFORMATIONS_LEGALES	
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_InfosLégales,Vrai)
+      	CAS PAGE_CONTACT				
+      		bPageEstDisponible =  RécupèreParamètreSite(csAdmin_PageDispo_FormulaireContact,Vrai)
+      	CAS PAGE_PRESENTATION
+      		bPageEstDisponible = RécupèreParamètreSite(csAdmin_PageDispo_Presentation,Vrai)
+      	AUTRE CAS
+      		AjouteErreur("Identifiant de page spéciale non valide")
+      		RENVOYER Faux	
+      FIN
+      
+      renvoyer bPageEstDisponible
+     type : 458752
+   -
+     name : ModifierDisponibilitéPageSpéciale
+     procedure_id : 2216013991679242713
+     type_code : 15
+     code : |1+
+      // Résumé : Modifie la disponibilité d'une page spéciale
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierDisponibilitéPageSpéciale (<nNuméroPageSpéciale> est entier, <bActif> est booléen)
+      //
+      // Paramètres :
+      //	nNuméroPageSpéciale (entier) : Numéro de la page (constantes PAGE_XXX de la collection)
+      //	bActif (booléen) : Vrai pour rendre la page visible, Faux sinon
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux en cas d'erreur
+      //
+      
+      PROCEDURE ModifierDisponibilitéPageSpéciale(nNuméroPageSpéciale est un entier, bActif est un booléen)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Lecture de la configuration
+      SELON nNuméroPageSpéciale
+      	CAS Page_ACTUALITES 		
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des actualités", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Actualités, bActif, CN_ENTIER)
+      	CAS Page_NOUVEAUTES 			
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des nouveautés", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Nouveautés, bActif, CN_ENTIER)
+      	CAS PAGE_PROMOTIONS				
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des promotions", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Promotions, bActif, CN_ENTIER)
+      	CAS PAGE_REFERENCES				
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des références", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Références, bActif, CN_ENTIER)
+      	CAS PAGE_SERVICES				
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des services", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Services, bActif, CN_ENTIER)
+      	CAS PAGE_INFORMATIONS_LEGALES	
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page des informations légales", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_InfosLégales, bActif, CN_ENTIER)
+      	CAS PAGE_CONTACT				
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page de prise de contact", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_FormulaireContact, bActif, CN_ENTIER)
+      	
+      	CAS PAGE_PRESENTATION
+      		// On note la modification de configuration
+      		NotifierModificationConfiguration("Modification de la disponibilité de la page de prise de contact", ""+LireDisponibilitéPageSpéciale(nNuméroPageSpéciale),""+bActif)
+      		
+      		RENVOYER SauvegardeParamètreSite(csAdmin_PageDispo_Presentation, bActif, CN_ENTIER)	
+      	AUTRE CAS
+      		AjouteErreur("Identifiant de page spéciale non valide")
+      		RENVOYER Faux	
+      FIN
+      
+     type : 458752
+   -
+     name : LireNomSite
+     procedure_id : 2216018737660497990
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte indiquée en nom de site
+      // Syntaxe :
+      //[ <Résultat> = ] LireNomSite ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Nom du site
+      //
+      
+      PROCEDURE LireNomSite() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_NomSite,"")
+     type : 458752
+   -
+     name : ModifierNomSite
+     procedure_id : 2216018840739802467
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le nom indiqué pour le site
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierNomSite (<sNomSite> est chaîne)
+      //
+      // Paramètres :
+      //	sNomSite (chaîne) : Nouveau nom indiqué pour le site
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierNomSite(sNomSite est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du nom du site", LireNomSite(), sNomSite)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_NomSite,sNomSite,CN_CHAINE)
+     type : 458752
+   -
+     name : LireLogoSite
+     internal_properties : CAAAAAgAAACyPf6Vu9iDSXoa1+0q1puib8Rs3CKDbX7oMsxVjdQSgzabMYyR6rC14IiKMB621S7knHRlbn4to/DcpR7svMTlxzDqepxSbxIGXpoMPv8gS1i1E9un6HWCHnN+cFWGOFV1rLPJfnMn4CLVYPfmIgu2r5UZkDoH4vniFybYN8OpVNByrGBpaHfijuMl87bebxIkwS/OQUo=
+     procedure_id : 2216024944103201910
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le logo du site
+      // Syntaxe :
+      //[ <Résultat> = ] LireLogoSite ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Buffer vide si aucune image de bandeau à appliquer
+      //
+      
+      PROCEDURE LireLogoSite()
+      
+      // Variables locales
+      sFichierLogo est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // Lecture du logo
+      sFichierLogo = RécupèreParamètreSite(csAdmin_LogoSite,"img_gen/logo.png")
+      SI sFichierLogo = "" alors RENVOYER ""
+      
+      // On renvoie le logo (en localisant correctement selon l'appel)
+      SI EnModeAWP() = Vrai _ou_ EnModeWebservice() = Vrai ALORS
+      	RENVOYER sFichierLogo
+      SINON
+      	RENVOYER "FR/"+sFichierLogo
+      FIN
+     type : 458752
+   -
+     name : ModifierLogoSite
+     internal_properties : CAAAAAgAAAApshU8gc64Cx8kghVh1N252w8uQlBJlm907P2t1+IkZxsL9GgQIyutx7DKi26FFVPk6dJhwww/9xj025yhX8+oW0CB2Qncls8x/2UYfrh2sbswaHjgRfuJTHtQ62L6jNX/Stxj7TPjMMGa+FJfCE++283wlA9PMe5q6Xv2cQdt9ONq+Vd9yLoEz8cdTOCzWR2HKGX27P2dA0Oh2wEC5AVXPqLm2vXgbeIbedXORMFvGdR/hLM=
+     procedure_id : 2216025090132189331
+     type_code : 15
+     code : |1-
+      // Résumé : Modification du logo du site
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierLogoSite (<sCheminFichier> est chaîne)
+      //
+      // Paramètres :
+      //	sCheminFichier (chaîne) : Chemin du fichier du nouveau logo
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierLogoSite(sCheminFichier est une chaine)
+      
+      // Variables locales
+      ImageLogo est une image
+      sCheminLogo	est une chaine<utile>
+      sCheminFichierGeneration est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du logo du site")
+      
+      // Vérification de l'existence du fichier
+      Si fFichierExiste(sCheminFichier) = Faux alors
+      	AjouteErreur("Le fichier pour le nouveau bandeau n'est pas accessible")
+      	RENVOYER Faux
+      FIN
+      
+      // On construit le nom de fichier de l'image de génération
+      sCheminFichierGeneration = CompleteRep(sRenvoyerRepGeneration())+fExtraitChemin(sCheminFichier,fFichier)+".png"
+      
+      // Est-ce que l'image n'est pas trop grande ?
+      ImageLogo = sCheminFichier
+      SI ImageLogo..Hauteur > 120 _ou_ ImageLogo..Largeur > 210  alors
+      	ImageAlpha est une image	
+      	// On crée une image destination avec couche Alpha pour gérer la transparence
+      	SI pas fExtraitChemin(sCheminFichier,fExtension)~=".png" alors
+      	
+      		ImageAlpha..CouleurRemplissage = iTransparent
+      		ImageAlpha..Largeur = ImageLogo..Largeur
+      		ImageAlpha..Hauteur = ImageLogo..Hauteur
+      	
+      		// On copie l'image lue dans l'image avec couche Alpha
+      		dFusionne(ImageAlpha,ImageLogo)
+      	SINON
+      		ImageAlpha = ImageLogo
+      	FIN
+      	
+      	// Redimensionnement de l'image
+      	SI dRedimensionne(ImageAlpha,210,120,drHomothétiqueCentré) = Faux alors
+      		AjouteErreur("L'image de bandeau fournie n'a pas pu être redimensionnée",ErreurInfo())
+      		// Ceci n'est pas une erreur fatale
+      	FIN
+      	
+      	// Sauvegarde de l'image : on veut forcément un PNG
+      	SI dSauveImagePNG(ImageAlpha,sCheminFichierGeneration) = Faux alors
+      		AjouteErreur("Une erreur est survenue pendant la sauvegarde du logo",ErreurInfo())
+      		RENVOYER Faux
+      	FIN
+      sinon
+      	SI fCopieFichier(sCheminFichier,sCheminFichierGeneration) = Faux alors
+      		AjouteErreur("Une erreur est survenue pendant la copie du logo")
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Non disponible 
+      	AjouteErreur("Cette fonctionnalité n'est pas disponible en mode Web Service")
+      	RENVOYER Faux
+      <SINON>	
+      	// On copie le logo dans le répertoire _WEB autorisé
+      	sCheminLogo = ComplèteRep(sRenvoyerRepWebUpload())+"logo.png"
+      	SI fCopieFichierRépertoireWeb(sCheminFichierGeneration,sCheminLogo) = Faux ALORS
+      		AjouteErreur("Une erreur est survenue pendant le déploiement du logo",ErreurInfo())
+      		RENVOYER Faux
+      	FIN
+      	
+      	// On construit le chemin de l'image par rapport à fRepWeb
+      	sCheminLogo	= Remplace(sCheminLogo,fRepWeb()+"\FR","")	
+      	
+      	sCheminLogo	= Remplace(sCheminLogo,"\","/")
+      	SI Gauche(sCheminLogo,1)~="/" ALORS sCheminLogo = Droite(sCheminLogo,Taille(sCheminLogo)-1)
+      
+      	// On sauvegarde le bandeau en base
+      	SI SauvegardeParamètreSite(csAdmin_LogoSite,sCheminLogo,CN_CHAINE) = Faux ALORS
+      		RENVOYER Faux
+      	FIN
+      	
+      	// On supprime le fichier temporaire
+      	SI fSupprime(sCheminFichier) = Faux ALORS
+      		AjouteErreur("Le fichier temporaire du bandeau n'a pas pu être supprimé",ErreurInfo())
+      		// Ceci n'est pas une erreur fatale
+      	FIN
+      	
+      	// La modification a été effectuée
+      	RENVOYER Vrai
+      	
+      <FIN>
+      
+      
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Une exception a été détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LogoSiteEstPersonnalisé
+     procedure_id : 2216025768739474153
+     type_code : 15
+     code : |1+
+      // Résumé : Indique si le logo du site est personnalisé
+      // Syntaxe :
+      //[ <Résultat> = ] LogoSiteEstPersonnalisé ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si le logo est personnalisé, Faux sinon
+      //
+      
+      PROCEDURE LogoSiteEstPersonnalisé()
+      
+      // Variables locales
+      sLogo est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      
+      
+      // Récupération du bandeau
+      sLogo = RécupèreParamètreSite(csAdmin_LogoSite)
+      
+      // Si le chemin est vide, c'est que le logo n'est pas personnalisé
+      Si sLogo = "" alors
+      	// Le bandeau est celui par défaut
+      	RENVOYER Faux
+      SINON
+      	// Le bandeau est personnalisé
+      	RENVOYER Vrai
+      FIN
+     type : 458752
+   -
+     name : LireRéférencesSociété
+     procedure_id : 2216108726154216012
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la présentation des références de la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireRéférencesSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Les références de la société
+      //
+      
+      PROCEDURE LireRéférencesSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(pParamètresSite.csAdmin_Références)
+     type : 458752
+   -
+     name : ModifierRéférencesSociété
+     procedure_id : 2216108975264474193
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie les références de la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierRéférencesSociété (<sRéférencesSociété> est chaîne)
+      //
+      // Paramètres :
+      //	sRéférencesSociété (chaîne) : Nouveau texte de présentation des références de la société
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierRéférencesSociété(sRéférencesSociété est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la page des références de la société", LireRéférencesSociété(), sRéférencesSociété)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_Références,sRéférencesSociété,CN_CHAINE) 
+     type : 458752
+   -
+     name : LireMontantFraisPortForfait
+     procedure_id : 2216113201778829633
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le montant forfaitaire des frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] LireMontantFraisPortForfait ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	réel : Montant forfaitaire des frais de port
+      //
+      
+      PROCEDURE LireMontantFraisPortForfait() : réel
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_FRAIS_Forfait,0)
+     type : 458752
+   -
+     name : LireMontantFraisPortGratuité
+     procedure_id : 2216113231843673510
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le montant minimum de commande provoquant la gratuité des frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] LireMontantFraisPortGratuité ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	réel : Montant minimum de commande
+      //
+      
+      PROCEDURE LireMontantFraisPortGratuité() : réel
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_FRAIS_Limite,0)
+     type : 458752
+   -
+     name : ModifierMontantFraisPortForfait
+     procedure_id : 2216113906160445566
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le montant forfaitaire des frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierMontantFraisPortForfait (<rMontantFraisPort> est réel)
+      //
+      // Paramètres :
+      //	rMontantFraisPort (réel) : Nouveau montant
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierMontantFraisPortForfait(LOCAL rMontantFraisPort est un réel)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du montant des frais de port forfaitaires", ""+LireMontantFraisPortForfait(),""+rMontantFraisPort)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_FRAIS_Forfait,rMontantFraisPort,CN_REEL)
+     type : 458752
+   -
+     name : ModifierMontantFraisPortGratuité
+     procedure_id : 2216113910455480160
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le montant minimum de commande provoquant la gratuité des frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierMontantFraisPortGratuité (<rMontantMinCommande> est réel)
+      //
+      // Paramètres :
+      //	rMontantMinCommande (réel) : Nouveau montant
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierMontantFraisPortGratuité(LOCAL rMontantMinCommande est un réel)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du montant minimum de commande pour la gratuité des frais de port", ""+LireMontantFraisPortGratuité(),""+rMontantMinCommande)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_FRAIS_Limite,rMontantMinCommande,CN_REEL)
+     type : 458752
+   -
+     name : ModifierAdresseEmailExpéditeurCommandeSociété
+     internal_properties : CAAAAAgAAABf7AsYFbI0w7kWRKCWAvh037/kYySckIU19/LtUbgXs8rh4ldJgXEHc3QgC24BocesKZJjNXbKf8isA9qBlCkkD/RBZ0/q2I0p59+o6hT2sbcsxLriH+3zcK/nKhtpncTGocNa2p5mdSpnFxE4Z9zp5vifY5xQIdpAKz0gZzgsJbTbasA45e87hrqaySM43CWw62qeRMSajMwlaFXefAgU0Kp6hnJ0gZn/CQFq+uHF8ToFMgU=
+     procedure_id : 2216115005677047916
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email utilisée pour envoyer les commandes
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailExpéditeurCommandeSociété (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne) : Nouvelle Adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailExpéditeurCommandeSociété(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email d'envoi de confirmation de commande",LireAdresseEmailExpéditeurCommandeSociété(),sAdresseEmail)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_EmailExpéditeur,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : ModifierAdresseEmailExpéditeurContactSociété
+     internal_properties : CAAAAAgAAABf7AsYFbI0w7kWRKCWAvh037/kYySckIU19/LtUbgXs8rh4ldJgXEHc3QgC24BocesKZJjNXbKf8isA9qBlCkkD/RBZ0/q2I0p59+o6hT2sbcsxLriH+3zcK/nKhtpncTGocNa2p5mdSpnFxE4Z9zp5vifY5xQIdpAKz0gZzgsJbTbasA45e87hrqaySM43CWw62qeRMSajMwlaFXefAgU0Kp6hnJ0gZn/CQFq+uHF8ToFMgU=
+     procedure_id : 2216115005677113576
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email utilisée lors d'une prise de contact
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailExpéditeurContactSociété (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne) : Nouvelle adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailExpéditeurContactSociété(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email d'envoi de contact",LireAdresseEmailExpéditeurContactSociété(),sAdresseEmail)
+      
+      
+      RENVOYER  SauvegardeParamètreSite(csAdmin_Contact_EmailExpéditeur,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : LireTexteFormulaireContact
+     procedure_id : 2216116010704741207
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte indiquée en cas de prise de contact
+      // Syntaxe :
+      //[ <Résultat> = ] LireTexteFormulaireContact ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte indiqué
+      //
+      
+      PROCEDURE LireTexteFormulaireContact() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_TexteFormulaireContact,"")
+     type : 458752
+   -
+     name : ModifierTexteFormulaireContact
+     procedure_id : 2216116036474616822
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le texte indiqué lors d'une prise de contact
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTexteFormulaireContact (<sTexteContact> est chaîne)
+      //
+      // Paramètres :
+      //	sTexteContact (chaîne) : Nouveau texte
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTexteFormulaireContact(sTexteContact est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du texte de prise de contact", LireTexteFormulaireContact(),sTexteContact)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_TexteFormulaireContact,sTexteContact,CN_CHAINE)
+     type : 458752
+   -
+     name : LireInformationsLegales
+     procedure_id : 2216117028677501197
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte indiqué en informations légales
+      // Syntaxe :
+      //[ <Résultat> = ] LireInformationsLegales ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : informations légales
+      //
+      
+      PROCEDURE LireInformationsLegales() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_InfoLegales,"")
+     type : 458752
+   -
+     name : ModifierInformationsLégales
+     procedure_id : 2216117230543829207
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le texte indiquée dans les informations légales
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierInformationsLégales (<sInformations> est chaîne)
+      //
+      // Paramètres :
+      //	sInformations (chaîne) : Nouveau texte
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierInformationsLégales(sInformations est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_InfoLegales,sInformations,CN_CHAINE)
+     type : 458752
+   -
+     name : Maintenance_GenererImagesProduits
+     internal_properties : CAAAAAgAAACXYYFZN5s3Oq69yDK9oYxj0IXNuDEm9KmFd/a62NXPJ8HkVuDrCNl9+EMDBJCe9e5/CjpwEHTeEJKZHPGshHLQua1Qp8EgtJS4+lZAovbMtrnwTCkGcNrcDea5KQqArtZHjumq1WnRF6e6azA=
+     procedure_id : 2216492854901307298
+     type_code : 15
+     code : |1-
+      // Résumé : Regénère toutes les images de produits
+      // Syntaxe :
+      //[ <Résultat> = ] Maintenance_GenererImagesProduits ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la génération s'est passée sans erreurs, faux sinon
+      //
+      
+      PROCEDURE Maintenance_GenererImagesProduits()
+      
+      // Variables locales
+      nIDContexte			est un entier
+      bErreur				est un booléen
+      
+      // par défaut, pas d'erreur
+      bErreur = Faux
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // C'est une opération de maintenance, on notifie
+      NotifierInformation("Génération de l'ensemble des images des produits")
+      
+      // Parcours des produits
+      Pour TOUT Produit sur IDProduit			
+      	// On génère toutes les photos de ce produit
+      	nIDContexte = HSauvePosition(Produit)
+      	SI GenerePhotosProduit(Produit.IDProduit) = Faux alors bErreur = Vrai
+      	HRetourPosition(nIDContexte)
+      	
+      FIN
+      
+      SI bErreur = Faux alors
+      	// L'opération s'est déroulée correctement
+      	RENVOYER Vrai
+      SINON
+      	// Au moins une image n'a pas pu être générée
+      	RENVOYER Faux
+      FIN
+     type : 458752
+   -
+     name : LireSiretSociété
+     internal_properties : CAAAAAgAAADr4iqbvx0Ky/Hh/gtEKHah0CPlatWCEagpQ8UbcYXJmP7TtSrXnuVwjLQ4vXuCmfYXK8F/IkOY43qjw+x1EX/eOpbwSlFWaHLSC7XknLy/9vA1XPyGHksAjuNbAJdpdMLAQmc4BxFisUSPPkVg7sfZdCOBP7kdmZlwQSd+W01k5w==
+     procedure_id : 2216759018082938948
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le Siret de la société
+      // Syntaxe :
+      //[ <Résultat> = ] LireSiretSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Le siret de la société
+      //
+      
+      PROCEDURE LireSiretSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(pParamètresSite.csAdmin_Siret)
+     type : 458752
+   -
+     name : ModifierSiretSociété
+     internal_properties : CAAAAAgAAADlhQPdH5A+8VesprZssGvU2nxFXfaehrdv6XhHswq1UUycMm2/Ly8xSyRm/4qxKWcQnXZd33hU9WxoURJB3EUIN5RxfVWgRgP1Y3k8JsTuAff0GBzEsYNlyOcW+Rwwch+h5Jop14lJntO4hsjxpk1Ixc/28gFbJN/FuKSniC/FvCPCWdcd+Op8J1clbOhD6SCzrpLi5OTGsLBdmDnefARgtPfyQxs8PdULMbHmSqmZMXGISH8=
+     procedure_id : 2216759391748260675
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le siret la société
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierSiretSociété (<sSiretSociété> est chaîne)
+      //
+      // Paramètres :
+      //	sSiretSociété (chaîne) : Nouveau siret
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierSiretSociété(sSiretSociété est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du siret de la société", LireSiretSociété(), sSiretSociété)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_Siret,sSiretSociété,CN_CHAINE) 
+     type : 458752
+   -
+     name : LireNombreMaximumNouveautés
+     procedure_id : 2216883258907268063
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le nombre maximum de nouveautés sur la page des nouveautés
+      // Syntaxe :
+      //[ <Résultat> = ] LireNombreMaximumNouveautés ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	entier : nombre maximum
+      //
+      
+      PROCEDURE LireNombreMaximumNouveautés() : entier
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER 0
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_LimiteNouveautesAffichees,10)
+     type : 458752
+   -
+     name : ModifierNombreMaximumNouveautés
+     procedure_id : 2216883666929190808
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le nombre maximum de nouveautés affichés sur la page des nouveautés
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierNombreMaximumNouveautés (<nNombreMaximum> est entier)
+      //
+      // Paramètres :
+      //	nNombreMaximum (entier) : Nouveau maximum
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierNombreMaximumNouveautés(nNombreMaximum est un entier)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du nombre maximum de nouveautés affiché", ""+LireNombreMaximumNouveautés(),""+nNombreMaximum)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_LimiteNouveautesAffichees,nNombreMaximum,CN_ENTIER)
+     type : 458752
+   -
+     name : Maintenance_OptimiserBaseDeDonnées
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2217630015985124666
+     type_code : 15
+     code : |1-
+      // Résumé : Optimise la base de données
+      // Syntaxe :
+      //[ <Résultat> = ] Maintenance_OptimiserBaseDeDonnées ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si l'opération s'est déroulée sans erreurs, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE Maintenance_OptimiserBaseDeDonnées()
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // C'est une opération de maintenance, on notifie
+      NotifierInformation("Demande d'optimisation de la base de données")
+      
+      
+      // Variables locales
+      sListeFichiers		est une chaine
+      sFichier			est une chaine
+      bErreur				est un booléen
+      
+      // Récupération de la liste des fichiers de la base de données
+      sListeFichiers = HListeFichier()
+      
+      // Parcours des fichiers
+      Pour toute chaine sFichier de sListeFichiers separee par RC
+      //	// Optimisation du fichier
+      	SI HRéindexe(sFichier) = Faux alors
+      		AjouteErreur(ChaineConstruit(<§Rff00015233fa6faa¤fr-FR¤Le fichier %1 n'a pas pu être optimisé§>,sFichier))
+      		bErreur = Vrai 
+      	FIN	
+      FIN
+      
+      // Est-ce que l'on a rencontré une erreur
+      SI bErreur = Vrai alors
+      	RENVOYER Faux
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : Maintenance_GenererImagesPromotions
+     internal_properties : CAAAAAgAAADA4iRlJPfTT93c1EbZPFe7NiwpiiiLv8uDoJ79kZ2I1Doto0b4F7dxmR1f9rcOHMbTvKLZPd7RxUTAs9RjUOiiEdE38V6TeJdfLh9Tv1IuwDBgz/F6ycsbBqcIaZpFJqBvc4sf5d7Xv2xD5GxpZ8uLdRYbqBdgbsRq04hZemxVEbwzzBKUO63X1jdHUq9xZOv4YZBN5Q==
+     procedure_id : 2218634678617616086
+     type_code : 15
+     code : |1-
+      // Résumé : Regénère toutes les images de promotions
+      // Syntaxe :
+      //[ <Résultat> = ] Maintenance_GenererImagesPromotions ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la génération s'est passée sans erreurs, faux sinon
+      //
+      
+      PROCEDURE Maintenance_GenererImagesPromotions()
+      
+      // Variables locales
+      nIDContexte			est un entier
+      bErreur				est un booléen
+      
+      // par défaut, pas d'erreur
+      bErreur = Faux
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // C'est une opération de maintenance, on notifie
+      NotifierInformation("Génération de l'ensemble des images des promotions")
+      
+      // Parcours des promotions
+      Pour TOUT Promotion 
+      	
+      	// On génère toutes les photos de cette promotion
+      	nIDContexte = HSauvePosition(Promotion)	
+      	SI GenerePhotosPromotions(Promotion.IDPromotion) = Faux alors bErreur = Vrai
+      	HRetourPosition(nIDContexte)
+      FIN
+      
+      SI bErreur = Faux alors
+      	// L'opération s'est déroulée correctement
+      	RENVOYER Vrai
+      SINON
+      	// Au moins une image n'a pas pu être générée
+      	RENVOYER Faux
+      FIN
+     type : 458752
+   -
+     name : LireConfigurationPaybox
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2219069399027490675
+     type_code : 15
+     code : |1-
+      // Résumé : Lire la configuration de la solution de paiement PAYBOX
+      // Syntaxe :
+      //[ <Résultat> = ] LireConfigurationPaybox ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	ST_CONFIGURATION_PAYXBOX : Configuration de la solution paybox
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LireConfigurationPaybox()
+      
+      // Variables locales
+      stConfiguration 			est un ST_CONFIGURATION_PAYXBOX
+      sConfigurationSerialisée	est une chaîne
+      
+      // Configuration par défaut
+      stConfiguration.bEstActivé = Vrai
+      stConfiguration.bEnModeTest = Vrai
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER stConfiguration
+      FIN
+      
+      // Récupération du contenu stocké
+      sConfigurationSerialisée = RécupèreParamètreSite(csAdmin_Paybox_Configuration, "")
+      
+      // Dé-sérialisation
+      SI sConfigurationSerialisée <> "" ALORS
+      	QUAND EXCEPTION DANS
+      		Désérialise(stConfiguration,sConfigurationSerialisée,psdXML)
+      	FAIRE
+      		AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	FIN
+      SINON
+      	
+      FIN
+      
+      // On renvoie la configuration
+      RENVOYER stConfiguration
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo(errComplet))
+      	RENVOYER stConfiguration
+     type : 458752
+   -
+     name : ModifierConfigurationPaybox
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2219071091245786008
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la configuration de la solution paybox
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierConfigurationPaybox (<stNouvelleConfiguration> est ST_CONFIGURATION_PAYXBOX)
+      //
+      // Paramètres :
+      //	stNouvelleConfiguration (ST_CONFIGURATION_PAYXBOX) : Nouvelle configuration
+      // Valeur de retour :
+      // 	booléen : Configuration de la solution paybox
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierConfigurationPaybox(stNouvelleConfiguration est un ST_CONFIGURATION_PAYXBOX)
+      
+      // Variables locales
+      sConfigurationSerialisée	est une chaîne
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la configuration paybox")
+      
+      // Vérification des paramètres
+      SI stNouvelleConfiguration.bEnModeTest = Faux alors
+      	// Est-ce que l'on a tous les paramètres réels ?
+      	SI stNouvelleConfiguration.sContratVAD~="" _ou_ stNouvelleConfiguration.sRang~="" _ou_ stNouvelleConfiguration.sIdentifiant~="" alors
+      		AjouteErreur("Les paramètres de contrats ne sont pas corrects")
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      // Sérialisation
+      QUAND EXCEPTION DANS
+      	Sérialise(stNouvelleConfiguration,sConfigurationSerialisée,psdXML)
+      FAIRE
+      	AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	RENVOYER Faux
+      FIN
+      
+      // Sauvegarde en base
+      SI SauvegardeParamètreSite(csAdmin_Paybox_Configuration, sConfigurationSerialisée, CN_CHAINE) = Faux ALORS	
+      	RENVOYER Faux
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",Exceptioninfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : Maintenance_GenererImagesFamilles
+     internal_properties : CAAAAAgAAACXYYFZN5s3Oq69yDK9oYxj0IXNuDEm9KmFd/a62NXPJ8HkVuDrCNl9+EMDBJCe9e5/CjpwEHTeEJKZHPGshHLQua1Qp8EgtJS4+lZAovbMtrnwTCkGcNrcDea5KQqArtZHjumq1WnRF6e6azA=
+     procedure_id : 2219455437249452385
+     type_code : 15
+     code : |1-
+      // Résumé : Regénère toutes les images des familles de produit
+      // Syntaxe :
+      //[ <Résultat> = ] Maintenance_GenererImagesFamilles ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la génération s'est passée sans erreurs, faux sinon
+      //
+      
+      PROCEDURE Maintenance_GenererImagesFamilles()
+      
+      // Variables locales
+      nIDContexte			est un entier
+      bErreur				est un booléen
+      
+      // par défaut, pas d'erreur
+      bErreur = Faux
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // C'est une opération de maintenance, on notifie
+      NotifierInformation("Génération de l'ensemble des images de familles de produits")
+      
+      // Parcours des familles
+      Pour TOUT Famille 	
+      	
+      	// On force la génération de la famille
+      	nIDContexte = HSauvePosition(Famille)	
+      	SI ModifierFamille(Famille.IDFamille,Famille.Binaire,Famille.Libellé)  = Faux ALORS bErreur = Vrai	
+      	HRetourPosition(nIDContexte)
+      FIN
+      
+      SI bErreur = Faux alors
+      	// L'opération s'est déroulée correctement
+      	RENVOYER Vrai
+      SINON
+      	// Au moins une image n'a pas pu être générée
+      	RENVOYER Faux
+      FIN
+     type : 458752
+   -
+     name : LireDemandeAffichageNomSite
+     procedure_id : 2219459354321683641
+     type_code : 15
+     code : |1-
+      // Résumé : Indique si l'on veut afficher le nom du site dans la partie haute du site
+      // Syntaxe :
+      //[ <Résultat> = ] LireDemandeAffichageNomSite ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai pour afficher le nom du site, Faux sinon
+      //
+      
+      PROCEDURE LireDemandeAffichageNomSite() : booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_AffichageNomSite,Vrai)
+     type : 458752
+   -
+     name : ModifierDemandeAffichageNomSite
+     procedure_id : 2219460062994008652
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'état d'affichage du nom du site sur le bandeau principal
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierDemandeAffichageNomSite (<bAfficherNomSite> est booléen)
+      //
+      // Paramètres :
+      //	bAfficherNomSite (booléen) : Vrai pour afficher le nom du site, Faux sinon
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierDemandeAffichageNomSite(bAfficherNomSite est un booléen)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'état d'affichage du nom du site", ""+LireDemandeAffichageNomSite(), ""+bAfficherNomSite)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_AffichageNomSite,bAfficherNomSite,CN_ENTIER)
+     type : 458752
+   -
+     name : LireAdresseEmailDestinataireCommandeSociété
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2219766221139628397
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email destinataire pour les commandes
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailDestinataireCommandeSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email
+      //
+      
+      PROCEDURE LireAdresseEmailDestinataireCommandeSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_EmailDestinataire,"")
+     type : 458752
+   -
+     name : LireAdresseEmailDestinataireContactSociété
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2219766229729630366
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email destinataire pour les contacts
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailDestinataireContactSociété ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email
+      //
+      
+      PROCEDURE LireAdresseEmailDestinataireContactSociété() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER  RécupèreParamètreSite(csAdmin_Contact_EmailDestinataire,"")
+     type : 458752
+   -
+     name : ModifierAdresseEmailDestinataireCommandeSociété
+     internal_properties : CAAAAAgAAADJYpUCL7xGneuoKjKM5BIesSVxXfoKroNJq8Q14djjL6pBQjXHF+/xe2yWZzoxUf8wzf69D7gcHTQYORJJJJUYLxwRVX2YZtM1m7lEdvQWuVdEQAzUoRttACdyjcDUptP9sOa9Y4U9ig+MwoyV+tHsEfuSFq1HCMvBXGDLzKM5MD9+tds55O54IzvhoPxXzSSPykm9Od+9qSmuj2QPK2HTSxzkLNjO53+Rm5OYKNPL+yRvpJM=
+     procedure_id : 2219766938535845456
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email utilisée pour recevoir en copie les commandes
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailDestinataireCommandeSociété (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne ANSI) : Nouvelle Adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailDestinataireCommandeSociété(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email de destination des copies de commandes",LireAdresseEmailDestinataireCommandeSociété(),sAdresseEmail)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_EmailDestinataire,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : ModifierAdresseEmailDestinataireContactSociété
+     internal_properties : CAAAAAgAAADJYpUCL7xGneuoKjKM5BIesSVxXfoKroNJq8Q14djjL6pBQjXHF+/xe2yWZzoxUf8wzf69D7gcHTQYORJJJJUYLxwRVX2YZtM1m7lEdvQWuVdEQAzUoRttACdyjcDUptP9sOa9Y4U9ig+MwoyV+tHsEfuSFq1HCMvBXGDLzKM5MD9+tds55O54IzvhoPxXzSSPykm9Od+9qSmuj2QPK2HTSxzkLNjO53+Rm5OYKNPL+yRvpJM=
+     procedure_id : 2219766947125847191
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email utilisée lors d'une prise de contact (envoie d'une copie)
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailDestinataireContactSociété (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne ANSI) : Nouvelle adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailDestinataireContactSociété(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email pour réception en cours des contacts",LireAdresseEmailDestinataireContactSociété(),sAdresseEmail)
+      
+      
+      RENVOYER  SauvegardeParamètreSite(csAdmin_Contact_EmailDestinataire,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : LireAdresseEmailDestinataireNotification
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2219769665845234825
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email de destination des notifications
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailDestinataireNotification ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email ou chaine vide
+      //
+      PROCEDURE LireAdresseEmailDestinataireNotification() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_NOTIFICATION_EmailDestinataire,"")
+     type : 458752
+   -
+     name : LireAdresseEmailExpéditeurNotification
+     internal_properties : CAAAAAgAAABlTZgZTssOGGADJPi3XCC0NW+lgzn72ViQlFDQpvbRDGC/7Su8LD6fo0WQMBkecPUYeaCj5SeZfaMO8TRyw9liQ9ojy7DYvMDlF6Iii4vJ5BmPmSMnKiemkxO+qBYI5G6Tbv5NPktQ1UENad2TtYJ+xpfU7Jgt/eVFTSBfG6jS
+     procedure_id : 2219769893478555146
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'adresse email d'expédition des notifications
+      // Syntaxe :
+      //[ <Résultat> = ] LireAdresseEmailExpéditeurNotification ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse email
+      //
+      
+      PROCEDURE LireAdresseEmailExpéditeurNotification() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_NOTIFICATION_EmailExpéditeur,"")
+     type : 458752
+   -
+     name : ModifierAdresseEmailDestinataireNotification
+     internal_properties : CAAAAAgAAADJYpUCL7xGneuoKjKM5BIesSVxXfoKroNJq8Q14djjL6pBQjXHF+/xe2yWZzoxUf8wzf69D7gcHTQYORJJJJUYLxwRVX2YZtM1m7lEdvQWuVdEQAzUoRttACdyjcDUptP9sOa9Y4U9ig+MwoyV+tHsEfuSFq1HCMvBXGDLzKM5MD9+tds55O54IzvhoPxXzSSPykm9Od+9qSmuj2QPK2HTSxzkLNjO53+Rm5OYKNPL+yRvpJM=
+     procedure_id : 2219770039507542801
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email destinataire des notifications
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailDestinataireNotification (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne ANSI) : Nouvelle Adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailDestinataireNotification(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email de destination des notifications",LireAdresseEmailDestinataireNotification(),sAdresseEmail)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_NOTIFICATION_EmailDestinataire,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : ModifierAdresseEmailExpéditeurNotification
+     internal_properties : CAAAAAgAAABf7AsYFbI0w7kWRKCWAvh037/kYySckIU19/LtUbgXs8rh4ldJgXEHc3QgC24BocesKZJjNXbKf8isA9qBlCkkD/RBZ0/q2I0p59+o6hT2sbcsxLriH+3zcK/nKhtpncTGocNa2p5mdSpnFxE4Z9zp5vifY5xQIdpAKz0gZzgsJbTbasA45e87hrqaySM43CWw62qeRMSajMwlaFXefAgU0Kp6hnJ0gZn/CQFq+uHF8ToFMgU=
+     procedure_id : 2219770267140862249
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'adresse email destinataire des notifications
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierAdresseEmailExpéditeurNotification (<sAdresseEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sAdresseEmail (chaîne) : Nouvelle Adresse email
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierAdresseEmailExpéditeurNotification(sAdresseEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'adresse email d'expédition des notifications",LireAdresseEmailExpéditeurNotification(),sAdresseEmail)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_NOTIFICATION_EmailExpéditeur,sAdresseEmail,CN_CHAINE)
+     type : 458752
+   -
+     name : LireNotificationSiErreurActif
+     internal_properties : CAAAAAgAAADuX8E5H7IsQd6Cvxh/GRs++JFGxeqHGbxVS9pE0MHwF1azcXHnWwGUGda7+egABpm8GxVQWjRFNKNDsDozUv2AxdO3YCQKszbzfIJtT0JLYIeUz1LJDNtAYoz5mud6+zo/bCatDoOSqZ5iytE1
+     procedure_id : 2221311507353155522
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie vrai si la notification en cas d'erreur est activée
+      // Syntaxe :
+      //[ <Résultat> = ] LireNotificationSiErreurActif ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Etat de la notification
+      //
+      
+      PROCEDURE LireNotificationSiErreurActif()
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      // Cette fonction ne doit pas réinitialiser le mécanisme des erreurs
+      
+      // Vérification de l'identification
+      // Ici, c'est une information publique : on ne met pas de code de vérification de la connexion
+      bRésultat est un booléen = Val(RécupèreParamètreSite(csAdmin_NOTIFICATION_SI_ERREUR,"0"))
+      
+      RENVOYER bRésultat
+     type : 458752
+   -
+     name : LireNotificationSiCommandeActif
+     internal_properties : CAAAAAgAAADuX8E5H7IsQd6Cvxh/GRs++JFGxeqHGbxVS9pE0MHwF1azcXHnWwGUGda7+egABpm8GxVQWjRFNKNDsDozUv2AxdO3YCQKszbzfIJtT0JLYIeUz1LJDNtAYoz5mud6+zo/bCatDoOSqZ5iytE1
+     procedure_id : 2221311593252521737
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie vrai si la notification en cas de commande est activée
+      // Syntaxe :
+      //[ <Résultat> = ] LireNotificationSiCommandeActif ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Etat de la notification
+      //
+      
+      PROCEDURE LireNotificationSiCommandeActif() : booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      RENVOYER val(RécupèreParamètreSite(csAdmin_NOTIFICATION_SI_COMMANDE,"0"))
+     type : 458752
+   -
+     name : LireNotificationSiConnexionActif
+     internal_properties : CAAAAAgAAADuX8E5H7IsQd6Cvxh/GRs++JFGxeqHGbxVS9pE0MHwF1azcXHnWwGUGda7+egABpm8GxVQWjRFNKNDsDozUv2AxdO3YCQKszbzfIJtT0JLYIeUz1LJDNtAYoz5mud6+zo/bCatDoOSqZ5iytE1
+     procedure_id : 2221311614727428480
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie vrai si la notification en cas de connexion au backoffice est activée
+      // Syntaxe :
+      //[ <Résultat> = ] LireNotificationSiConnexionActif ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Etat de la notification
+      //
+      
+      PROCEDURE LireNotificationSiConnexionActif() : booléen
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      
+      RENVOYER Val(RécupèreParamètreSite(csAdmin_NOTIFICATION_SI_CONNEXIONBO,"0"))
+     type : 458752
+   -
+     name : LireEmailConfirmationCommande
+     internal_properties : CAAAAAgAAADJgAj6VTuQQwsnLG3mFsYfvO89MjeF4ajpw8XbccXJGD7TNWqX3qUwjHR4vbuC2TYX64H/osMYYzojw6x10f/eGnbQqjH2CJJyq1UEfJwfFtCVPFzmvmsgLgN7IPfJVOIgIkcYZzGCUWQ/D5SplYIk34Z+eiyuPhb73EQZPWtGxQ==
+     procedure_id : 2222387229306696477
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le contenu de l'email de confirmation de commande
+      // Syntaxe :
+      //[ <Résultat> = ] LireEmailConfirmationCommande ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Le contenu HTML de l'email
+      //
+      
+      PROCEDURE LireEmailConfirmationCommande() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(pParamètresSite.csAdmin_COMMANDE_EmailConfirmation)
+     type : 458752
+   -
+     name : ModifierEmailConfirmationCommande
+     internal_properties : CAAAAAgAAAByG295SFgdgOycvaNWelkyzSx5tPiKoz2y+PmXR2DqHJJGCmws1pZJ/idY5/x/DX+VQt7eTLLp4OR93KDciqCUO+4vsV7I3rpV4uJP5+jVs37cXCN8smHaRcQk1cqa/qvXQgiXv2EVqj8EyqaVwgWgv2nIAPE7FpkTcnTr9Iu9RDFP5qvrOWy1HBMg0dTL43lid6QcqMlgZFcYglqV9dtrCg7/iA==
+     procedure_id : 2222387650214572588
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le contenu de l'email de confirmation de commande
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierEmailConfirmationCommande (<sContenuHTMLEmail> est chaîne)
+      //
+      // Paramètres :
+      //	sContenuHTMLEmail (chaîne ANSI) : Nouveau contenu de commande
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierEmailConfirmationCommande(sContenuHTMLEmail est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'email de confirmation de commande", LireEmailConfirmationCommande(),sContenuHTMLEmail )
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_EmailConfirmation,sContenuHTMLEmail,CN_CHAINE) 
+     type : 458752
+   -
+     name : LireTauxTaxeFraisPortForfait
+     procedure_id : 2222444014683582443
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le taux de taxe associé aux frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] LireTauxTaxeFraisPortForfait ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	réel : Taux de taxe
+      //
+      
+      PROCEDURE LireTauxTaxeFraisPortForfait():réel
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_FRAIS_TauxTaxeForfait,0)
+     type : 458752
+   -
+     name : ModifierTauxTaxeFraisPortForfait
+     procedure_id : 2222444388346872788
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le taux de taxe des frais de port
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTauxTaxeFraisPortForfait (<rTauxTaxeFraisPort> est réel)
+      //
+      // Paramètres :
+      //	rTauxTaxeFraisPort (réel) : Nouveau taux
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTauxTaxeFraisPortForfait(rTauxTaxeFraisPort est un réel)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du taux de taxe des frais de port forfaitaires", ""+LireTauxTaxeFraisPortForfait(),""+rTauxTaxeFraisPort)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_FRAIS_TauxTaxeForfait,rTauxTaxeFraisPort,CN_REEL)
+     type : 458752
+   -
+     name : LireConfigurationPayPal
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2223832288244274190
+     type_code : 15
+     code : |1-
+      // Résumé : Lire la configuration de la solution de paiement PAYPAL
+      // Syntaxe :
+      //[ <Résultat> = ] LireConfigurationPayPal ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	ST_CONFIGURATION_PAYPAL : Configuration de la solution de paiement PAYPAL
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE LireConfigurationPayPal()
+      
+      // Variables locales
+      stConfiguration 			est un ST_CONFIGURATION_PAYPAL
+      sConfigurationSerialisée	est une chaîne
+      
+      // Configuration par défaut
+      stConfiguration.bEstActivé = Faux
+      stConfiguration.bEnModeTest = Vrai
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER stConfiguration
+      FIN
+      
+      // Récupération du contenu stocké
+      sConfigurationSerialisée = RécupèreParamètreSite(csAdmin_Paypal_Configuration, "")
+      
+      // Dé-sérialisation
+      SI sConfigurationSerialisée <> "" ALORS
+      	QUAND EXCEPTION DANS
+      		Désérialise(stConfiguration,sConfigurationSerialisée,psdXML)
+      	FAIRE
+      		AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	FIN
+      SINON
+      	
+      FIN
+      
+      // On renvoie la configuration
+      RENVOYER stConfiguration
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo(errComplet))
+      	RENVOYER stConfiguration
+     type : 458752
+   -
+     name : ModifierConfigurationPaypal
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2223832627546768965
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie la configuration de la solution PAYPAL
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierConfigurationPaypal (<stNouvelleConfiguration> est ST_CONFIGURATION_PAYPAL)
+      //
+      // Paramètres :
+      //	stNouvelleConfiguration (ST_CONFIGURATION_PAYPAL) : Nouvelle configuration
+      // Valeur de retour :
+      // 	booléen : Configuration de la solution paypal
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE ModifierConfigurationPaypal(stNouvelleConfiguration est un ST_CONFIGURATION_PAYPAL)
+      
+      // Variables locales
+      sConfigurationSerialisée	est une chaîne
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de la configuration paybox")
+      
+      // Vérification des paramètres
+      SI stNouvelleConfiguration.bEnModeTest = Faux alors
+      	// Est-ce que l'on a tous les paramètres réels ?
+      	SI stNouvelleConfiguration.Identifiant~="" _ou_ stNouvelleConfiguration.MotDePasse~="" _ou_ stNouvelleConfiguration.Signature~="" alors
+      		AjouteErreur("Les paramètres de contrats ne sont pas corrects")
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      // Sérialisation
+      QUAND EXCEPTION DANS
+      	Sérialise(stNouvelleConfiguration,sConfigurationSerialisée,psdXML)
+      FAIRE
+      	AjouteErreur("Un problème de format a été détecté",ErreurInfo())
+      	RENVOYER Faux
+      FIN
+      
+      // Sauvegarde en base
+      SI SauvegardeParamètreSite(csAdmin_Paypal_Configuration, sConfigurationSerialisée, CN_CHAINE) = Faux ALORS	
+      	RENVOYER Faux
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",Exceptioninfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : RestaurerLogoSiteDefaut
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2242371076418496568
+     type_code : 15
+     code : |1-
+      // Résumé : Restaure le logo par défaut du site
+      // Syntaxe :
+      //[ <Résultat> = ] RestaurerLogoSiteDefaut ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la restauration a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      
+      PROCEDURE RestaurerLogoSiteDefaut()
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Restauration du logo par défaut du site")
+      
+      // On restaure le logo
+      SI ModifierLogoSite(fRepDonnées()+["\"]+"logo_defaut.png") = Faux alors
+      	AjouteErreur(<§Rff00025233fc6faa¤fr-FR¤Impossible de restaurer le logo par défaut§>)
+      	RENVOYER Faux	
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Une exception a été détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : RestaurerBandeauSiteDefaut
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2242377806632374123
+     type_code : 15
+     code : |1-
+      // Résumé : Restaure le bandeau par défaut du site
+      // Syntaxe :
+      //[ <Résultat> = ] RestaurerBandeauSiteDefaut ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	booléen : Vrai si la restauration a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE RestaurerBandeauSiteDefaut()
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Restauration du bandeau par défaut du site")
+      
+      // On supprime le bandeau
+      SI SupprimeParamètreSite(csAdmin_Bandeau) = Faux alors
+      	AjouteErreur(<§Rff00035233fe6faa¤fr-FR¤Impossible de restaurer le bandeau par défaut§>)
+      	RENVOYER Faux
+      FIN
+      
+      // La modification a été effectuée
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Une exception a été détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : LireURLPageAdminRest
+     procedure_id : 2242763812957026989
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie l'URL de la page d'administration REST 
+      // Syntaxe :
+      //[ <Résultat> = ] LireURLPageAdminRest ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Nom du site
+      //
+      
+      PROCEDURE LireURLPageAdminRest() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_URLPAGEREST_Administration,"")
+     type : 458752
+   -
+     name : ModifierURLPageAdminRest
+     procedure_id : 2242766127946510913
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie l'URL de la page d'administration REST
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierURLPageAdminRest (<sURL> est chaîne)
+      //
+      // Paramètres :
+      //	sURL (chaîne ANSI) : Nouvelle URL indiquée pour la page REST du site
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierURLPageAdminRest(sURL est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification de l'URL de la page d'administration REST", LireURLPageAdminRest(), sURL)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_URLPAGEREST_Administration,sURL,CN_CHAINE)
+     type : 458752
+   -
+     name : LireTexteBonDeCommande
+     procedure_id : 2243180677634689982
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte personnalisé du bon de commande
+      // Syntaxe :
+      //[ <Résultat> = ] LireTexteBonDeCommande ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte du bon de commandes
+      //
+      
+      PROCEDURE LireTexteBonDeCommande() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_TexteBDC, "")
+     type : 458752
+   -
+     name : ModifierTexteBonDeCommande
+     procedure_id : 2243181107132961635
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le texte perso des bons de commandes
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTexteBonDeCommande (<sTexteBDC> est chaîne)
+      //
+      // Paramètres :
+      //	sTexteBDC (chaîne ANSI) : Nouveau texte du bon de commande
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTexteBonDeCommande(sTexteBDC est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du texte BDC", LireTexteBonDeCommande(), sTexteBDC)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_TexteBDC, sTexteBDC, CN_CHAINE)
+     type : 458752
+   -
+     name : LireTitreSectionProduitsLiés
+     procedure_id : 1221938554370696606
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le titre de la section "produits liés" de la page "produit"
+      // Syntaxe :
+      //[ <Résultat> = ] LireTitreSectionProduitsLiés ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Titre
+      //
+      
+      PROCEDURE LireTitreSectionProduitsLiés() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_TitreSectionProduitsLiés,"")
+     type : 458752
+   -
+     name : ModifierTitreSectionProduitsLiés
+     procedure_id : 1221938764824143047
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie le titre de la section "Produits liés" de la page "produit"
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTitreSectionProduitsLiés (<sTitre> est chaîne)
+      //
+      // Paramètres :
+      //	sTitre (chaîne ANSI) : Nouveau titre
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTitreSectionProduitsLiés(sTitre est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du titre de la section des produits liés", LireTitreSectionProduitsLiés(), sTitre)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_TitreSectionProduitsLiés, sTitre, CN_CHAINE)
+     type : 458752
+   -
+     name : LireTextePanierProduitStockMax
+     procedure_id : 1223111131563474225
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte personnalisé si la quantité commandée correspond au stock max
+      // Syntaxe :
+      //[ <Résultat> = ] LireTextePanierProduitStockMax ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte affiché
+      //
+      
+      PROCEDURE LireTextePanierProduitStockMax() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Information publique
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_TextePanierStockMax, "")
+     type : 458752
+   -
+     name : LireTextePanierProduitStockInsuffisant
+     procedure_id : 1223111797283429629
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte personnalisé si le stock est insuffisant
+      // Syntaxe :
+      //[ <Résultat> = ] LireTextePanierProduitStockInsuffisant ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte affiché
+      //
+      
+      PROCEDURE LireTextePanierProduitStockInsuffisant() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Information publique
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_TextePanierStockInsuffisant, "")
+     type : 458752
+   -
+     name : ModifierTextePanierProduitStockMax
+     procedure_id : 1223112132290957045
+     type_code : 15
+     code : |1-
+      // Résumé : Modification du texte du panier si la quantité est limitée
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTextePanierProduitStockMax (<sTextePanier> est chaîne)
+      //
+      // Paramètres :
+      //	sTextePanier (chaîne ANSI) : Nouveau texte affiché
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTextePanierProduitStockMax(sTextePanier est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du texte du panier si la quantité est limitée", LireTextePanierProduitStockMax(), sTextePanier)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_TextePanierStockMax, sTextePanier, CN_CHAINE)
+     type : 458752
+   -
+     name : ModifierTextePanierProduitStockInsuffisant
+     procedure_id : 1223112488773325637
+     type_code : 15
+     code : |1-
+      // Résumé : Modification du texte du panier si le stock est insuffisant
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTextePanierProduitStockInsuffisant (<sTextePanier> est chaîne)
+      //
+      // Paramètres :
+      //	sTextePanier (chaîne ANSI) : Nouveau texte affiché
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTextePanierProduitStockInsuffisant(sTextePanier est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du texte du panier si le stock est insuffisant", LireTextePanierProduitStockInsuffisant(), sTextePanier)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_TextePanierStockInsuffisant, sTextePanier, CN_CHAINE)
+     type : 458752
+   -
+     name : LireTexteStockProduitFaible
+     procedure_id : 1223119635617346539
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le texte personnalisé si la quantité disponible de ce produit est faible
+      // Syntaxe :
+      //[ <Résultat> = ] LireTexteStockProduitFaible ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte affiché
+      //
+      
+      PROCEDURE LireTexteStockProduitFaible() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Information publique
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_TexteStockFaible, "")
+     type : 458752
+   -
+     name : ModifierTexteStockProduitFaible
+     procedure_id : 1223120151014853118
+     type_code : 15
+     code : |1-
+      // Résumé : Modification du texte si la quantité en stock du produit est faible
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTexteStockProduitFaible (<sTexteStock> est chaîne)
+      //
+      // Paramètres :
+      //	sTexteStock (chaîne ANSI) : Nouveau texte affiché
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierTexteStockProduitFaible(sTexteStock est une chaine)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du texte de disponibilité d'un produit si la quantité est faible", LireTexteStockProduitFaible(), sTexteStock)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_TexteStockFaible, sTexteStock, CN_CHAINE)
+     type : 458752
+   -
+     name : LireSeuilStockProduitFaible
+     procedure_id : 1223120696481594050
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie le seuil indiquant que la quantité disponible de ce produit est faible
+      // Syntaxe :
+      //[ <Résultat> = ] LireSeuilStockProduitFaible ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	chaîne ANSI : Texte affiché
+      //
+      
+      PROCEDURE LireSeuilStockProduitFaible() : chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Information publique
+      
+      RENVOYER RécupèreParamètreSite(csAdmin_COMMANDE_SeuilStockFaible, "")
+     type : 458752
+   -
+     name : ModifierSeuilStockProduitFaible
+     procedure_id : 1223121035784089807
+     type_code : 15
+     code : |1-
+      // Résumé : Modification le seuil définissant si la quantité en stock du produit est faible
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierSeuilStockProduitFaible (<nSeuilStock> est entier)
+      //
+      // Paramètres :
+      //	nSeuilStock (entier) : Nouveau seuil
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      
+      PROCEDURE ModifierSeuilStockProduitFaible(nSeuilStock est un entier)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification du seuil de disponibilité d'un produit si la quantité est faible", LireSeuilStockProduitFaible(), ""+nSeuilStock)
+      
+      RENVOYER SauvegardeParamètreSite(csAdmin_COMMANDE_SeuilStockFaible, nSeuilStock, CN_ENTIER)
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x1eb15ad0055be076
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      fr-FR : Le fichier %1 n'a pas pu être optimisé
+     index : 1
+   -
+     text :
+      fr-FR : Impossible de restaurer le logo par défaut
+     index : 2
+   -
+     text :
+      fr-FR : Impossible de restaurer le bandeau par défaut
+     index : 3
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

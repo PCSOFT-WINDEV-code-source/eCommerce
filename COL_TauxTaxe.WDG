@@ -1,0 +1,213 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_TauxTaxe
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15ad40586ee4b
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier TauxTaxe
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_TauxTaxe est une structure
+      		IDTauxTaxe est un entier
+      		Taux est un monétaire		
+      Fin
+       
+       gtabTauxTaxe	est un tableau de STCOL_TauxTaxe
+     type : 720896
+  procedures :
+   -
+     name : ListeTauxTaxe
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2239487486906597289
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la liste des taux de taxes
+      // Syntaxe :
+      //[ <Résultat> = ] ListeTauxTaxe ()
+      //
+      // Paramètres :
+      //	Aucun
+      // Valeur de retour :
+      // 	tableau (STCOL_TauxTaxe) : <indiquez ici le rôle de la valeur de retour>
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ListeTauxTaxe()
+      
+      // Variables locales
+      stErr est un STCOL_TauxTaxe
+      
+      // On supprime le contenu du tableau précédent
+      TableauSupprimeTout(gtabTauxTaxe)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER gtabTauxTaxe
+      FIN
+      
+      // Parcours de tous les taux
+      Pour TOUT TauxTaxe 
+      	stTauxTaxe est un STCOL_TauxTaxe
+      	
+      	// Récupération des informations
+      	FichierVersMémoire(stTauxTaxe,TauxTaxe)
+      	
+      	// On ajoute au tableau
+      	TableauAjoute(gtabTauxTaxe,stTauxTaxe)	
+      FIN
+      
+      // On renvoie la liste des taux de taxes
+      renvoyer gtabTauxTaxe
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())	
+      	TableauAjoute(gtabTauxTaxe,stErr)
+      	
+     type : 458752
+   -
+     name : AjouterTauxTaxe
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2243187422327943647
+     type_code : 15
+     code : |1-
+      // Résumé : Ajoute un taux de taxe
+      // Syntaxe :
+      //[ <Résultat> = ] AjouterTauxTaxe (<moTauxTaxe> est monétaire)
+      //
+      // Paramètres :
+      //	moTauxTaxe (monétaire) : Taux de Taxe à ajouter
+      // Valeur de retour :
+      // 	entier : Identifiant du taux de taxe, -1 en cas d'erreur
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction AjouterTauxTaxe( LOCAL moTauxTaxe est un monétaire )
+      
+      // Variables locales
+      nIDTaux		est un entier	= -1
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER nIDTaux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Ajout d'un taux de taxe","",""+moTauxTaxe)
+      
+      // Initialisation de l'enregistrement
+      HRaz(TauxTaxe)
+      
+      // On remplit les données
+      TauxTaxe.Taux = moTauxTaxe
+      
+      // Ajout en base
+      SI HAjoute(TauxTaxe) = Faux ALORS
+      	AjouteErreur("Ajout de l'enregistrement impossible")
+      	RENVOYER nIDTaux
+      FIN
+      
+      // On mémorise l'actualité créée
+      nIDTaux = TauxTaxe.IDTauxTaxe
+      
+      // Mise à jour 
+      FichierVersTableau(gtabTauxTaxe,TauxTaxe)
+      
+      // On renvoie l'identifiant du taux
+      RENVOYER nIDTaux
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER nIDTaux
+     type : 458752
+   -
+     name : ModifierTauxTaxe
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2243188122407710614
+     type_code : 15
+     code : |1-
+      // Résumé : Modifie un taux de taxe
+      // Syntaxe :
+      //[ <Résultat> = ] ModifierTauxTaxe (<nIDTauxAModifier> est entier, <moNouveauTauxTaxe> est monétaire)
+      //
+      // Paramètres :
+      //	nIDTauxAModifier (entier) : Taux de Taxe à modifier
+      //	moNouveauTauxTaxe (monétaire) : nouveau taux de taxe
+      // Valeur de retour :
+      // 	booléen : Vrai si la modification a été effectuée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction ModifierTauxTaxe( LOCAL nIDTauxAModifier est un entier, LOCAL moNouveauTauxTaxe est un monétaire )
+      
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)	
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du taux
+      HLitRecherchePremier(TauxTaxe,IDTauxTaxe,nIDTauxAModifier)
+      SI Htrouve(TauxTaxe) = Faux alors
+      	AjouteErreur("Taux de taxe non trouvé")
+      	RENVOYER Faux
+      FIN
+      
+      // On note la modification de configuration
+      NotifierModificationConfiguration("Modification d'un taux de taxe",""+TauxTaxe.Taux,""+moNouveauTauxTaxe)
+      
+      // On remplit les données
+      TauxTaxe.Taux = moNouveauTauxTaxe
+      
+      // Mise à jour en base
+      SI HModifie(TauxTaxe) = Faux ALORS
+      	AjouteErreur("Mise à jour de l'enregistrement impossible")
+      	RENVOYER Faux
+      FIN
+      
+      // Mise à jour 
+      FichierVersTableau(gtabTauxTaxe,TauxTaxe)
+      
+      // Par défaut la mise à jour fonctionne
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f17859a
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

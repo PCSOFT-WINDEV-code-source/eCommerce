@@ -1,0 +1,156 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_Adresse
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1eb15acf0543da4e
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1-
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier Adresse
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_Adresse est une structure
+      		IDAdresse est un entier 
+      		LibelleAdresse est une chaîne
+      		NomComplet est un chaîne
+      		Adresse est un chaîne
+      		Complément est un chaîne
+      		CodePostal est un chaîne
+      		Ville est un chaîne
+      		Pays est un chaîne
+      		TypeAdresse est un entier
+      		AdresseDefaut est un booléen 
+      		Societe est un chaîne
+      		IDClient est un entier 
+      Fin
+       
+       
+     type : 720896
+  procedures :
+   -
+     name : RécupèreAdresseFormatée
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2286636577016104450
+     type_code : 15
+     code : |1-
+      // Résumé : Récupère une adresse formatée
+      // Syntaxe :
+      //[ <Résultat> = ] RécupèreAdresseFormatée (<nIDAdresse> est entier)
+      //
+      // Paramètres :
+      //	nIDAdresse (entier) : Identifiant de l'adresse
+      // Valeur de retour :
+      // 	chaîne ANSI : Chaine formatée
+      //
+      // Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE RécupèreAdresseFormatée(nIDAdresse est un entier)
+      
+      // Variables locales
+      sAdresse est une chaine
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      // Recherche l'adresse (il faut utiliser le fichier AdresseArchive, qui contient les adresses au moment de la commande)
+      HLitRecherchePremier(Adresse, IDAdresse, nIDAdresse)
+      si htrouve(Adresse) alors
+      
+      	// Formate l'adresse
+      	sAdresse = FormateAdresse(Adresse.NomComplet, Adresse.Societe, Adresse.Voie, Adresse.complement, Adresse.CodePostal, adresse.Ville, Adresse.EtatProvince, Adresse.pays)
+      	
+      	// Renvoie l'adresse
+      	RENVOYER sAdresse
+      SINON
+      	AjouteErreur("Adresse non trouvée")
+      	RENVOYER ""	
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",Exceptioninfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : FormateAdresse
+     procedure_id : 2286636710160121171
+     type_code : 15
+     code : |1-
+      // Résumé : Formate une adresse
+      // Syntaxe :
+      //[ <Résultat> = ] FormateAdresse (<sNomComplet> est chaîne, <sSociete> est chaîne, <sVoie> est chaîne, <sComplément> est chaîne, <sCodePostal> est chaîne, <sVille> est chaîne, <sEtatProvince> est chaîne, <sPays> est chaîne)
+      //
+      // Paramètres :
+      //	sNomComplet (chaîne ANSI) : Nom complet
+      //	sSociete (chaîne ANSI) : Société
+      //	sVoie (chaîne ANSI) : Voie
+      //	sComplément (chaîne ANSI) : Complément
+      //	sCodePostal (chaîne ANSI) : Code postal
+      //	sVille (chaîne ANSI) : Ville
+      //	sEtatProvince (chaîne ANSI) : Etat/Province
+      //	sPays (chaîne ANSI) : Pays
+      // Valeur de retour :
+      // 	chaîne ANSI : Adresse formatée
+      //
+      
+      PROCEDURE FormateAdresse(sNomComplet est une chaine, sSociete est une chaîne, sVoie est une chaîne, sComplément est une chaîne, sCodePostal est une chaîne, sVille est une chaîne, sEtatProvince est une chaîne, sPays est une chaîne)
+      
+      sAdresseFormatée est une chaîne
+      
+      // Modèle pour le format d'adresse
+      sModèleFormatAdresse est une chaine = -%[
+      [%NOM%]
+      [%SOCIETE%]
+      [%VOIE%]
+      [%COMPLEMENT%]
+      [%CODEPOSTAL%] [%VILLE%]
+      [%ETAT%]
+      [%PAYS%]
+      ]
+      
+      // Remplace chaque élément de l'adresse
+      sAdresseFormatée = sModèleFormatAdresse
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%NOM%]", sNomComplet)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%SOCIETE%]", sSociete)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%VOIE%]", sVoie)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%COMPLEMENT%]", sComplément)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%CODEPOSTAL%]", sCodePostal)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%VILLE%]", sVille)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%ETAT%]", sEtatProvince)
+      sAdresseFormatée = remplace(sAdresseFormatée, -%"[%PAYS%]", sPays)
+      
+      // Supprime les RC en double
+      tantque position(sAdresseFormatée, RC+RC) > 0
+      	sAdresseFormatée = remplace(sAdresseFormatée, RC+RC, RC)
+      Fin
+      sAdresseFormatée = ChaîneFormate(sAdresseFormatée,ccsansespace)
+      
+      // Renvoie l'adresse formatée
+      renvoyer sAdresseFormatée
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f0711268aab
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

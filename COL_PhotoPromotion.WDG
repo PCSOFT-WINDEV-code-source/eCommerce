@@ -1,0 +1,427 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : COL_PhotoPromotion
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1ec50af6116dd721
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  type_code : 31
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAACko1DOYSGWiEfmi47+g0xrryBFucjRJOZNM28b4cO+S1M4MC2h4adn0pITUUH+X+gT4JsjJwu3rpWi0Nt9BiXJMn3gzThsJTpDY5C2E6bDK8jnmlOjc+813c/t3AK14IdkK2kd7CvOV5R9lQ==
+     code : |1+
+      // Cette structure correspond à la structure décrite dans l'analyse pour le fichier PhotoPromotion
+      // Cette structure est utilisée pour la gestion du backoffice et pour le Web Service
+      STCOL_PhotoPromotion est une structure
+      		IDPhotoPromotion 	est un entier
+      		Photo 				est un chaîne
+      		Role 				est un entier 
+      		Binaire 			est un buffer 
+      		IDPromotion 		est un entier
+      Fin
+      
+     type : 720896
+  procedures :
+   -
+     name : _GenereMiniaturePromotion
+     internal_properties : CAAAAAgAAAClpt7GimIXd6Ul9mzipqxK/tc0Wcblw64Q/dIsCBMB5foVMg2gxPh3yutl9rJfKqBaIQelXsZG2KST2TxQok24VOfuzwqyMAVN3HIKRXCIw8NRlUnNOmpglxeoDymHsqBxlU2vfkrqkkQdFVVkbq2v1sBRte7Xr44nhq0Nkj2YTXOpHaX5d71V8ynK/1nOaBuaQGnPFRgSuee+Mq3C3Logl1FnoPDPLL/9CGWjo2fbqEL7Whf+5Qoz01mbQ8LARdyNgyJpWxAEWoXtI/O3roGJXPr9dLKyJ6oBFGxqKyDd3YV7ymDqDXRvJP87mtcA5oB4jGxDgsPRXDctGUI=
+     procedure_id : 2218741995900040497
+     type_code : 15
+     code : |1-
+      // Résumé : Génère la miniature d'une promotion
+      // Syntaxe :
+      //[ <Résultat> = ] _GenereMiniaturePromotion (<bufPhotoPromotion> est buffer, <nRole> est entier, <nIDPromotion> est entier)
+      //
+      // Paramètres :
+      //	bufPhotoPromotion (buffer) : buffer de l'image de promotion
+      //	nRole (entier) : Rôle de l'image
+      //	nIDPromotion (entier) : Identifiant de la promotion
+      // Valeur de retour :
+      // 	chaîne: chemin de la miniature, (chaîne vide en cas d'erreur)
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction Privée _GenereMiniaturePromotion( bufPhotoPromotion est un buffer , nRole est un entier , nIDPromotion est un entier)
+      
+      // Variables locales
+      sCheminCompletRepertoireWeb	est une chaine
+      sCheminCompletGeneration	est une chaine
+      sCheminWeb					est une chaine
+      Miniature					est une image
+      
+      // Ce traitement ne doit pas être exécuté en Web Service
+      SI EnModeWebservice() = Vrai alors
+      	AjouteErreur("Ce traitement ne doit pas être exécuté en Web Service")
+      	RENVOYER ""
+      FIN
+      
+      // Chargement de l'image
+      si bufPhotoPromotion <> "" alors
+      	// On prend l'image par défaut
+      	Miniature = bufPhotoPromotion
+      	
+      	// On remplit la couleur de fond pour gérer le redimensionnement
+      	SI Miniature..AvecAlpha = Faux ALORS
+      		// Blanc s'il n'y a pas de transparence
+      		Miniature.CouleurRemplissage.Couleur = iBlanc
+      	SINON
+      		// Transparent si on peut
+      		Miniature.CouleurRemplissage.Couleur = iTransparent
+      	FIN
+      SINON
+      	// On génère une image par défaut
+      	<COMPILE SI TypeConfiguration=Webservice>
+      		Miniature.CouleurRemplissage.Couleur = iBlanc	
+      	<SINON>
+      		Miniature.CouleurRemplissage.Couleur = CouleurPalette(couleurFondGénéral)
+      	<FIN>	
+      		
+      	Miniature..Largeur = 100
+      	Miniature..Hauteur = 100	
+      FIN
+      
+      // Selon le rôle, on redimensionne
+      selon nRole
+      	CAS ROLE_PROMOTION_GRAND_CARRE  //	Format 600x600 affiché en cas de promotion principale
+      		dRedimensionne(Miniature,600,600,drHomothétiqueCentré)
+      		
+      		// Redimensionnement de la zone de l'image 
+      		Miniature..Largeur = 600
+      		Miniature..Hauteur = 600
+      		
+      	CAS ROLE_PROMOTION_CARRE_PETIT	// Format 200x200 affiché dans la liste des promotions
+      		dRedimensionne(Miniature,200,200,drHomothétiqueCentré)
+      		
+      		// Redimensionnement de la zone de l'image 
+      		Miniature..Largeur = 200
+      		Miniature..Hauteur = 200
+      		
+      	CAS ROLE_PROMOTION_PAYSAGE_GRAND  // Format 705x175 affiché dans les pages d'accueil
+      		dRedimensionne(Miniature,705,175,drHomothétiqueCentré)
+      		
+      		// Redimensionnement de la zone de l'image 
+      		Miniature..Largeur = 705
+      		Miniature..Hauteur = 175
+      		
+      	AUTRE CAS
+      		AjouteErreur("Rôle de photo non géré")
+      		RENVOYER ""
+      FIN
+      
+      // Sauvegarde de l'image
+      SI Miniature..AvecAlpha = Faux alors
+      	
+      	// Construction du chemin complet du fichier
+      	sCheminCompletRepertoireWeb = ComplèteRep(sRenvoyerRepWebUpload())+"promotion_"+nIDPromotion+"_"+nRole+".jpg"
+      	sCheminCompletGeneration = ComplèteRep(sRenvoyerRepGeneration())+"promotion_"+nIDPromotion+"_"+nRole+".jpg"
+      	
+      	// Sauvegarde au format JPEG
+      	SI dSauveImageJPEG(Miniature,sCheminCompletGeneration) = Faux alors
+      		AjouteErreur("Erreur lors de la sauvegarde de la miniature",ErreurInfo())
+      		RENVOYER ""
+      	FIN
+      SINON
+      	// Construction du chemin complet du fichier
+      	sCheminCompletRepertoireWeb = ComplèteRep(sRenvoyerRepWebUpload())+"promotion_"+nIDPromotion+"_"+nRole+".png"
+      	sCheminCompletGeneration = ComplèteRep(sRenvoyerRepGeneration())+"promotion_"+nIDPromotion+"_"+nRole+".png"
+      	
+      	// Sauvegarde en PNG pour conserver la couche alpha
+      	SI dSauveImagePNG(Miniature,sCheminCompletGeneration) = Faux alors
+      		AjouteErreur("Erreur lors de la sauvegarde de la miniature",ErreurInfo())
+      		RENVOYER ""			
+      	FIN
+      FIN
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Ce traitement ne doit pas être appelé en Web Service
+      <SINON>
+      	// Copie dans le répertoire _WEB
+      	SI fCopieFichierRépertoireWeb(sCheminCompletGeneration,sCheminCompletRepertoireWeb) = Faux ALORS
+      		AjouteErreur("Erreur lors du déploiement de l'image dans le répertoire _WEB",ErreurInfo())
+      		RENVOYER ""
+      	FIN
+      <FIN>
+      
+      
+      // Suppression du fichier de génération
+      SI fFichierExiste(sCheminCompletGeneration) = Vrai alors
+      	SI fSupprime(sCheminCompletGeneration) = Faux alors
+      		AjouteErreur("Impossible de supprimer le fichier de génération",ErreurInfo())
+      		// Erreur non fatale, on peut continuer
+      	FIN
+      Fin
+      
+      <COMPILE SI TypeConfiguration=Webservice>
+      	// Ce traitement ne doit pas être appelé en Web Service
+      <SINON>
+      	// On construit le chemin de l'image par rapport à fRepWeb
+      	sCheminWeb = Remplace(sCheminCompletRepertoireWeb,fRepWeb()+"\FR","")
+      <FIN>
+      
+      sCheminWeb = Remplace(sCheminWeb,"\","/")
+      Si Gauche(sCheminWeb,1)~="/" alors sCheminWeb = Droite(sCheminWeb,Taille(sCheminWeb)-1)
+      
+      // On renvoie le chemin Web
+      RENVOYER sCheminWeb
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER ""
+     type : 458752
+   -
+     name : AssocierPhotoPromotion
+     internal_properties : CAAAAAgAAACBqT/psyuMu3vwjMaoQLfwxnCzI8D4lHk3sQbbazZRTZB4yYD/6X1HG4zoa3rBlfs8Ue5bFUZloZB0feh1C0M0d+wBHzdC+C05/8+w+oRO+Zd8HArSvwVrqL+LtjdVGVB6hccmLsJyCb7jq4104wiFCtyzH7BuYF/bIr6h5vLOW0Ix9Br+X2H13Hw8a8mibgnVE0trLyELv2NQCeqthT8VNVJZymjv+BZYxuCt2zQF5YWkbFs=
+     procedure_id : 2218741995900106079
+     type_code : 15
+     code : |1-
+      // Résumé : Associe une photo à une promotion
+      // Syntaxe :
+      //[ <Résultat> = ] AssocierPhotoPromotion (<nIDPromotion> est entier, <nRole> est entier, <bufImagePromotion> est buffer)
+      //
+      // Paramètres :
+      //	nIDPromotion (entier) : Identifiant de la promotion
+      //	nRole (entier) : Rôle de la photo
+      //	bufImagePromotion (buffer) : Buffer de l'image
+      // Valeur de retour :
+      // 	booléen : Vrai si la photo est associée, Faux sinon
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      PROCEDURE AssocierPhotoPromotion(nIDPromotion est un entier, nRole est un entier, bufImagePromotion est un buffer)
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Variables locales
+      bEstUnAjout		est un booléen
+      
+      // Recherche de la promotion
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotion)
+      SI HTrouve(Promotion) = Faux alors
+      	RENVOYER Faux
+      FIN
+      
+      // Est-ce que l'on a déjà une photo pour ce rôle
+      HLitRecherchePremier(PhotoPromotion,IDPromotionRole,[Promotion.IDPromotion,nRole])
+      SI Htrouve(PhotoPromotion) = Vrai alors
+      	// C'est une mise à jour
+      	bEstUnAjout = Faux
+      SINON
+      	// C'est une nouvelle photo
+      	bEstUnAjout = Vrai
+      	PhotoPromotion.IDPromotion	= nIDPromotion	
+      	PhotoPromotion.Role = nRole
+      FIN
+      
+      // Mémorisation du binaire
+      PhotoPromotion.Binaire = bufImagePromotion
+      
+      // Génération de l'image
+      Si EnModeWebservice() = Vrai alors
+      	// En mode WS, on ne génère pas la miniature en local
+      	
+      SINON
+      	PhotoPromotion.Photo = _GenereMiniaturePromotion(bufImagePromotion,nRole,nIDPromotion)	
+      	SI PhotoPromotion.Photo = "" alors
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      // Enregistrement en base
+      SI bEstUnAjout = Vrai alors
+      	// Ajout en base
+      	SI HAjoute(PhotoPromotion) = Faux ALORS
+      		AjouteErreur("Impossible d'ajouter  la photo du bandeau")
+      		RENVOYER Faux	
+      	FIN	
+      SINON
+      	// Mise à jour
+      	SI HModifie(PhotoPromotion) = Faux alors
+      		AjouteErreur("Impossible de modifier la photo du bandeau")
+      		RENVOYER Faux	
+      	FIN
+      FIN
+      
+      // Cas particulier : si on est en train de générer le grand carré, on génère le petit
+      SI nRole = ROLE_PROMOTION_GRAND_CARRE alors
+      	SI AssocierPhotoPromotion(nIDPromotion,ROLE_PROMOTION_CARRE_PETIT,bufImagePromotion) = Faux alors
+      		AjouteErreur("Impossible de générer le petit bandeau carré")
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      // Si on est en mode WebService, on appel l'API rest pour générer les images
+      SI EnModeWebservice() = Vrai ALORS
+      	SI AppelWSRestAdministration(CN_ADMIN_REST_PARAM_IDOPERATION+"="+CN_ADMIN_REST_OPE_GENERATION_PROMOTION+"&"+CN_ADMIN_REST_PARAM_IDPROMOTION+"="+nIDPromotion) = Faux ALORS
+      		AjouteErreur("Impossible d'appeler l'API d'administration")	
+      		RENVOYER Faux
+      	FIN
+      FIN
+      
+      // Par défaut, l'opération se déroule correctement
+      RENVOYER Vrai
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",ExceptionInfo())
+      	RENVOYER Faux
+     type : 458752
+   -
+     name : GenerePhotosPromotions
+     procedure_id : 2218741995900171647
+     type_code : 15
+     code : |1-
+      // Résumé : Génère les photos d'une promotion
+      // Syntaxe :
+      //[ <Résultat> = ] GenerePhotosPromotions (<nIDPromotion> est entier)
+      //
+      // Paramètres :
+      //	nIDPromotion (entier) : Identifiant de la promotion
+      // Valeur de retour :
+      // 	booléen :  Vrai si la génération s'est correctement déroulée, Faux sinon
+      //
+      
+      PROCEDURE GenerePhotosPromotions(nIDPromotion est un entier)
+      
+      
+      // Variables locales
+      sListeRole 		est une chaine
+      bufPhotoProduit	est un buffer
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER Faux
+      FIN
+      
+      // Recherche du produit
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotion)
+      SI HTrouve(Promotion) = Faux ALORS
+      	AjouteErreur("Promotion non trouvé en base")
+      	RENVOYER Faux
+      FIN
+      
+      // Initialisation de la liste des rôles
+      sListeRole = ROLE_PROMOTION_GRAND_CARRE + TAB + ROLE_PROMOTION_PAYSAGE_GRAND
+      
+      // On crée les différentes photos correspondant aux différents rôles définis dans la collection COL_ECOMMERCE
+      POUR TOUTE CHAÎNE sRoleEnCours DE sListeRole SEPAREE PAR TAB
+      	HLitRecherchePremier(PhotoPromotion,IDPromotionRole,[promotion.IDPromotion,Val(sRoleEnCours)])
+      	SI HTrouve(PhotoPromotion) = Vrai ALORS
+      		// Récupération de l'image du bandeau
+      		bufPhotoProduit = PhotoPromotion.Binaire
+      		
+      		PhotoPromotion.Photo = _GenereMiniaturePromotion(bufPhotoProduit,Val(sRoleEnCours),Promotion.IDPromotion)
+      		
+      		// Modification en base
+      		SI HModifie(PhotoPromotion) = Faux ALORS
+      			AjouteErreur("Modification de la miniature impossible")
+      			RENVOYER Faux			
+      		FIN
+      		
+      		// Cas particulier : si on est en train de générer le grand carré, on génère le petit
+      		SI Val(sRoleEnCours) = ROLE_PROMOTION_GRAND_CARRE ALORS
+      			SI AssocierPhotoPromotion(nIDPromotion,ROLE_PROMOTION_CARRE_PETIT,bufPhotoProduit) = Faux ALORS
+      				AjouteErreur("Impossible de générer le petit bandeau carré")
+      				RENVOYER Faux
+      			FIN
+      		FIN
+      		
+      	SINON
+      		// On génère une image par défaut
+      		bufPhotoProduit = ""
+      		SI AssocierPhotoPromotion(Promotion.IDPromotion,Val(sRoleEnCours),bufPhotoProduit) = Faux alors
+      			AjouteErreur("Impossible de générer une image de promotion par défaut")
+      			RENVOYER Faux
+      		FIN
+      	FIN	
+      FIN
+      
+      
+      RENVOYER Vrai
+     type : 458752
+   -
+     name : LirePhotoPromotion
+     internal_properties : CAAAAAgAAAAeQeZWqR4YD9gNuw5ISpse4q5d4YfQh8vxSSLWonylqfGpzXAstIQfjtu5yNZJ9N/c91UXiZv53fcJCNn0zKQH2jXtD1BPimLproJX87E+1RbRiyhFUUvyPW0p6P5mipLcRRthNLb+/G4cHMU2fOcWaLmnLrlIMic+6HTcyeP/rQgO
+     procedure_id : 2218741995900237261
+     type_code : 15
+     code : |1-
+      // Résumé : Renvoie la photo de la promotion
+      // Syntaxe :
+      //[ <Résultat> = ] LirePhotoPromotion (<nIDPromotionRecherchée> est entier, <nRole> est entier)
+      //
+      // Paramètres :
+      //	nIDPromotionRecherchée (entier) : Identifiant de la promotion recherchée
+      //	nRole (entier) : Rôle de la photo (parmi les constantes ROLE_PROMOTION_XXX de la collection)
+      // Valeur de retour :
+      // 	chaîne ANSI : Le chemin de l'image de la promotion
+      //
+      //// Traitement automatique des exceptions :   exécuter le bloc de code CAS EXCEPTION:
+      //
+      
+      Fonction LirePhotoPromotion( nIDPromotionRecherchée est un entier, nRole est un entier ) :chaine
+      // Variables locales
+      
+      // Initialisation du mécanisme de remontée des erreurs
+      InitialiseErreur()
+      
+      // Vérification de l'identification
+      SI bEstConnectéWSBackOffice() = Faux ALORS
+      	AjouteErreur(CST_MESSAGE_ERREUR_DROITS)
+      	RENVOYER ""
+      FIN
+      
+      // Recherche en base
+      HLitRecherchePremier(Promotion,IDPromotion,nIDPromotionRecherchée)
+      SI Htrouve(Promotion) = Faux alors
+      	AjouteErreur("Promotion non trouvée")
+      	RENVOYER ""
+      FIN
+      
+      // Recherche de l'image du rôle
+      HLitRecherchePremier(PhotoPromotion,IDPromotionRole,[Promotion.IDPromotion,nRole])
+      SI Htrouve(PhotoPromotion) = Faux alors
+      	AjouteErreur("Aucune photo de promotion pour ce rôle")
+      	RENVOYER ""
+      FIN
+      
+      // Est-ce que l'image est valide ?
+      SI PhotoPromotion.Photo = "" alors PhotoPromotion.Photo = "images/vide.gif"
+      
+      // On renvoie le chemin de l'image de la promotion
+      SI EnModeAWP()=Vrai _ou_ EnModeWebservice()=Vrai alors
+      	Renvoyer PhotoPromotion.Photo
+      SINON
+      	RENVOYER "FR/"+PhotoPromotion.Photo
+      FIN
+      
+      CAS EXCEPTION:
+      	AjouteErreur("Exception détectée",Exceptioninfo())
+      	RENVOYER ""
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+resources :
+ string_res :
+  identifier : 0x10225f060f3a85e9
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ
